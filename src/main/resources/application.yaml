@@ -1,0 +1,50 @@
+server:
+  port: 5508
+
+logging:
+  level:
+    org.ecnusmartboys:
+      repository: info
+  file:
+    path: logs
+    max-history: 30
+
+spring:
+  application:
+    name: freud
+  datasource:
+    url: jdbc:mysql://${mysql.host:localhost}/freud?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Hongkong
+    username: ${mysql.username:root}
+    password: ${mysql.password:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      validation-query: SELECT 1 FROM DUAL
+  jpa:
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+  data:
+    redis:
+      repositories:
+        enabled: false
+  redis:
+    host: ${redis.host:localhost}
+    port: ${redis.port:6379}
+    password: ${redis.password}
+    database: 0
+  cache:
+    type: redis
+  profiles:
+    active: default
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  type-enums-package: org.ecnusmartboys.model.entity.enums
+
+freud:
+  weixin:
+    appid:
+    secret:
