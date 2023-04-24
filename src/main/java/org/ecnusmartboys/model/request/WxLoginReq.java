@@ -11,12 +11,4 @@ public class WxLoginReq {
 
     @NotNull
     String code;
-
-    String encryptedData;
-
-    String iv;
-
-    String nickname;
-
-    String avatarUrl;
 }

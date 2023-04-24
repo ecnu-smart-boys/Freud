@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "freud.weixin")
 public class WeixinMpConfig {
 
-    private String appid;
+    private String appId;
 
     private String secret;
 }

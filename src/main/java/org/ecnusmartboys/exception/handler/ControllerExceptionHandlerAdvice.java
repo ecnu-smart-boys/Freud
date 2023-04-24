@@ -5,6 +5,7 @@ import org.ecnusmartboys.exception.*;
 import org.ecnusmartboys.model.response.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -71,6 +72,12 @@ public class ControllerExceptionHandlerAdvice {
     @ExceptionHandler(UnauthorizedException.class)
     public BaseResponse<?> internalExceptionHandler(UnauthorizedException exception) {
         return BaseResponse.error(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public BaseResponse<?> methodNotAllowedExceptionHandler(HttpRequestMethodNotSupportedException exception) {
+        return BaseResponse.error(HttpStatus.METHOD_NOT_ALLOWED.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

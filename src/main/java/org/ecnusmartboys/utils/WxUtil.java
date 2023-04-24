@@ -3,8 +3,14 @@ package org.ecnusmartboys.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.ecnusmartboys.config.WeixinMpConfig;
+import org.ecnusmartboys.model.request.WxLoginReq;
+import org.ecnusmartboys.model.response.AccessTokenResponse;
 import org.ecnusmartboys.model.response.Code2SessionResponse;
+import org.ecnusmartboys.model.response.PhoneNumberResponse;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
@@ -30,17 +36,32 @@ public class WxUtil {
 
     private final WeixinMpConfig config;
 
+    private final RedisUtil redisUtil;
+
+    private static final String ACCESS_TOKEN_PREFIX = "";
+
     /**
      * 通过小程序前端获取的jscode向微信请求Session相关信息
      */
     public Code2SessionResponse code2Session(String code) {
         Assert.notNull(code, "code不能为空");
         String url = "https://api.weixin.qq.com/sns/jscode2session?"
-                + "appid=" + config.getAppid()
+                + "appid=" + config.getAppId()
                 + "&secret=" + config.getSecret()
                 + "&js_code=" + code
                 + "&grant_type=authorization_code";
         return restTemplate.getForObject(url, Code2SessionResponse.class, new HashMap<>());
+    }
+
+    @Cacheable(cacheNames = "access_token#7000", key = "'wx_access_token'")
+    public String getAccessToken(){
+        String url = "https://api.weixin.qq.com/cgi-bin/token?"
+                + "grant_type=client_credential"
+                + "&appid=" + config.getAppId()
+                + "&secret=" + config.getSecret();
+        var token = restTemplate.getForObject(url, AccessTokenResponse.class, new HashMap<>());
+        Assert.notNull(token, "获取access_token失败");
+        return token.getAccess_token();
     }
 
 

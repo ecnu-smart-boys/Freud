@@ -39,12 +39,26 @@ spring:
     type: redis
   profiles:
     active: default
+  mvc:
+    path-match:
+      matching-strategy: ant_path_matcher
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml
   type-enums-package: org.ecnusmartboys.model.entity.enums
 
+# set these values in application-local.yaml
 freud:
   weixin:
-    appid:
+    app-id:
     secret:
+  im:
+    app-id:
+    secret-key:
+    token:
+  sms:
+    secretId:
+    secretKey:
+    sdkAppId:
+    signName:
+    templateId:

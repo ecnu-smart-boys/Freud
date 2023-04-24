@@ -12,6 +12,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 /**
  * Redis配置。
  */
@@ -53,6 +55,6 @@ public class RedisConfig {
                 .defaultCacheConfig()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(redisTemplate.getValueSerializer()));
-        return new RedisCacheManager(redisCacheWriter, cacheConfig);
+        return new RedisCacheManagerWithTTL(redisCacheWriter, cacheConfig);
     }
 }

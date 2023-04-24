@@ -11,6 +11,6 @@ public class SpringSessionConfig {
 
     @Bean
     public HeaderHttpSessionIdResolver headerHttpSessionIdResolver() {
-        return new HeaderHttpSessionIdResolver("x-auth-token");
+        return new HeaderHttpSessionIdResolver("x-freud");
     }
 }
