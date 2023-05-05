@@ -42,6 +42,9 @@ spring:
   mvc:
     path-match:
       matching-strategy: ant_path_matcher
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: true
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml

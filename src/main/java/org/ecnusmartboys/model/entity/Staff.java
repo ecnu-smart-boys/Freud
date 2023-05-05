@@ -24,9 +24,6 @@ public class Staff extends BaseEntity{
     @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
-    @ApiModelProperty("最大咨询数")
-    private Integer maxConsults;
-
     @ApiModelProperty("身份证号")
     private String idNumber;
 
