@@ -1,5 +1,6 @@
 package org.ecnusmartboys.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.annotation.AnonymousAccess;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/sms")
 @RequiredArgsConstructor
+@Api(tags = "短信接口")
 public class SMSController {
 
     private final SmsUtil smsUtil;
@@ -32,12 +34,6 @@ public class SMSController {
     @PostMapping("/send")
     @AnonymousAccess
     public BaseResponse<String> sendSMS(@RequestBody @Validated SendSMSReq req, HttpServletRequest request) {
-        // 验证图形验证码
-        var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
-        if (!validCaptcha) {
-            throw new BadRequestException("验证码错误");
-        }
-
         String ip = RequestUtil.getIp(request);
         String key = "limit:sms:" + ip;
         if (redisUtil.get(key) != null) {

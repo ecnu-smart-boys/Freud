@@ -6,6 +6,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import static org.ecnusmartboys.utils.Validator.PATTERN_PHONE_STR;
 
 @Data
 @ApiModel("微信访客注册请求")
@@ -28,6 +31,7 @@ public class WxRegisterReq {
     private String avatar;
 
     @NotNull(message = "访客电话不能为空")
+    @Pattern(regexp = PATTERN_PHONE_STR, message = "访客电话格式错误")
     @ApiModelProperty(value = "访客电话", required = true)
     private String phone;
 
@@ -44,6 +48,7 @@ public class WxRegisterReq {
     private String emergencyContact;
 
     @NotNull(message = "访客紧急联系人电话不能为空")
+    @Pattern(regexp = PATTERN_PHONE_STR, message = "访客紧急联系人电话格式错误")
     @ApiModelProperty(value = "访客紧急联系人", required = true)
     private String emergencyPhone;
 

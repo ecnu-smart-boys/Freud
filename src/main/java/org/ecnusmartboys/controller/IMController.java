@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.config.IMConfig;
 import org.ecnusmartboys.model.response.BaseResponse;
+import org.ecnusmartboys.utils.SecurityUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +21,9 @@ public class IMController {
 
     @GetMapping("/userSig")
     public BaseResponse<String> userSig() {
-        return null;
+        var userId = SecurityUtil.getCurrentUserId();
+        var userSig = imConfig.getUserSig(String.valueOf(userId));
+        return BaseResponse.ok("ok", userSig);
     }
 
     @GetMapping("/cb")

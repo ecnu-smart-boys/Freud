@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.annotation.AnonymousAccess;
 import org.ecnusmartboys.config.IMConfig;
+import org.ecnusmartboys.exception.BadRequestException;
 import org.ecnusmartboys.exception.ForbiddenException;
 import org.ecnusmartboys.mapstruct.UserInfoMapper;
 import org.ecnusmartboys.model.dto.UserInfo;
@@ -73,12 +74,9 @@ public class WxController {
     @PostMapping("/register")
     @Transactional
     public BaseResponse<UserInfo> register(@RequestBody @Validated WxRegisterReq req, HttpServletRequest request) {
-        Assert.isTrue(Validator.validatePhone(req.getPhone()), "手机号格式不正确");
-        Assert.isTrue(Validator.validatePhone(req.getEmergencyPhone()), "紧急联系人手机号格式不正确");
-
         var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
         if (!validSms) {
-            throw new ForbiddenException("短信验证码错误");
+            throw new BadRequestException("短信验证码错误");
         }
 
         var u = saveVisitor(req);

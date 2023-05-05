@@ -9,7 +9,8 @@ public class Validator {
     private final static int ID_LENGTH = 17;
     private final static int NUMBER_0 = 48;
     private final static char[] CHECK_CODE_LIST = new char[]{'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
-    private final static Pattern PATTERN_PHONE = Pattern.compile("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$");
+    public final static String PATTERN_PHONE_STR = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$";
+    private final static Pattern PATTERN_PHONE = Pattern.compile(PATTERN_PHONE_STR);
 
     public static boolean validateID(String id) {
         if (id != null && !id.isEmpty()) {

@@ -3,6 +3,8 @@ package org.ecnusmartboys.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.mapstruct.UserInfoMapper;
+import org.ecnusmartboys.model.dto.UserInfo;
 import org.ecnusmartboys.model.entity.User;
 import org.ecnusmartboys.model.entity.Visitor;
 import org.ecnusmartboys.model.request.WxRegisterReq;
@@ -25,6 +27,8 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 
     private final StaffRepository staffRepository;
 
+    private final UserInfoMapper userInfoMapper;
+
     @Override
     @Transactional
     public User saveVisitor(WxRegisterReq req) {
@@ -40,5 +44,27 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
         visitorRepository.insert(visitor);
 
         return user;
+    }
+
+    @Override
+    public UserInfo getUserInfo(Long id) {
+        if (id == null) {
+            return null;
+        }
+        var user = getById(id);
+        if (user == null) {
+            return null;
+        }
+        var userInfo = userInfoMapper.toDto(user);
+        if (user.getRoles() != null) {
+            // 假设访客与咨询师督导互斥
+            if (user.getRoles().contains(ROLE_VISITOR)) {
+                userInfo.setVisitor(visitorRepository.selectById(id));
+            } else {
+                userInfo.setStaff(staffRepository.selectById(id));
+            }
+        }
+
+        return userInfo;
     }
 }

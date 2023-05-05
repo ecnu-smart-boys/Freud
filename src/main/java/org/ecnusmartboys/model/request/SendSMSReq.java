@@ -11,9 +11,4 @@ public class SendSMSReq {
     @ApiModelProperty(value = "手机号", required = true)
     private String phone;
 
-    @ApiModelProperty(value = "图形验证码", required = true)
-    private String captcha;
-
-    @ApiModelProperty(value = "图形验证码id", required = true)
-    private String captchaId;
 }
