@@ -3,7 +3,6 @@ package org.ecnusmartboys.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import org.ecnusmartboys.config.WeixinMpConfig;
 import org.ecnusmartboys.model.request.WxLoginReq;
 import org.ecnusmartboys.model.response.AccessTokenResponse;

@@ -1,7 +1,5 @@
 package wx;
 
-
-import lombok.var;
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.controller.WxController;
 import org.ecnusmartboys.model.request.WxRegisterReq;

@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM adoptopenjdk/openjdk11:jre-11.0.19_7
 
 ARG WORKDIR=/opt/freud
 

@@ -2,7 +2,6 @@ package org.ecnusmartboys.controller;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.ecnusmartboys.annotation.AnonymousAccess;
 import org.ecnusmartboys.exception.BadRequestException;
 import org.ecnusmartboys.model.request.SendSMSReq;

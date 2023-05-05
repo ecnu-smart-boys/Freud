@@ -6,8 +6,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import org.ecnusmartboys.annotation.AnonymousAccess;
+import org.ecnusmartboys.config.IMConfig;
 import org.ecnusmartboys.exception.ForbiddenException;
 import org.ecnusmartboys.mapstruct.UserInfoMapper;
 import org.ecnusmartboys.model.dto.UserInfo;
@@ -56,7 +56,6 @@ public class WxController {
     public BaseResponse<UserInfo> loginWx(@RequestBody @Validated WxLoginReq req, HttpServletRequest request) {
         var code2Session = wxUtil.code2Session(req.getCode());
         Assert.isTrue(code2Session != null && StringUtils.hasText(code2Session.getOpenid()), "获取openid失败");
-
         var u = getByOpenId(code2Session.getOpenid());
         if (u != null) {
             if (Boolean.TRUE.equals(u.getDisabled())) {

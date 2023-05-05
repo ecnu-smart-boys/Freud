@@ -1,7 +1,6 @@
 package org.ecnusmartboys.interceptor;
 
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.ecnusmartboys.annotation.AnonymousAccess;
 import org.ecnusmartboys.annotation.AuthRoles;
 import org.ecnusmartboys.utils.SecurityUtil;

@@ -1,6 +1,5 @@
 package org.ecnusmartboys.utils;
 
-import lombok.var;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
