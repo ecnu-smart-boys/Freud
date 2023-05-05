@@ -25,6 +25,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
           settings-path: .github/settings.xml
+          overwrite-settings: false
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
