@@ -38,7 +38,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             if (authRoles != null && authRoles.value().length > 0) {
                 String[] permissions = authRoles.value();
                 var userRoles = SecurityUtil.getCurrentUserRoles();
-                if (Arrays.stream(permissions).anyMatch(userRoles::contains)) {
+                if (Arrays.stream(permissions).noneMatch(userRoles::contains)) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN);
                     return false;
                 }

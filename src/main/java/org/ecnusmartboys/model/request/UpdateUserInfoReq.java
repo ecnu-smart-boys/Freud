@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
 import static org.ecnusmartboys.utils.Validator.PATTERN_PHONE_STR;
@@ -32,6 +33,10 @@ public class UpdateUserInfoReq {
     @Pattern(regexp = PATTERN_PHONE_STR, message = "手机号格式错误")
     @ApiModelProperty("手机号")
     private String phone;
+
+    @Email(message = "邮箱格式错误")
+    @ApiModelProperty("邮箱")
+    private String email;
 
     @Length(max = 32, message = "用户名过长")
     @ApiModelProperty("用户名")
