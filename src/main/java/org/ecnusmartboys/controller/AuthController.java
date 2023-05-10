@@ -136,6 +136,9 @@ public class AuthController {
         User user = new User();
         BeanUtils.copyProperties(req, user);
         user.setRoles(Collections.singletonList(ROLE_VISITOR));
+        var c = wxUtil.code2Session(req.getCode());
+        user.setDisabled(false);
+        user.setOpenId(c.getOpenid());
         userService.save(user);
 
         Visitor visitor = new Visitor();

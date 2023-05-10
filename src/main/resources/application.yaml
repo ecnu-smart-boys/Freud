@@ -5,6 +5,8 @@ logging:
   level:
     org.ecnusmartboys:
       repository: info
+    org.springframework.web.filter:
+      CommonsRequestLoggingFilter: debug
   file:
     path: logs
     max-history: 30

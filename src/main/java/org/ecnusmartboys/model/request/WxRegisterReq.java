@@ -3,6 +3,7 @@ package org.ecnusmartboys.model.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -44,6 +45,7 @@ public class WxRegisterReq {
     private String smsCodeId;
 
     @NotNull(message = "访客紧急联系人不能为空")
+    @Length(max = 31, message = "访客紧急联系人过长")
     @ApiModelProperty(value = "访客紧急联系人", required = true)
     private String emergencyContact;
 
@@ -51,5 +53,9 @@ public class WxRegisterReq {
     @Pattern(regexp = PATTERN_PHONE_STR, message = "访客紧急联系人电话格式错误")
     @ApiModelProperty(value = "访客紧急联系人", required = true)
     private String emergencyPhone;
+
+    @NotNull(message = "微信code不能为空")
+    @ApiModelProperty(value = "微信code", required = true)
+    private String code;
 
 }
