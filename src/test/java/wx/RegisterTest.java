@@ -1,7 +1,7 @@
 package wx;
 
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.controller.WxController;
+import org.ecnusmartboys.controller.AuthController;
 import org.ecnusmartboys.model.request.WxRegisterReq;
 import org.ecnusmartboys.repository.VisitorRepository;
 import org.ecnusmartboys.service.UserService;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class RegisterTest {
 
     @Resource
-    WxController wxController;
+    AuthController authController;
 
     @Resource
     UserService userService;
@@ -42,7 +42,7 @@ public class RegisterTest {
         req.setEmergencyContact("TEST");
         req.setEmergencyPhone("13666666666");
 
-        var u = wxController.register(req, mock).getData();
+        var u = authController.register(req, mock).getData();
         assertNotNull(u);
         assertNotNull(u.getId());
 

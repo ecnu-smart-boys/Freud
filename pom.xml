@@ -163,6 +163,11 @@
       <artifactId>im-server-sdk-java</artifactId>
       <version>0.3.42</version>
     </dependency>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-crypto</artifactId>
+      <version>5.3.9</version>
+    </dependency>
     <!-- utils -->
 
   </dependencies>
