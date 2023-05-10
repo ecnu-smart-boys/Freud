@@ -25,9 +25,9 @@ public class Conversation extends BaseEntity{
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Long consultantId;
+    private Long fromId;
 
-    private Long visitorId;
+    private Long toId;
 
     private Long startTime;
 

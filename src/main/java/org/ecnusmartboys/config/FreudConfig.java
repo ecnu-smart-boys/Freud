@@ -3,7 +3,9 @@ package org.ecnusmartboys.config;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
+import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.interceptor.AuthenticationInterceptor;
+import org.ecnusmartboys.interceptor.WebSocketInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -19,13 +21,12 @@ import javax.annotation.Resource;
  * 后端整体配置，包括拦截器和静态资源配置。
  */
 @Configuration
+@RequiredArgsConstructor
 public class FreudConfig implements WebMvcConfigurer {
 
     private static final long MAX_AGE_SECS = 3600;
 
-
-    @Resource
-    private AuthenticationInterceptor authenticationInterceptor;
+    private final AuthenticationInterceptor authenticationInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
