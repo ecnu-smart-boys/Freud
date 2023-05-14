@@ -1,9 +1,7 @@
 package im;
 
 
-import io.github.doocs.im.ClientConfiguration;
 import io.github.doocs.im.ImClient;
-import io.github.doocs.im.constant.Domain;
 import io.github.doocs.im.constant.MsgType;
 import io.github.doocs.im.constant.SyncOtherMachine;
 import io.github.doocs.im.model.message.*;
@@ -14,8 +12,7 @@ import io.github.doocs.im.model.response.AdminRoamMsgResult;
 import io.github.doocs.im.model.response.MsgListItem;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.config.IMConfig;
-import org.junit.jupiter.api.BeforeAll;
+import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

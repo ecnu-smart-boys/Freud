@@ -1,10 +1,10 @@
 package wx;
 
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.controller.AuthController;
-import org.ecnusmartboys.model.request.WxRegisterReq;
-import org.ecnusmartboys.repository.VisitorRepository;
-import org.ecnusmartboys.service.UserService;
+import org.ecnusmartboys.api.controller.AuthController;
+import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
+import org.ecnusmartboys.domain.repository.VisitorRepository;
+import org.ecnusmartboys.domain.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;

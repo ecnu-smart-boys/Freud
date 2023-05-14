@@ -1,6 +1,6 @@
 package org.ecnusmartboys;
 
-import org.ecnusmartboys.annotation.AnonymousAccess;
+import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
