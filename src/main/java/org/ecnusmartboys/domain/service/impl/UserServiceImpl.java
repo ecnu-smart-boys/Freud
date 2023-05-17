@@ -2,25 +2,35 @@ package org.ecnusmartboys.domain.service.impl;
 
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.controller.UserController;
+import org.ecnusmartboys.application.dto.request.command.*;
+import org.ecnusmartboys.application.dto.request.query.BaseQuery;
+import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
+import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.mapper.UserInfoMapper;
 import org.ecnusmartboys.application.dto.UserInfo;
+import org.ecnusmartboys.infrastructure.model.mysql.Consulvisor;
+import org.ecnusmartboys.infrastructure.model.mysql.Staff;
 import org.ecnusmartboys.infrastructure.model.mysql.User;
 import org.ecnusmartboys.infrastructure.model.mysql.Visitor;
-import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
 import org.ecnusmartboys.domain.repository.StaffRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.domain.repository.VisitorRepository;
 import org.ecnusmartboys.domain.service.UserService;
+import org.mapstruct.control.MappingControl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +40,8 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
     private final VisitorRepository visitorRepository;
 
     private final StaffRepository staffRepository;
+
+    private final ConsulvisorRepository consulvisorRepository;
 
     private final UserInfoMapper userInfoMapper;
 
@@ -70,6 +82,123 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
         }
 
         return userInfo;
+    }
+
+    @Override
+    public List<User> getUsers(UserListReq req, String role) {
+        BaseQuery<User> query = new BaseQuery<>();
+        query.setSize(req.getSize());
+        query.setCurrent(req.getCurrent());
+        Page<User> page = query.toPage();
+        QueryWrapper<User> wrapper = query.toQueryWrapper();
+
+        if(!req.getName().equals("")) {
+            wrapper.like("name", req.getName());
+        }
+
+        getBaseMapper().selectPage(page, wrapper.like("roles", role));
+        return page.getRecords();
+    }
+
+    @Override
+    public long getUserCount(String role) {
+        return getBaseMapper().selectCount(new QueryWrapper<User>().like("roles", role));
+    }
+
+    @Override
+    public void disable(Long userId, String role) {
+        var wrapper = new QueryWrapper<User>().eq("id", userId).like("roles", role);
+        User user = getOne(wrapper);
+        if(user == null) {
+            throw new BadRequestException("该用户不存在");
+        }
+
+        if(user.getDisabled()) {
+            throw new BadRequestException("请勿重复禁用该用户");
+        }
+
+        user.setDisabled(true);
+        updateById(user);
+    }
+
+    @Override
+    public void enable(Long userId, String role) {
+        var wrapper = new QueryWrapper<User>().eq("id", userId).like("roles", role);
+        User user = getOne(wrapper);
+        if(user == null) {
+            throw new BadRequestException("该用户不存在");
+        }
+
+        if(!user.getDisabled()) {
+            throw new BadRequestException("请勿重复启用该用户");
+        }
+
+        user.setDisabled(false);
+        updateById(user);
+    }
+
+    @Override
+    @Transactional
+    public void saveSupervisor(AddSupervisorReq req) {
+        User user = new User();
+        BeanUtils.copyProperties(req, user);
+        user.setRoles(Collections.singletonList(ROLE_SUPERVISOR));
+        getBaseMapper().insert(user);
+
+        Staff staff = new Staff();
+        staff.setId(user.getId());
+        BeanUtils.copyProperties(req, staff);
+        staffRepository.insert(staff);
+    }
+
+    @Override
+    public void updateSupervisor(UpdateSupervisorReq req) {
+        User user = new User();
+        BeanUtils.copyProperties(req, user);
+        user.setId(req.getSupervisorId());
+        user.setRoles(Collections.singletonList(ROLE_SUPERVISOR));
+        getBaseMapper().updateById(user);
+
+        Staff staff = new Staff();
+        staff.setId(req.getSupervisorId());
+        BeanUtils.copyProperties(req, staff);
+        staffRepository.updateById(staff);
+    }
+
+    @Override
+    @Transactional
+    public void saveConsultant(AddConsultantReq req) {
+        User user = new User();
+        BeanUtils.copyProperties(req, user);
+        user.setRoles(Collections.singletonList(ROLE_SUPERVISOR));
+        getBaseMapper().insert(user);
+
+        Staff staff = new Staff();
+        staff.setId(user.getId());
+        BeanUtils.copyProperties(req, staff);
+        staffRepository.insert(staff);
+
+        var ids = req.getSuperVisorIds();
+        ids.forEach(id -> {
+            Consulvisor consulvisor = new Consulvisor(user.getId(), id);
+            consulvisorRepository.insert(consulvisor);
+        });
+
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return getOne(new QueryWrapper<User>().eq("username", username));
+    }
+
+    @Override
+    public User getByPhone(String phone) {
+        return getOne(new QueryWrapper<User>().eq("phone", phone));
+    }
+
+    @Override
+    public User getSingleUser(Long userId, String role) {
+        return getOne(new QueryWrapper<User>().eq("id", userId).like("roles", role));
     }
 
     @Override

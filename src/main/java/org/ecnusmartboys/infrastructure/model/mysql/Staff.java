@@ -26,15 +26,9 @@ public class Staff extends BaseModel {
     @ApiModelProperty("职称")
     private String title;
 
-    @ApiModelProperty("平台督导的时间累计")
-    private Long totalTime;
-
     @ApiModelProperty("资质")
-    private String qualification;
+    private String qualification = "";
 
     @ApiModelProperty("资质编号")
-    private String qualificationCode;
-
-    @ApiModelProperty("一周排班, 1<<(1-7)分别代表周一到周日, 0代表休息, 1代表上班")
-    private byte arrangement;
+    private String qualificationCode = "";
 }
