@@ -1,9 +1,9 @@
-package org.ecnusmartboys.domain.repository;
+package org.ecnusmartboys.infrastructure.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
 
 @Mapper
 public interface ArrangementRepository extends BaseMapper<Arrangement> {

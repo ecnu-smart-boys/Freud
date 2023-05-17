@@ -2,7 +2,7 @@ package org.ecnusmartboys.domain.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
-import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
 
 public interface ArrangementService extends IService<Arrangement> {
 

@@ -3,9 +3,8 @@ package org.ecnusmartboys.application.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ecnusmartboys.infrastructure.model.mysql.Staff;
+import org.ecnusmartboys.infrastructure.data.mysql.Staff;
 
-import java.time.Duration;
 import java.util.List;
 
 @Data

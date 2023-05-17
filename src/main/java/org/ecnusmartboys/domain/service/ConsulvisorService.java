@@ -1,7 +1,7 @@
 package org.ecnusmartboys.domain.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.ecnusmartboys.infrastructure.model.mysql.Consulvisor;
+import org.ecnusmartboys.infrastructure.data.mysql.Consulvisor;
 
 import java.util.List;
 

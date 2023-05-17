@@ -1,9 +1,7 @@
 package mapstruct;
 
-import org.ecnusmartboys.infrastructure.model.mysql.User;
-import org.junit.jupiter.api.Assertions;
+import org.ecnusmartboys.infrastructure.data.mysql.User;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.ap.internal.model.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,7 +1,7 @@
 package mapstruct;
 
+import org.ecnusmartboys.infrastructure.data.mysql.User;
 import org.ecnusmartboys.infrastructure.mapper.BaseDTOMapper;
-import org.ecnusmartboys.infrastructure.model.mysql.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

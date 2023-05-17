@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
-import org.ecnusmartboys.infrastructure.model.mysql.User;
+import org.ecnusmartboys.infrastructure.data.mysql.User;
 
 import java.util.List;
 

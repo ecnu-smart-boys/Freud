@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
-import org.ecnusmartboys.domain.repository.ArrangementRepository;
 import org.ecnusmartboys.domain.service.ArrangementService;
-import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.repository.ArrangementRepository;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
