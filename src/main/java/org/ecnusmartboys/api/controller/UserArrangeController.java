@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.request.command.*;
+import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.domain.service.ConsulvisorService;
 import org.ecnusmartboys.domain.service.StaffService;
@@ -46,7 +47,8 @@ public class UserArrangeController {
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("获取咨询师列表")
     @GetMapping("/consultants")
-    public Response<ConsultantsDTO> getConsultants(@RequestBody @Validated UserListReq req) {
+    public Response<ConsultantsDTO> getConsultants(@RequestBody @Validated
+    UserListReq req) {
         List<ConsultantInfo> consultantInfoList = new ArrayList<>();
         var consultants = userService.getUsers(req, ROLE_CONSULTANT);
         consultants.forEach( v -> {
@@ -181,7 +183,7 @@ public class UserArrangeController {
             throw new BadRequestException("该手机号已被注册");
         }
 
-        var ids = req.getSuperVisorIds();
+        var ids = req.getSupervisorIds();
         ids.forEach(id -> {
             if(userService.getSingleUser(id, ROLE_SUPERVISOR) == null) {
                 throw new BadRequestException("所要绑定的督导不存在");
@@ -200,7 +202,7 @@ public class UserArrangeController {
             throw new BadRequestException("该咨询师不存在");
         }
 
-        var ids = req.getSuperVisorIds();
+        var ids = req.getSupervisorIds();
         ids.forEach(id -> {
             if(userService.getSingleUser(id, ROLE_SUPERVISOR) == null) {
                 throw new BadRequestException("所要绑定的督导不存在");

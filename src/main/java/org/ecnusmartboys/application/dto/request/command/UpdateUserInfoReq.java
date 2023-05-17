@@ -3,6 +3,7 @@ package org.ecnusmartboys.application.dto.request.command;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.ecnusmartboys.api.annotation.Phone;
 import org.ecnusmartboys.infrastructure.utils.Validator;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
@@ -29,7 +30,7 @@ public class UpdateUserInfoReq {
     @ApiModelProperty("姓名")
     private String name;
 
-    @Pattern(regexp = Validator.PATTERN_PHONE_STR, message = "手机号格式错误")
+    @Phone
     @ApiModelProperty("手机号")
     private String phone;
 

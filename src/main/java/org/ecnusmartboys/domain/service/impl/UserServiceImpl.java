@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.controller.UserController;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.BaseQuery;
+import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.mapper.UserInfoMapper;
@@ -21,14 +22,11 @@ import org.ecnusmartboys.domain.repository.StaffRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.domain.repository.VisitorRepository;
 import org.ecnusmartboys.domain.service.UserService;
-import org.mapstruct.control.MappingControl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -178,7 +176,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
         BeanUtils.copyProperties(req, staff);
         staffRepository.insert(staff);
 
-        var ids = req.getSuperVisorIds();
+        var ids = req.getSupervisorIds();
         ids.forEach(id -> {
             Consulvisor consulvisor = new Consulvisor(user.getId(), id);
             consulvisorRepository.insert(consulvisor);

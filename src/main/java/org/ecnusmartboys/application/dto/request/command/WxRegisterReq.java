@@ -3,6 +3,7 @@ package org.ecnusmartboys.application.dto.request.command;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.ecnusmartboys.api.annotation.Phone;
 import org.ecnusmartboys.infrastructure.utils.Validator;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
@@ -31,7 +32,7 @@ public class WxRegisterReq {
     private String avatar;
 
     @NotNull(message = "访客电话不能为空")
-    @Pattern(regexp = Validator.PATTERN_PHONE_STR, message = "访客电话格式错误")
+    @Phone
     @ApiModelProperty(value = "访客电话", required = true)
     private String phone;
 
@@ -49,7 +50,7 @@ public class WxRegisterReq {
     private String emergencyContact;
 
     @NotNull(message = "访客紧急联系人电话不能为空")
-    @Pattern(regexp = Validator.PATTERN_PHONE_STR, message = "访客紧急联系人电话格式错误")
+    @Phone
     @ApiModelProperty(value = "访客紧急联系人", required = true)
     private String emergencyPhone;
 

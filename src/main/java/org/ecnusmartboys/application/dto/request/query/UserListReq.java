@@ -1,4 +1,4 @@
-package org.ecnusmartboys.application.dto.request.command;
+package org.ecnusmartboys.application.dto.request.query;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

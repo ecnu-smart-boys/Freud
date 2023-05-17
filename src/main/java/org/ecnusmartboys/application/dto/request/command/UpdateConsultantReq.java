@@ -2,8 +2,10 @@ package org.ecnusmartboys.application.dto.request.command;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import org.ecnusmartboys.api.annotation.IdNumber;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -29,12 +31,11 @@ public class UpdateConsultantReq {
     private Integer age;
 
     @NotNull(message = "邮箱不能为空")
-    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "邮箱格式不正确")
-    @Size(max = 50, message = "邮箱长度不能超过50个字符")
+    @Email(message = "邮箱格式不正确")
     private String email;
 
     @NotNull(message = "身份证号码不能为空")
-    @Pattern(regexp = "^\\d{17}(\\d|X|x)$", message = "身份证号码格式不正确")
+    @IdNumber
     private String idNumber;
 
     @NotNull(message = "工作单位不能为空")
@@ -46,5 +47,5 @@ public class UpdateConsultantReq {
     private String title;
 
     @NotNull(message = "咨询师必须绑定督导")
-    private List<Long> superVisorIds;
+    private List<Long> supervisorIds;
 }

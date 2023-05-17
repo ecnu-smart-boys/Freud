@@ -2,10 +2,17 @@ package org.ecnusmartboys.application.dto.request.command;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import org.ecnusmartboys.api.annotation.IdNumber;
+import org.ecnusmartboys.api.annotation.Phone;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import static org.ecnusmartboys.infrastructure.utils.Validator.PATTERN_PHONE_STR;
 
 @Data
 @ApiModel("添加督导请求")
@@ -32,16 +39,15 @@ public class AddSupervisorReq {
     private Integer age;
 
     @NotNull(message = "电话号码不能为空")
-    @Pattern(regexp = "^[1]([3-9])[0-9]{9}$", message = "手机号不合法")
+    @Phone
     private String phone;
 
     @NotNull(message = "邮箱不能为空")
-    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "邮箱格式不正确")
-    @Size(max = 50, message = "邮箱长度不能超过50个字符")
+    @Email(message = "邮箱格式不正确")
     private String email;
 
     @NotNull(message = "身份证号码不能为空")
-    @Pattern(regexp = "^\\d{17}(\\d|X|x)$", message = "身份证号码格式不正确")
+    @IdNumber
     private String idNumber;
 
     @NotNull(message = "工作单位不能为空")
