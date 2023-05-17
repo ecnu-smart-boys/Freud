@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ServletComponentScan
 @EnableCaching
 @EnableConfigurationProperties
+@EnableScheduling
 public class FreudApp {
     public static void main(String[] args) {
         SpringApplication.run(FreudApp.class, args);

@@ -91,23 +91,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-cache</artifactId>
     </dependency>
-    <!-- authorization -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-      <version>3.0.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.casbin</groupId>
-      <artifactId>jcasbin</artifactId>
-      <version>1.32.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.casbin</groupId>
-      <artifactId>jdbc-adapter</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <!-- authorization -->
     <!-- api docs -->
     <dependency>
       <groupId>io.springfox</groupId>
