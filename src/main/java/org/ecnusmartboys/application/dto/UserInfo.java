@@ -1,8 +1,8 @@
 package org.ecnusmartboys.application.dto;
 
 import lombok.Data;
-import org.ecnusmartboys.infrastructure.model.mysql.Staff;
-import org.ecnusmartboys.infrastructure.model.mysql.Visitor;
+import org.ecnusmartboys.infrastructure.data.mysql.Staff;
+import org.ecnusmartboys.infrastructure.data.mysql.Visitor;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.ecnusmartboys.domain.value;
+package org.ecnusmartboys.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;

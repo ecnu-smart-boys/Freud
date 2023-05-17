@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.ecnusmartboys.infrastructure.config.SmsConfig;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
-import org.ecnusmartboys.domain.value.SMSCode;
+import org.ecnusmartboys.application.dto.SMSCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

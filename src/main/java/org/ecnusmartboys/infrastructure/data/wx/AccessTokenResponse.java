@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.model.wx;
+package org.ecnusmartboys.infrastructure.data.wx;
 
 import lombok.Data;
 

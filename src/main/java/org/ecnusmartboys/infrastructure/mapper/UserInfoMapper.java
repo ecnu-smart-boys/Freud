@@ -1,7 +1,7 @@
 package org.ecnusmartboys.infrastructure.mapper;
 
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.infrastructure.model.mysql.User;
+import org.ecnusmartboys.infrastructure.data.mysql.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

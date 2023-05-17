@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.model.im;
+package org.ecnusmartboys.infrastructure.data.im;
 
 public class CallbackCommand {
 

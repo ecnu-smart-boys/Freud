@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.model.mysql;
+package org.ecnusmartboys.infrastructure.data.mysql;
 
 
 import com.baomidou.mybatisplus.annotation.TableName;

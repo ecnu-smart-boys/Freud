@@ -3,7 +3,7 @@ package wx;
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.api.controller.AuthController;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
-import org.ecnusmartboys.domain.repository.VisitorRepository;
+import org.ecnusmartboys.infrastructure.repository.VisitorRepository;
 import org.ecnusmartboys.domain.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

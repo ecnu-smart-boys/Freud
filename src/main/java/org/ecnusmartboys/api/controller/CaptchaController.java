@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.domain.value.Captcha;
+import org.ecnusmartboys.application.dto.Captcha;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

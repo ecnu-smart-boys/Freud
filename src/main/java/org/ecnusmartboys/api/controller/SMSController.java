@@ -7,7 +7,7 @@ import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.application.dto.request.command.SendSMSReq;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.domain.value.SMSCode;
+import org.ecnusmartboys.application.dto.SMSCode;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;
 import org.ecnusmartboys.infrastructure.utils.RedisUtil;
 import org.ecnusmartboys.infrastructure.utils.RequestUtil;

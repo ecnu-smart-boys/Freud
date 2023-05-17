@@ -1,4 +1,4 @@
-package org.ecnusmartboys.domain.value;
+package org.ecnusmartboys.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
-import org.ecnusmartboys.infrastructure.model.mysql.Message;
-import org.ecnusmartboys.infrastructure.model.im.IMCallbackParam;
+import org.ecnusmartboys.infrastructure.data.mysql.Message;
+import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.domain.repository.MessageRepository;
+import org.ecnusmartboys.infrastructure.repository.MessageRepository;
 import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
@@ -24,8 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.Date;
 
-import static org.ecnusmartboys.infrastructure.model.im.CallbackCommand.AFTER_MSG_WITHDRAW;
-import static org.ecnusmartboys.infrastructure.model.im.CallbackCommand.AFTER_SEND_MSG;
+import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_MSG_WITHDRAW;
+import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_SEND_MSG;
 
 @Slf4j
 @RestController
