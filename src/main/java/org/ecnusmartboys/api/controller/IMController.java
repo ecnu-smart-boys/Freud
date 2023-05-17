@@ -11,10 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
-import org.ecnusmartboys.infrastructure.data.mysql.Message;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.infrastructure.repository.MessageRepository;
 import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
@@ -36,7 +34,7 @@ public class IMController {
 
     private final IMConfig imConfig;
 
-    private final MessageRepository messageRepository;
+    private final MessageMapper messageMapper;
 
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -68,7 +66,7 @@ public class IMController {
                 message.setToId(toAccount.getFirst());
                 message.setMsgBody(msgBody);
                 message.setTime(new Date(cb.getMsgTime() * (long)1000));
-                messageRepository.insert(message);
+                messageMapper.insert(message);
                 log.debug("im callback msg: {}", message);
                 break;
             }
@@ -77,7 +75,7 @@ public class IMController {
                 var key = cb.getMsgKey(); // 消息的唯一表示
                 var wrapper = new QueryWrapper<Message>();
                 wrapper.eq("msg_key", key);
-                messageRepository.delete(wrapper);
+                messageMapper.delete(wrapper);
                 break;
             }
             }

@@ -1,4 +1,4 @@
-package org.ecnusmartboys.domain.service;
+package org.ecnusmartboys.infrastructure.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ecnusmartboys.application.dto.UserInfo;

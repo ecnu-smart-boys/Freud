@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.ecnusmartboys.domain.service.UserService.ROLE_VISITOR;
+import static org.ecnusmartboys.infrastructure.service.UserService.ROLE_VISITOR;
 
 @Slf4j
 @RestController

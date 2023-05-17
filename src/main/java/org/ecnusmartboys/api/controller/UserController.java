@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.infrastructure.data.mysql.User;
-import org.ecnusmartboys.infrastructure.data.mysql.Visitor;
+import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
 import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoReq;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.infrastructure.repository.VisitorRepository;
-import org.ecnusmartboys.domain.service.UserService;
+import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
+import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -26,11 +26,11 @@ public class UserController {
     private final UserService userService;
     public static final String userServiceName = "userService";
 
-    private final VisitorRepository visitorRepository;
+    private final VisitorInfoMapper visitorInfoMapper;
 
-    public UserController(UserService userService, VisitorRepository visitorRepository) {
+    public UserController(UserService userService, VisitorInfoMapper visitorInfoMapper) {
         this.userService = userService;
-        this.visitorRepository = visitorRepository;
+        this.visitorInfoMapper = visitorInfoMapper;
     }
 
     @AnonymousAccess
@@ -52,11 +52,11 @@ public class UserController {
         userService.updateById(user);
 
         // 更新访客信息
-        var visitor = new Visitor();
+        var visitor = new VisitorInfo();
         visitor.setId(userId);
         visitor.setEmergencyContact(req.getEmergencyContact());
         visitor.setEmergencyPhone(req.getEmergencyPhone());
-        visitorRepository.updateById(visitor);
+        visitorInfoMapper.updateById(visitor);
 
         return Response.ok();
     }

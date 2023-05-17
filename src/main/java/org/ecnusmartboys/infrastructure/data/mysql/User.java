@@ -14,8 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_user", autoResultMap = true)
+@TableName(value = User.TABLE_NAME, autoResultMap = true)
 public class User extends BaseModel {
+    public static final String TABLE_NAME = "sys_user";
 
     private String openId;
 

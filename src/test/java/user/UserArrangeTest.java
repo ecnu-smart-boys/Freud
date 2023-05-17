@@ -7,10 +7,8 @@ import org.ecnusmartboys.application.dto.request.command.AddConsultantReq;
 import org.ecnusmartboys.application.dto.request.command.AddSupervisorReq;
 import org.ecnusmartboys.application.dto.request.command.UpdateSupervisorReq;
 import org.ecnusmartboys.application.dto.request.command.UserListReq;
-import org.ecnusmartboys.domain.service.ConsulvisorService;
-import org.ecnusmartboys.domain.service.StaffService;
-import org.ecnusmartboys.domain.service.UserService;
-import org.ecnusmartboys.domain.service.VisitorService;
+import org.ecnusmartboys.infrastructure.service.UserService;
+import org.ecnusmartboys.infrastructure.service.VisitorService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +19,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.ecnusmartboys.domain.service.UserService.*;
+import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @SpringBootTest(classes = FreudApp.class)
 @ActiveProfiles({"local", "test"})

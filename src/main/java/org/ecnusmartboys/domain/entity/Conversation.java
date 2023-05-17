@@ -1,6 +1,7 @@
 package org.ecnusmartboys.domain.entity;
 
 import lombok.Getter;
+import org.ecnusmartboys.domain.value.Comment;
 
 import java.util.Date;
 
@@ -20,6 +21,24 @@ public class Conversation extends BaseEntity{
     public User getToUser() {
         return null;
     }
+
+    /**
+     * 获取访客评论
+     */
+    public Comment getFromComment(){
+        return null;
+    }
+
+    /**
+     * 获取咨询师评论
+     */
+    public Comment getToComment(){
+        return null;
+    }
+
+    /**
+     * 工厂类
+     */
     public static class Factory {
         static public Conversation Retrieve(String conversationId){
             return new Conversation();
