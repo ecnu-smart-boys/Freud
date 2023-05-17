@@ -14,13 +14,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "rate", autoResultMap = true)
-public class Rate extends BaseModel {
+@TableName(value = Comment.TABLE_NAME, autoResultMap = true)
+public class Comment extends BaseModel {
+    public static final String TABLE_NAME = "conversation_comment";
     private Long conversationId;
 
     private Long userId;
 
     private Integer score;
 
-    private String comment;
+    private String text;
 }

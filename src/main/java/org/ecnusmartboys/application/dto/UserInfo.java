@@ -1,8 +1,8 @@
 package org.ecnusmartboys.application.dto;
 
 import lombok.Data;
-import org.ecnusmartboys.infrastructure.data.mysql.Staff;
-import org.ecnusmartboys.infrastructure.data.mysql.Visitor;
+import org.ecnusmartboys.infrastructure.data.mysql.StaffInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class UserInfo {
 
     private List<String> roles;
 
-    private Visitor visitor;
+    private VisitorInfo visitorInfo;
 
-    private Staff staff;
+    private StaffInfo staffInfo;
 }

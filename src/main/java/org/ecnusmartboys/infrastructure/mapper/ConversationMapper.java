@@ -1,9 +1,9 @@
-package org.ecnusmartboys.infrastructure.repository;
+package org.ecnusmartboys.infrastructure.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.ecnusmartboys.infrastructure.data.mysql.Conversation;
 
 @Mapper
-public interface ConversationRepository extends BaseMapper<Conversation> {
+public interface ConversationMapper extends BaseMapper<Conversation> {
 }

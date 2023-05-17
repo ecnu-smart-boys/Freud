@@ -3,8 +3,8 @@ package wx;
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.api.controller.AuthController;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
-import org.ecnusmartboys.infrastructure.repository.VisitorRepository;
-import org.ecnusmartboys.domain.service.UserService;
+import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
+import org.ecnusmartboys.infrastructure.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -28,7 +28,7 @@ public class RegisterTest {
     UserService userService;
 
     @Resource
-    VisitorRepository visitorRepository;
+    VisitorInfoMapper visitorInfoMapper;
 
     @Test
     public void testRegister(){
@@ -55,7 +55,7 @@ public class RegisterTest {
         assertEquals(user.getDisabled(), false);
         user.getRoles().forEach(role -> assertEquals("visitor", role));
 
-        var visitor = visitorRepository.selectById(u.getId());
+        var visitor = visitorInfoMapper.selectById(u.getId());
         assertNotNull(visitor);
         assertEquals(visitor.getEmergencyContact(), req.getEmergencyContact());
         assertEquals(visitor.getEmergencyPhone(), req.getEmergencyPhone());

@@ -8,10 +8,8 @@ import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.domain.service.ConsulvisorService;
-import org.ecnusmartboys.domain.service.StaffService;
-import org.ecnusmartboys.domain.service.UserService;
-import org.ecnusmartboys.domain.service.VisitorService;
+import org.ecnusmartboys.infrastructure.service.UserService;
+import org.ecnusmartboys.infrastructure.service.VisitorService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.ecnusmartboys.domain.service.UserService.*;
+import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @Slf4j
 @RestController

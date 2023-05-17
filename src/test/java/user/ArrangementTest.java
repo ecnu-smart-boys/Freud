@@ -2,10 +2,9 @@ package user;
 
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
-import org.ecnusmartboys.domain.service.ArrangementService;
-import org.ecnusmartboys.domain.service.UserService;
-import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;

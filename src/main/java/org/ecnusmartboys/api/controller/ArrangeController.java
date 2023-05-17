@@ -7,10 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
 import org.ecnusmartboys.application.dto.response.Response;
-import org.ecnusmartboys.domain.service.ArrangementService;
-import org.ecnusmartboys.domain.service.UserService;
-import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-import static org.ecnusmartboys.domain.service.UserService.*;
+import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @Slf4j
 @RestController

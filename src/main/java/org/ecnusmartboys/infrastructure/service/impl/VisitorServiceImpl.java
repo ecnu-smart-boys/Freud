@@ -1,11 +1,11 @@
-package org.ecnusmartboys.domain.service.impl;
+package org.ecnusmartboys.infrastructure.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.domain.service.VisitorService;
-import org.ecnusmartboys.infrastructure.data.mysql.Visitor;
-import org.ecnusmartboys.infrastructure.repository.VisitorRepository;
+import org.ecnusmartboys.infrastructure.service.VisitorService;
+import org.ecnusmartboys.domain.repository.VisitorRepository;
+import org.ecnusmartboys.infrastructure.model.mysql.Visitor;
 import org.springframework.stereotype.Service;
 
 @Slf4j
