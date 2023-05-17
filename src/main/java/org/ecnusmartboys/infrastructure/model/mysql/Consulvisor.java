@@ -1,6 +1,5 @@
 package org.ecnusmartboys.infrastructure.model.mysql;
 
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
