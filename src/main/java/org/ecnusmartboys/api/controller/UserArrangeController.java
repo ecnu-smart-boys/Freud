@@ -10,6 +10,7 @@ import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
+import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -27,11 +28,13 @@ import static org.ecnusmartboys.infrastructure.service.UserService.*;
 @RequiredArgsConstructor
 public class UserArrangeController {
 
+    private final UserArrangeService userArrangeService;
+
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("获取咨询师列表")
     @GetMapping("/consultants")
     public Response<ConsultantsResponse> getConsultants(@RequestBody @Validated UserListReq req) {
-
+        return userArrangeService.getConsultants(req);
     }
 
     @AuthRoles(ROLE_ADMIN)

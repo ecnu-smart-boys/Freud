@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
+import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.service.ArrangeService;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
@@ -27,14 +29,17 @@ import static org.ecnusmartboys.infrastructure.service.UserService.*;
 @Api(tags = "排班管理接口")
 public class ArrangeController {
 
-    private final UserService userService;
+    private final ArrangeService arrangeService;
 
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("移除排班")
     @DeleteMapping("/remove/{id}/{date}")
-    public Response<Object> remove(@PathVariable Long id, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        arrangementService.remove(new QueryWrapper<Arrangement>().eq("user_id", id).eq("date", date));
-        return Response.ok("成功移除排班");
+    public Response<Object> remove(@PathVariable String id, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        var req = new RemoveArrangeRequest(id, date);
+
+        return arrangeService.remove(req);
+
+        //arrangementService.remove(new QueryWrapper<Arrangement>().eq("user_id", id).eq("date", date));
     }
 
     @AuthRoles(ROLE_ADMIN)
