@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.api.controller.UserController;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.BaseQuery;
 import org.ecnusmartboys.infrastructure.service.UserService;
@@ -18,10 +17,9 @@ import org.ecnusmartboys.infrastructure.model.mysql.Staff;
 import org.ecnusmartboys.infrastructure.model.mysql.User;
 import org.ecnusmartboys.infrastructure.model.mysql.Visitor;
 import org.ecnusmartboys.domain.repository.UserRepository;
-import org.ecnusmartboys.domain.repository.VisitorRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -29,7 +27,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service(UserController.userServiceName)
+@Component
 public class UserServiceImpl extends ServiceImpl<UserRepository, User> implements UserService, InitializingBean {
 
     private final VisitorRepository visitorRepository;
@@ -42,7 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 
     @Override
     @Transactional
-    public User saveVisitor(WxRegisterReq req) {
+    public User saveVisitor(WxRegisterRequest req) {
         User user = new User();
         BeanUtils.copyProperties(req, user);
         user.setRoles(Collections.singletonList(ROLE_VISITOR));
@@ -134,7 +132,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 
     @Override
     @Transactional
-    public void saveSupervisor(AddSupervisorReq req) {
+    public void saveSupervisor(AddSupervisorRequest req) {
         User user = new User();
         BeanUtils.copyProperties(req, user);
         user.setRoles(Collections.singletonList(ROLE_SUPERVISOR));
@@ -147,7 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
     }
 
     @Override
-    public void updateSupervisor(UpdateSupervisorReq req) {
+    public void updateSupervisor(UpdateSupervisorRequest req) {
         User user = new User();
         BeanUtils.copyProperties(req, user);
         user.setId(req.getSupervisorId());
@@ -162,7 +160,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
 
     @Override
     @Transactional
-    public void saveConsultant(AddConsultantReq req) {
+    public void saveConsultant(AddConsultantRequest req) {
         User user = new User();
         BeanUtils.copyProperties(req, user);
         user.setRoles(Collections.singletonList(ROLE_SUPERVISOR));

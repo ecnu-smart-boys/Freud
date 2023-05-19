@@ -8,7 +8,7 @@ import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.infrastructure.data.mysql.User;
 import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
-import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoReq;
+import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
 import org.ecnusmartboys.infrastructure.service.UserService;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    public static final String userServiceName = "userService";
 
     private final VisitorInfoMapper visitorInfoMapper;
 
@@ -43,7 +42,7 @@ public class UserController {
 
     @ApiOperation("更新用户信息")
     @PutMapping("/info")
-    public Response<Object> updateUserInfo(@RequestBody @Validated UpdateUserInfoReq req) {
+    public Response<Object> updateUserInfo(@RequestBody @Validated UpdateUserInfoRequest req) {
         // 更新用户信息
         var userId = SecurityUtil.getCurrentUserId();
         var user = new User();

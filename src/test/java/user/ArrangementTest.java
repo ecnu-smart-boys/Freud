@@ -1,7 +1,7 @@
 package user;
 
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
+import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.model.mysql.Arrangement;
@@ -24,7 +24,7 @@ public class ArrangementTest {
 
     @Test
     public void addArrangementTest() {
-        AddArrangementReq req =  new AddArrangementReq();
+        AddArrangementRequest req =  new AddArrangementRequest();
         req.setDate(new Date());
         req.setUserId(11L);
         if(userService.getSingleUser(req.getUserId(), UserService.ROLE_SUPERVISOR) == null) {

@@ -1,5 +1,6 @@
 package org.ecnusmartboys.application.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.ecnusmartboys.infrastructure.data.mysql.StaffInfo;
 import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
@@ -29,7 +30,28 @@ public class UserInfo {
 
     private List<String> roles;
 
-    private VisitorInfo visitorInfo;
+    //访客信息
+    private String emergencyContactName;
 
-    private StaffInfo staffInfo;
+    private String emergencyContactPhone;
+    //咨询师/督导信息
+    private String idNumber;
+
+    @ApiModelProperty("工作单位")
+    private String department;
+
+    @ApiModelProperty("职称")
+    private String title;
+
+    @ApiModelProperty("资质")
+    private String qualification;
+
+    @ApiModelProperty("资质编号")
+    private String qualificationCode;
+
+    private Integer consultNum;
+
+    private Long accumulatedTime;
+
+    private List<String> supervisors;
 }

@@ -15,7 +15,7 @@ public interface UserService extends IService<User> {
     String ROLE_SUPERVISOR = "supervisor";
     String ROLE_ADMIN = "admin";
 
-    User saveVisitor(WxRegisterReq req);
+    User saveVisitor(WxRegisterRequest req);
 
     /**
      * 获取用户信息
@@ -56,19 +56,19 @@ public interface UserService extends IService<User> {
      * 添加督导
      * @param req 添加督导参数
      */
-    void saveSupervisor(AddSupervisorReq req);
+    void saveSupervisor(AddSupervisorRequest req);
 
     /**
      * 更新督导
      * @param req 更新督导参数
      */
-    void updateSupervisor(UpdateSupervisorReq req);
+    void updateSupervisor(UpdateSupervisorRequest req);
 
     /**
      * 添加咨询师
      * @param req 添加咨询师参数
      */
-    void saveConsultant(AddConsultantReq req);
+    void saveConsultant(AddConsultantRequest req);
 
     /**
      * 通过用户名查询用户

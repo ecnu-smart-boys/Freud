@@ -1,11 +1,9 @@
 package user;
 
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.application.dto.SupervisorInfo;
-import org.ecnusmartboys.application.dto.VisitorInfo;
-import org.ecnusmartboys.application.dto.request.command.AddConsultantReq;
-import org.ecnusmartboys.application.dto.request.command.AddSupervisorReq;
-import org.ecnusmartboys.application.dto.request.command.UpdateSupervisorReq;
+import org.ecnusmartboys.application.dto.request.command.AddConsultantRequest;
+import org.ecnusmartboys.application.dto.request.command.AddSupervisorRequest;
+import org.ecnusmartboys.application.dto.request.command.UpdateSupervisorRequest;
 import org.ecnusmartboys.application.dto.request.command.UserListReq;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.service.VisitorService;
@@ -99,7 +97,7 @@ public class UserArrangeTest {
 
     @Test
     public void addSupervisorTest() {
-        AddSupervisorReq req = new AddSupervisorReq();
+        AddSupervisorRequest req = new AddSupervisorRequest();
         req.setUsername("consult_2");
         req.setName("咨询师测试");
         req.setPassword("password");
@@ -121,7 +119,7 @@ public class UserArrangeTest {
 
     @Test
     public void updateSupervisorTest() {
-        UpdateSupervisorReq req = new UpdateSupervisorReq();
+        UpdateSupervisorRequest req = new UpdateSupervisorRequest();
         req.setSupervisorId(13L);
         req.setName("督导修改测试");
         req.setGender(1);
@@ -138,7 +136,7 @@ public class UserArrangeTest {
 
     @Test
     public void addConsultantTest() {
-        AddConsultantReq req = new AddConsultantReq();
+        AddConsultantRequest req = new AddConsultantRequest();
         req.setUsername("consult_3");
         req.setName("咨询师测试");
         req.setPassword("password");

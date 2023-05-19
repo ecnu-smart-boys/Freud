@@ -55,7 +55,7 @@ public class Response<T> {
     }
 
     public static <T> Response<T> ok(String message, T data) {
-        return new Response<>(HttpStatus.OK.value(), message, data);
+        return new Response<>(0, message, data);
     }
 
     /**

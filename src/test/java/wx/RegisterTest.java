@@ -2,7 +2,7 @@ package wx;
 
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.api.controller.AuthController;
-import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
+import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class RegisterTest {
     @Test
     public void testRegister(){
         var mock = new MockHttpServletRequest();
-        var req = new WxRegisterReq();
+        var req = new WxRegisterRequest();
         req.setAge(18);
         req.setAvatar("https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJibicQicqicibi");
         req.setGender(1);

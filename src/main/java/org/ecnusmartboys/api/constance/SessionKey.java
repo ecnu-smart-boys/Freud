@@ -1,5 +1,6 @@
 package org.ecnusmartboys.api.constance;
 
-public enum SessionKey {
-    UserID, Roles
+public class SessionKey {
+    public static String UserID = "userId";
+    public static String Role = "role";
 }

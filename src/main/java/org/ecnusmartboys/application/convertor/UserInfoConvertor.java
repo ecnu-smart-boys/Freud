@@ -1,7 +1,7 @@
 package org.ecnusmartboys.application.convertor;
 
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.domain.entity.User;
+import org.ecnusmartboys.domain.model.user.User;
 import org.ecnusmartboys.infrastructure.convertor.BaseConvertor;
 
 import org.mapstruct.Mapper;

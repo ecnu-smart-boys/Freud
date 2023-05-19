@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
-import org.ecnusmartboys.application.dto.request.command.StartConsultReq;
+import org.ecnusmartboys.application.dto.request.command.StartConsultRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.dto.response.StartConsultResponse;
 import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
@@ -28,7 +28,7 @@ public class ConversationController {
     @AuthRoles(ROLE_VISITOR)
     @PostMapping("/consult")
     @ApiOperation("发起咨询会话")
-    public Response<StartConsultResponse> startConversation(@RequestBody @Validated StartConsultReq req){
+    public Response<StartConsultResponse> startConversation(@RequestBody @Validated StartConsultRequest req){
         var userId = SecurityUtil.getCurrentUserId();
 
         return Response.ok();

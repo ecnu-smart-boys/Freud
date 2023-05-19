@@ -3,9 +3,10 @@ package org.ecnusmartboys.api.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
-import org.ecnusmartboys.application.dto.request.command.AddArrangementReq;
+import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
@@ -22,17 +23,11 @@ import static org.ecnusmartboys.infrastructure.service.UserService.*;
 @Slf4j
 @RestController
 @RequestMapping("/arrangement")
+@RequiredArgsConstructor
 @Api(tags = "排班管理接口")
 public class ArrangeController {
 
-    private final ArrangementService arrangementService;
-
     private final UserService userService;
-
-    public ArrangeController(ArrangementService arrangementService, UserService userService) {
-        this.arrangementService = arrangementService;
-        this.userService = userService;
-    }
 
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("移除排班")
@@ -45,19 +40,19 @@ public class ArrangeController {
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("添加咨询师排班")
     @PostMapping("/add/consultant")
-    public Response<Object> addConsultant(@RequestBody @Validated AddArrangementReq req) {
+    public Response<Object> addConsultant(@RequestBody @Validated AddArrangementRequest req) {
         return addArrangement(req, ROLE_CONSULTANT);
     }
 
     @AuthRoles(ROLE_ADMIN)
     @ApiOperation("添加督导排班")
     @PostMapping("/add/supervisor")
-    public Response<Object> addSupervisor(@RequestBody @Validated AddArrangementReq req) {
+    public Response<Object> addSupervisor(@RequestBody @Validated AddArrangementRequest req) {
         return addArrangement(req, ROLE_SUPERVISOR);
     }
 
     @NotNull
-    private Response<Object> addArrangement(@Validated @RequestBody AddArrangementReq req, String roleConsultant) {
+    private Response<Object> addArrangement(@Validated @RequestBody AddArrangementRequest req, String roleConsultant) {
         if(userService.getSingleUser(req.getUserId(), roleConsultant) == null) {
             throw new BadRequestException("所要排班的督导不存在");
         }

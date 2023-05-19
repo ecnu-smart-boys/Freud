@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.constance.SessionKey;
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.application.dto.request.command.StaffLoginReq;
-import org.ecnusmartboys.application.dto.request.command.WxLoginReq;
-import org.ecnusmartboys.application.dto.request.command.WxRegisterReq;
+import org.ecnusmartboys.application.dto.request.command.StaffLoginRequest;
+import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;
+import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.service.AuthService;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +33,12 @@ public class AuthController {
     @AnonymousAccess
     @ApiOperation("微信登录")
     @PostMapping("/login-wx")
-    public Response<UserInfo> loginWx(@RequestBody @Validated WxLoginReq req, HttpServletRequest request) {
+    public Response<UserInfo> loginWx(@RequestBody @Validated WxLoginRequest req, HttpServletRequest request) {
         var res = authService.loginWx(req);
         var u = res.getData();
         var session = request.getSession();
-        session.setAttribute(SessionKey.UserID.name(), u.getId());
-        session.setAttribute(SessionKey.Roles.name(), u.getRoles());
+        session.setAttribute(SessionKey.UserID, u.getId());
+        session.setAttribute(SessionKey.Role, "visitor");
         return res;
     }
 
@@ -46,25 +46,25 @@ public class AuthController {
     @ApiOperation("访客注册")
     @PostMapping("/register")
     @Transactional
-    public Response<UserInfo> register(@RequestBody @Validated WxRegisterReq req, HttpServletRequest request) {
+    public Response<UserInfo> register(@RequestBody @Validated WxRegisterRequest req, HttpServletRequest request) {
         var res = authService.register(req);
         var u = res.getData();
         var session = request.getSession();
-        session.setAttribute(SessionKey.UserID.name(), u.getId());
-        session.setAttribute(SessionKey.Roles.name(), u.getRoles());
+        session.setAttribute(SessionKey.UserID, u.getId());
+        session.setAttribute(SessionKey.Role, "visitor");
         return res;
     }
 
     @AnonymousAccess
     @ApiOperation("员工登录")
     @PostMapping("/login-staff")
-    public Response<UserInfo> staffLogin(@RequestBody @Validated StaffLoginReq req, HttpServletRequest request) {
+    public Response<UserInfo> staffLogin(@RequestBody @Validated StaffLoginRequest req, HttpServletRequest request) {
         var res = authService.staffLogin(req);
         var user = res.getData();
         // 保存登录信息
         var session = request.getSession();
-        session.setAttribute(SessionKey.UserID.name(), user.getId());
-        session.setAttribute(SessionKey.Roles.name(), user.getRoles());
+        session.setAttribute(SessionKey.UserID, user.getId());
+        session.setAttribute(SessionKey.Role, req.getRole());
         return res;
     }
 
