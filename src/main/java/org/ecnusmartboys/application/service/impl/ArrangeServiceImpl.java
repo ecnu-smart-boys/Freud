@@ -1,9 +1,11 @@
 package org.ecnusmartboys.application.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.service.ArrangeService;
+import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -12,5 +14,20 @@ public class ArrangeServiceImpl implements ArrangeService {
     @Override
     public Response<Object> remove(RemoveArrangeRequest req) {
         return null;
+    }
+
+    @Override
+    public Response<Object> addConsultant(AddArrangementRequest req) {
+        if(userService.getSingleUser(req.getUserId(), roleConsultant) == null) {
+            throw new BadRequestException("所要排班的督导不存在");
+        }
+
+        if(arrangementService.getArrangement(req) != null) {
+            throw new BadRequestException("请勿重复排班");
+        }
+
+        Arrangement arrangement = new Arrangement(req.getDate(), req.getUserId());
+        arrangementService.save(arrangement);
+        return Response.ok("成功添加排班");
     }
 }

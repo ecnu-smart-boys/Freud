@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-public abstract class BaseModel {
+public abstract class BaseDO {
     @TableId(value = "id", type = IdType.AUTO)
     protected Long id;
 

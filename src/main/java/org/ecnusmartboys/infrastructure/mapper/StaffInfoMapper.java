@@ -2,8 +2,8 @@ package org.ecnusmartboys.infrastructure.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.ecnusmartboys.infrastructure.data.mysql.StaffInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.StaffInfoDO;
 
 @Mapper
-public interface StaffInfoMapper extends BaseMapper<StaffInfo> {
+public interface StaffInfoMapper extends BaseMapper<StaffInfoDO> {
 }

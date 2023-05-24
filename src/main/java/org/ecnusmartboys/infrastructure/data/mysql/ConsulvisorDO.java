@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"consultantId", "supervisorId"}, callSuper = false)
-@TableName(value = Consulvisor.TABLE_NAME, autoResultMap = true)
-public class Consulvisor extends BaseModel {
+@TableName(value = ConsulvisorDO.TABLE_NAME, autoResultMap = true)
+public class ConsulvisorDO extends BaseDO {
     public static final String TABLE_NAME = "consulvisor";
     private Long consultantId;
 

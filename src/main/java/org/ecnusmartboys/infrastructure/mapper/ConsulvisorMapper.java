@@ -4,16 +4,16 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.ecnusmartboys.infrastructure.data.mysql.Consulvisor;
+import org.ecnusmartboys.infrastructure.data.mysql.ConsulvisorDO;
 
 import java.util.List;
 
 @Mapper
-public interface ConsulvisorMapper extends BaseMapper<Consulvisor> {
+public interface ConsulvisorMapper extends BaseMapper<ConsulvisorDO> {
 
     @Select("SELECT * FROM consulvisor where consultant_id = #{consultantId}")
-    List<Consulvisor> selectByConsultantId(@Param("consultantId") Long consultantId);
+    List<ConsulvisorDO> selectByConsultantId(@Param("consultantId") Long consultantId);
 
     @Select("SELECT * FROM consulvisor where supervisor_id = #{supervisorId}")
-    List<Consulvisor> selectBySupervisorId(Long supervisorId);
+    List<ConsulvisorDO> selectBySupervisorId(Long supervisorId);
 }

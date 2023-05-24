@@ -2,8 +2,6 @@ package org.ecnusmartboys.application.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.ecnusmartboys.infrastructure.data.mysql.StaffInfo;
-import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
 
 import java.util.List;
 

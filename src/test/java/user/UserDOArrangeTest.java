@@ -21,7 +21,7 @@ import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @SpringBootTest(classes = FreudApp.class)
 @ActiveProfiles({"local", "test"})
-public class UserArrangeTest {
+public class UserDOArrangeTest {
 
     @Resource
     UserService userService;

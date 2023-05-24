@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = Conversation.TABLE_NAME, autoResultMap = true)
-public class Conversation extends BaseModel {
+@TableName(value = ConversationDO.TABLE_NAME, autoResultMap = true)
+public class ConversationDO extends BaseDO {
     public static final String TABLE_NAME = "conversation";
     private Long fromId;
 

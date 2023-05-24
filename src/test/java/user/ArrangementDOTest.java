@@ -14,7 +14,7 @@ import java.util.Date;
 
 @SpringBootTest(classes = FreudApp.class)
 @ActiveProfiles({"local", "test"})
-public class ArrangementTest {
+public class ArrangementDOTest {
 
     @Resource
     ArrangementService arrangementService;

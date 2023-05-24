@@ -17,4 +17,6 @@ public class AddArrangementRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "排班日期不能为空")
     private Date date;
+
+    private String role;
 }

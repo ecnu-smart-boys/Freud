@@ -1,18 +1,16 @@
 package org.ecnusmartboys.domain.schedule;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.domain.service.ArrangementService;
 import org.ecnusmartboys.domain.service.StaffService;
 import org.ecnusmartboys.domain.service.UserService;
-import org.ecnusmartboys.infrastructure.data.mysql.Arrangement;
+import org.ecnusmartboys.infrastructure.data.mysql.ArrangementDO;
 import org.ecnusmartboys.infrastructure.data.mysql.Staff;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,7 +34,7 @@ public class ArrangementScheduler {
         var staffList = staffService.list(wrapper);
 
         for (Staff staff : staffList) {
-            var a = new Arrangement();
+            var a = new ArrangementDO();
             a.setDate(now);
             a.setUserId(staff.getId());
             try {

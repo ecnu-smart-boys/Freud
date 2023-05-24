@@ -8,14 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.BaseQuery;
+import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.application.convertor.UserInfoConvertor;
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.infrastructure.model.mysql.Consulvisor;
-import org.ecnusmartboys.infrastructure.model.mysql.Staff;
-import org.ecnusmartboys.infrastructure.model.mysql.User;
-import org.ecnusmartboys.infrastructure.model.mysql.Visitor;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class UserServiceImpl extends ServiceImpl<UserRepository, User> implements UserService, InitializingBean {
+public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> implements UserService, InitializingBean {
 
     private final VisitorRepository visitorRepository;
 
@@ -78,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, User> implement
     }
 
     @Override
-    public List<User> getUsers(UserListReq req, String role) {
+    public List<UserDO> getUsers(UserListReq req, String role) {
         BaseQuery<User> query = new BaseQuery<>();
         query.setSize(req.getSize());
         query.setCurrent(req.getCurrent());

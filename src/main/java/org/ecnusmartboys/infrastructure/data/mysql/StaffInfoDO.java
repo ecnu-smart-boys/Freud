@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = StaffInfo.TABLE_NAME, autoResultMap = true)
-public class StaffInfo extends BaseModel {
+@TableName(value = StaffInfoDO.TABLE_NAME, autoResultMap = true)
+public class StaffInfoDO extends BaseDO {
     public static final String TABLE_NAME = "staff_info";
     @ApiModelProperty("身份证号")
     private String idNumber;

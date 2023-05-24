@@ -1,6 +1,5 @@
 package org.ecnusmartboys.infrastructure.data.mysql;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,8 +15,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"date", "userId"}, callSuper = false)
-@TableName(value = Arrangement.TABLE_NAME, autoResultMap = true)
-public class Arrangement extends BaseModel {
+@TableName(value = ArrangementDO.TABLE_NAME, autoResultMap = true)
+public class ArrangementDO extends BaseDO {
     public static final String TABLE_NAME = "arrangement";
     private Date date;
 

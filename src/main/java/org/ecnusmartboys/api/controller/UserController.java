@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.infrastructure.data.mysql.User;
-import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
+import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
 import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
@@ -45,13 +45,13 @@ public class UserController {
     public Response<Object> updateUserInfo(@RequestBody @Validated UpdateUserInfoRequest req) {
         // 更新用户信息
         var userId = SecurityUtil.getCurrentUserId();
-        var user = new User();
+        var user = new UserDO();
         BeanUtils.copyProperties(req, user);
         user.setId(userId);
         userService.updateById(user);
 
         // 更新访客信息
-        var visitor = new VisitorInfo();
+        var visitor = new VisitorInfoDO();
         visitor.setId(userId);
         visitor.setEmergencyContact(req.getEmergencyContact());
         visitor.setEmergencyPhone(req.getEmergencyPhone());

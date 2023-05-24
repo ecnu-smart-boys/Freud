@@ -4,18 +4,16 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
-import org.ecnusmartboys.infrastructure.data.mysql.User;
+import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
 
 import java.util.List;
 
-public interface UserService extends IService<User> {
+public interface UserService extends IService<UserDO> {
 
     String ROLE_VISITOR = "visitor";
     String ROLE_CONSULTANT = "consultant";
     String ROLE_SUPERVISOR = "supervisor";
     String ROLE_ADMIN = "admin";
-
-    User saveVisitor(WxRegisterRequest req);
 
     /**
      * 获取用户信息
@@ -30,7 +28,7 @@ public interface UserService extends IService<User> {
      * @param role 角色
      * @return 用户实体类列表
      */
-    List<User> getUsers(UserListReq req, String role);
+    List<UserDO> getUsers(UserListReq req, String role);
 
     /**
      * 获得某种用户总数
@@ -75,14 +73,14 @@ public interface UserService extends IService<User> {
      * @param username 用户名
      * @return 用户
      */
-    User getByUsername(String username);
+    UserDO getByUsername(String username);
 
     /**
      * 通过手机号查询用户
      * @param phone 手机号
      * @return 用户
      */
-    User getByPhone(String phone);
+    UserDO getByPhone(String phone);
 
     /**
      * 获得单个用户
@@ -90,7 +88,7 @@ public interface UserService extends IService<User> {
      * @param role 用户角色
      * @return 用户
      */
-    User getSingleUser(Long userId, String role);
+    UserDO getSingleUser(Long userId, String role);
 
 
 

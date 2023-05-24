@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = VisitorInfo.TABLE_NAME, autoResultMap = true)
-public class VisitorInfo extends BaseModel {
+@TableName(value = VisitorInfoDO.TABLE_NAME, autoResultMap = true)
+public class VisitorInfoDO extends BaseDO {
     public static final String TABLE_NAME = "visitor_info";
 
     @ApiModelProperty(value = "紧急联系人", required = true)
