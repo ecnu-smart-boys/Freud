@@ -40,12 +40,16 @@ public class AuthServiceImpl implements AuthService {
     public Response<UserInfo> loginWx(WxLoginRequest req) {
         var code2Session = wxUtil.code2Session(req.getCode());
         Assert.isTrue(code2Session != null && StringUtils.hasText(code2Session.getOpenid()), "获取openid失败");
-        Visitor u = (Visitor)userRepository.retrieveByOpenId(code2Session.getOpenid());
-        if (u != null && Boolean.TRUE.equals(u.isDisabled())) {
-            throw ForbiddenException.DISABLED;
+        Visitor user;
+        if(userRepository.retrieveByOpenId(code2Session.getOpenid()) instanceof Visitor tmp){
+            if(tmp.isDisabled()){
+                throw ForbiddenException.DISABLED;
+            }
+            user = tmp;
+        }else{
+            throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
-
-        return Response.ok(userInfoConvertor.fromEntity(u));
+        return Response.ok(userInfoConvertor.fromEntity(user));
     }
 
     @Override
@@ -57,7 +61,6 @@ public class AuthServiceImpl implements AuthService {
         visitor.setOpenID(wxUtil.code2Session(req.getCode()).getOpenid());
         userRepository.save(visitor);
 
-
         return Response.ok(userInfoConvertor.fromEntity(visitor));
     }
 
@@ -68,9 +71,13 @@ public class AuthServiceImpl implements AuthService {
         if (!validCaptcha) {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
-
-        var user = (Consultant)userRepository.retrieveByName(req.getUsername(), "staff");
-        if (user == null) {
+        Consultant user;
+        if(userRepository.retrieveByName(req.getUsername()) instanceof Consultant tmp){
+            if(tmp.isDisabled()){
+                throw ForbiddenException.DISABLED;
+            }
+            user = tmp;
+        } else {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
 

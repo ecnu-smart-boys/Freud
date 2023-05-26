@@ -7,12 +7,12 @@ import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.service.UserArrangeService;
+import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +22,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
     @Override
     public Response<ConsultantsResponse> getConsultants(UserListReq req) {
         List<UserInfo> consultantInfoList = new ArrayList<>();
-        var consultants = userRepository.retrieveByRole("consultant");
+        var consultants = userRepository.retrieveByRole(Consultant.ROLE);
         consultants.forEach( v -> {
             var consultantInfo = userInfoConvertor.fromEntity(v);
 
