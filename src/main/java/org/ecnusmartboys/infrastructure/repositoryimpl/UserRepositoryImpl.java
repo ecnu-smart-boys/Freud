@@ -2,8 +2,8 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
@@ -14,15 +14,14 @@ import org.ecnusmartboys.infrastructure.mapper.RoleMapper;
 import org.ecnusmartboys.infrastructure.mapper.StaffInfoMapper;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.ecnusmartboys.infrastructure.service.UserService.ROLE_ADMIN;
-
+@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class UserRepositoryImpl implements UserRepository, InitializingBean {
@@ -54,7 +53,6 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
         if (roleDO == null) {
             return null;
         }
-
         return userConvertor.toUser(userDO, roleDO);
     }
 
@@ -87,7 +85,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     @Override
     public void afterPropertiesSet() {
         // 创建超级管理员
-        Long count = roleMapper.selectCount(new LambdaQueryWrapper<RoleDO>().eq(RoleDO::getRole, ROLE_ADMIN));
+        Long count = roleMapper.selectCount(new LambdaQueryWrapper<RoleDO>().eq(RoleDO::getRole, Admin.ROLE));
         if (count == 0) {
             UserDO userDO = new UserDO();
             userDO.setName("弗洛伊德");
@@ -98,8 +96,8 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             userDO.setPassword(BCrypt.hashpw(rawPassword));
             userMapper.insert(userDO);
             RoleDO roleDO = new RoleDO();
-            roleDO.setRole(ROLE_ADMIN);
-            //TODO 不确定
+            roleDO.setRole(Admin.ROLE);
+            //TODO 不确定是这么返回的吗
             roleDO.setUserID(String.valueOf(userDO.getId()));
             log.info("创建超级管理员成功，用户名：{}，密码：{}", userDO.getUsername(), rawPassword);
         }

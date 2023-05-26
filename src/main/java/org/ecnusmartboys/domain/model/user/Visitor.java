@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Visitor extends User{
+    public static final String ROLE = "visitor";
     private String emergencyContactName;
     private String emergencyContactPhone;
 }

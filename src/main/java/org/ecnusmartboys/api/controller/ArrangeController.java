@@ -9,10 +9,9 @@ import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.service.ArrangeService;
+import org.ecnusmartboys.domain.model.user.Admin;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @Slf4j
 @RestController
@@ -23,7 +22,7 @@ public class ArrangeController {
 
     private final ArrangeService arrangeService;
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("移除排班")
     @PostMapping("/remove")
     public Response<Object> remove(@RequestBody RemoveArrangeRequest req) {
@@ -32,7 +31,7 @@ public class ArrangeController {
         //arrangementService.remove(new QueryWrapper<Arrangement>().eq("user_id", id).eq("date", date));
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("添加排班")
     @PostMapping("/add")
     public Response<Object> addConsultant(@RequestBody @Validated AddArrangementRequest req) {
