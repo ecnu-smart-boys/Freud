@@ -9,11 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.BaseQuery;
 import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
+import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.ecnusmartboys.infrastructure.service.UserService;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.application.convertor.UserInfoConvertor;
 import org.ecnusmartboys.application.dto.UserInfo;
-import org.ecnusmartboys.domain.repository.UserRepository;
+import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -25,13 +26,13 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> implements UserService, InitializingBean {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService, InitializingBean {
 
-    private final VisitorRepository visitorRepository;
+    private final VisitorMapper visitorMapper;
 
-    private final StaffRepository staffRepository;
+    private final StaffMapper staffMapper;
 
-    private final org.ecnusmartboys.domain.repository.ConsulvisorMapper consulvisorMapper;
+    private final org.ecnusmartboys.domain.mapper.ConsulvisorMapper consulvisorMapper;
 
     private final UserInfoConvertor userInfoConvertor;
 
@@ -47,7 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
         visitor.setId(user.getId());
         visitor.setEmergencyContact(req.getEmergencyContact());
         visitor.setEmergencyPhone(req.getEmergencyPhone());
-        visitorRepository.insert(visitor);
+        visitorMapper.insert(visitor);
 
         return user;
     }
@@ -65,9 +66,9 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
         if (user.getRoles() != null) {
             // 假设访客与咨询师督导互斥
             if (user.getRoles().contains(ROLE_VISITOR)) {
-                userInfo.setVisitor(visitorRepository.selectById(id));
+                userInfo.setVisitor(visitorMapper.selectById(id));
             } else {
-                userInfo.setStaff(staffRepository.selectById(id));
+                userInfo.setStaff(staffMapper.selectById(id));
             }
         }
 
@@ -138,7 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
         Staff staff = new Staff();
         staff.setId(user.getId());
         BeanUtils.copyProperties(req, staff);
-        staffRepository.insert(staff);
+        staffMapper.insert(staff);
     }
 
     @Override
@@ -152,7 +153,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
         Staff staff = new Staff();
         staff.setId(req.getSupervisorId());
         BeanUtils.copyProperties(req, staff);
-        staffRepository.updateById(staff);
+        staffMapper.updateById(staff);
     }
 
     @Override
@@ -166,7 +167,7 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
         Staff staff = new Staff();
         staff.setId(user.getId());
         BeanUtils.copyProperties(req, staff);
-        staffRepository.insert(staff);
+        staffMapper.insert(staff);
 
         var ids = req.getSuperVisorIds();
         ids.forEach(id -> {
@@ -193,20 +194,6 @@ public class UserServiceImpl extends ServiceImpl<UserRepository, UserDO> impleme
 
     @Override
     public void afterPropertiesSet() {
-        // 创建超级管理员
-        var wrapper = new QueryWrapper<User>().like("roles", ROLE_ADMIN);
-        if (getBaseMapper().selectCount(wrapper) == 0) {
-            var user = new User
-            user.setName("弗洛伊德");
-            user.setAvatar("https://ts1.cn.mm.bing.net/th/id/R-C.45b3a4f888e913e1ada56e2950bbd193?rik=ScD5TlSiXveZ9A&riu=http%3a%2f%2fwww.cuimianxinli.com%2fupload%2f2016-12%2f16122009305407.jpg&ehk=%2fzLL0q3fqB7F%2b8YM4OpdDSd33tZowsGpwk0VLco4p7g%3d&risl=&pid=ImgRaw&r=0");
-            user.setAge(167);
-            user.setGender(0);
-            user.setUsername("freud_admin");
-            var rawPassword = "freud_admin" + System.currentTimeMillis();
-            user.setPassword(BCrypt.hashpw(rawPassword));
-            user.setRoles(Collections.singletonList(ROLE_ADMIN));
-            getBaseMapper().insert(user);
-            log.info("创建超级管理员成功，用户名：{}，密码：{}", user.getUsername(), rawPassword);
-        }
+
     }
 }
