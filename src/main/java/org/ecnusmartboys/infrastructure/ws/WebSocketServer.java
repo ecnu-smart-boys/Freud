@@ -68,6 +68,7 @@ public class WebSocketServer extends TextWebSocketHandler {
         log.debug("WebSocket connection established for userId {}", userId);
 
         sessionMap.put(userId, session);
+        session.sendMessage(new TextMessage("🤗" + userId));
 
         onlineStateService.setUserState(userId, OnlineState.IDLE);
     }

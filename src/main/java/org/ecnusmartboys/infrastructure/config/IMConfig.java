@@ -27,6 +27,6 @@ public class IMConfig {
 
     @Bean("adminClient")
     public ImClient adminClient() {
-        return ImClient.getInstance(appId, "administrator", token);
+        return ImClient.getInstance(appId, "administrator", secretKey);
     }
 }
