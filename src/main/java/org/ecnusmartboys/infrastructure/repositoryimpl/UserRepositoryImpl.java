@@ -46,14 +46,22 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     }
 
     @Override
-    public User retrieveByName(String name) {
-        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getName, name));
+    public User retrieveByUsername(String username) {
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getUsername, username));
         if (userDO == null) {
             return null;
         }
         return convert(userDO);
     }
 
+    @Override
+    public User retrieveByPhone(String phone) {
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getPhone, phone));
+        if (userDO == null) {
+            return null;
+        }
+        return convert(userDO);
+    }
     private User convert(UserDO userDO){
         String role = userDO.getRole();
         switch (role) {
@@ -69,6 +77,8 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
         }
         return userConvertor.toUser(userDO);
     }
+
+
 
     @Override
     public List<User> retrieveByRole(String role) {
@@ -88,6 +98,8 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             staffInfoMapper.updateById(staffInfo);
         }
     }
+
+
 
     @Override
     public void afterPropertiesSet() {
