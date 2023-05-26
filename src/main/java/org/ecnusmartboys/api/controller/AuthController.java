@@ -10,7 +10,7 @@ import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.StaffLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.AuthService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +33,7 @@ public class AuthController {
     @AnonymousAccess
     @ApiOperation("微信登录")
     @PostMapping("/login-wx")
-    public Response<UserInfo> loginWx(@RequestBody @Validated WxLoginRequest req, HttpServletRequest request) {
+    public Responses<UserInfo> loginWx(@RequestBody @Validated WxLoginRequest req, HttpServletRequest request) {
         var res = authService.loginWx(req);
         var u = res.getData();
         var session = request.getSession();
@@ -46,7 +46,7 @@ public class AuthController {
     @ApiOperation("访客注册")
     @PostMapping("/register")
     @Transactional
-    public Response<UserInfo> register(@RequestBody @Validated WxRegisterRequest req, HttpServletRequest request) {
+    public Responses<UserInfo> register(@RequestBody @Validated WxRegisterRequest req, HttpServletRequest request) {
         var res = authService.register(req);
         var u = res.getData();
         var session = request.getSession();
@@ -58,7 +58,7 @@ public class AuthController {
     @AnonymousAccess
     @ApiOperation("员工登录")
     @PostMapping("/login-staff")
-    public Response<UserInfo> staffLogin(@RequestBody @Validated StaffLoginRequest req, HttpServletRequest request) {
+    public Responses<UserInfo> staffLogin(@RequestBody @Validated StaffLoginRequest req, HttpServletRequest request) {
         var res = authService.staffLogin(req);
         var user = res.getData();
         // 保存登录信息
@@ -71,9 +71,9 @@ public class AuthController {
     @AnonymousAccess
     @ApiOperation("登出")
     @PostMapping("/logout")
-    public Response<Object> logout(HttpServletRequest request) {
+    public Responses<Object> logout(HttpServletRequest request) {
         var session = request.getSession();
         session.invalidate();
-        return Response.ok();
+        return Responses.ok();
     }
 }

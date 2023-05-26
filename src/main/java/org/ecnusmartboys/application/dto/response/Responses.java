@@ -3,7 +3,6 @@ package org.ecnusmartboys.application.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 /**
  * 统一接口返回数据类型。
@@ -13,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response<T> {
+public class Responses<T> {
     /**
      * 业务状态码，与http状态码不相同。
      */
@@ -36,7 +35,7 @@ public class Response<T> {
      * @param <T> /
      * @return /
      */
-    public static <T> Response<T> ok() {
+    public static <T> Responses<T> ok() {
         return ok("ok", null);
     }
 
@@ -50,12 +49,12 @@ public class Response<T> {
      * @param <T>  /
      * @return /
      */
-    public static <T> Response<T> ok(T data) {
+    public static <T> Responses<T> ok(T data) {
         return ok("ok", data);
     }
 
-    public static <T> Response<T> ok(String message, T data) {
-        return new Response<>(0, message, data);
+    public static <T> Responses<T> ok(String message, T data) {
+        return new Responses<>(0, message, data);
     }
 
     /**
@@ -63,8 +62,8 @@ public class Response<T> {
      *
      * @see #ok(Object)
      */
-    public static <T> Response<T> ok(String message) {
-        return Response.ok(message, null);
+    public static <T> Responses<T> ok(String message) {
+        return Responses.ok(message, null);
     }
 
     /**
@@ -74,7 +73,7 @@ public class Response<T> {
      * @param <T>     /
      * @return /
      */
-    public static <T> Response<T> error(String message) {
+    public static <T> Responses<T> error(String message) {
         return error(DEFAULT_ERROR_STATUS, message);
     }
 
@@ -86,7 +85,7 @@ public class Response<T> {
      * @param <T>     /
      * @return /
      */
-    public static <T> Response<T> error(int status, String message) {
-        return new Response<>(status, message, null);
+    public static <T> Responses<T> error(int status, String message) {
+        return new Responses<>(status, message, null);
     }
 }

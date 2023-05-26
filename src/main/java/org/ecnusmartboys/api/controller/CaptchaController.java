@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.Captcha;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class CaptchaController {
             notes = "验证码五分钟失效，使用验证码登录无论成功与否都会失效，需要重新获取验证码")
     @GetMapping
     @AnonymousAccess
-    public Response<Captcha> getCaptcha() {
-        return Response.ok(captchaUtil.generateCaptcha());
+    public Responses<Captcha> getCaptcha() {
+        return Responses.ok(captchaUtil.generateCaptcha());
     }
 }

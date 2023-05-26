@@ -5,11 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
+import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
@@ -18,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,68 +34,45 @@ public class UserArrangeController {
     @AuthRoles(Admin.ROLE)
     @ApiOperation("获取咨询师列表")
     @GetMapping("/consultants")
-    public Response<ConsultantsResponse> getConsultants(@RequestBody @Validated UserListReq req) {
+    public Responses<ConsultantsResponse> getConsultants(@RequestBody @Validated UserListReq req) {
         return userArrangeService.getConsultants(req);
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("获取督导列表")
     @GetMapping("/supervisors")
-    public Response<SupervisorsResponse> getSupervisors(@RequestBody @Validated UserListReq req) {
-        List<SupervisorInfo> supervisorInfoList = new ArrayList<>();
-        var supervisors = userService.getUsers(req, ROLE_SUPERVISOR);
-        supervisors.forEach( v -> {
-            SupervisorInfo supervisorInfo = new SupervisorInfo();
-            BeanUtils.copyProperties(v, supervisorInfo);
-
-            supervisorInfo.setConsultants(consulvisorService.getConsultants(supervisorInfo.getId()));
-            supervisorInfo.setStaff(staffService.getById(supervisorInfo.getId()));
-            // TODO 累计咨询次数，咨询时间
-            supervisorInfo.setConsultNum(0);
-            supervisorInfo.setAccumulatedTime(0L);
-            // TODO 排班
-
-            supervisorInfoList.add(supervisorInfo);
-        });
-        return Response.ok(new SupervisorsResponse(supervisorInfoList, userService.getUserCount(ROLE_SUPERVISOR)));
+    public Responses<SupervisorsResponse> getSupervisors(@RequestBody @Validated UserListReq req) {
+        return userArrangeService.getSupervisors(req);
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("获取访客列表")
     @GetMapping("/visitors")
-    public Response<VisitorsDTO> getVisitors(@RequestBody @Validated UserListReq req) {
-        List<VisitorInfo> visitorInfoList = new ArrayList<>();
-        var visitors = userService.getUsers(req, ROLE_VISITOR);
-        visitors.forEach( v -> {
-            VisitorInfo visitorInfo = new VisitorInfo();
-            BeanUtils.copyProperties(v, visitorInfo);
-
-            visitorInfo.setVisitor(visitorService.getById(visitorInfo.getId()));
-            visitorInfoList.add(visitorInfo);
-        });
-        return Response.ok(new VisitorsDTO(visitorInfoList, userService.getUserCount(ROLE_VISITOR)));
+    public Responses<VisitorsResponse> getVisitors(@RequestBody @Validated UserListReq req) {
+        return userArrangeService.getVisitors(req);
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("禁用用户")
     @PutMapping("/disable/{id}")
-    public Response<Object> disable(@PathVariable String id) {
+    public Responses<Object> disable(@PathVariable String id) {
+
         userService.disable(id, ROLE_CONSULTANT);
-        return Response.ok("成功禁用咨询师");
+        return Responses.ok("成功禁用咨询师");
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("启用用户")
     @PutMapping("/enable/{id}")
-    public Response<Object> enable(@PathVariable String id) {
+    public Responses<Object> enable(@PathVariable String id) {
         userService.enable(id, ROLE_VISITOR);
-        return Response.ok("成功启用访客");
+        return Responses.ok("成功启用访客");
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("添加督导")
     @PostMapping("/add/supervisor")
-    public Response<Object> addSupervisor(@RequestBody @Validated AddSupervisorRequest req) {
+    public Responses<Object> addSupervisor(@RequestBody @Validated AddSupervisorRequest req) {
         if(userService.getByUsername(req.getUsername()) != null) {
             throw new BadRequestException("该用户名已存在");
         }
@@ -101,24 +81,24 @@ public class UserArrangeController {
             throw new BadRequestException("该手机号已被注册");
         }
         userService.saveSupervisor(req);
-        return Response.ok("成功添加督导");
+        return Responses.ok("成功添加督导");
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("更新督导")
     @PostMapping("/update/supervisor")
-    public Response<Object> updateSupervisor(@RequestBody @Validated UpdateSupervisorRequest req) {
+    public Responses<Object> updateSupervisor(@RequestBody @Validated UpdateSupervisorRequest req) {
         if(userService.getSingleUser(req.getSupervisorId(), ROLE_SUPERVISOR) == null) {
             throw new BadRequestException("该咨询师不存在");
         }
         userService.updateSupervisor(req);
-        return Response.ok("成功更新督导");
+        return Responses.ok("成功更新督导");
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("添加咨询师")
     @PostMapping("/add/consultant")
-    public Response<Object> addConsultant(@RequestBody @Validated AddConsultantRequest req) {
+    public Responses<Object> addConsultant(@RequestBody @Validated AddConsultantRequest req) {
         if(userService.getByUsername(req.getUsername()) != null) {
             throw new BadRequestException("该用户名已存在");
         }
@@ -135,13 +115,13 @@ public class UserArrangeController {
         });
 
         userService.saveConsultant(req);
-        return Response.ok("成功添加咨询师");
+        return Responses.ok("成功添加咨询师");
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("更新咨询师")
     @PostMapping("/update/consultant")
-    public Response<Object> updateConsultant(@RequestBody @Validated UpdateConsultantRequest req) {
+    public Responses<Object> updateConsultant(@RequestBody @Validated UpdateConsultantRequest req) {
         if(userService.getSingleUser(req.getConsultantId(), ROLE_CONSULTANT) == null) {
             throw new BadRequestException("该咨询师不存在");
         }
@@ -153,6 +133,6 @@ public class UserArrangeController {
             }
         });
 //        userService.updateConsultant(req); TODO
-        return Response.ok("成功更新督导");
+        return Responses.ok("成功更新督导");
     }
 }

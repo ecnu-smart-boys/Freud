@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.StartConsultRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.StartConsultResponse;
 import org.ecnusmartboys.domain.model.user.Visitor;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +29,8 @@ public class ConversationController {
     @AuthRoles(Visitor.ROLE)
     @PostMapping("/consult")
     @ApiOperation("发起咨询会话")
-    public Response<StartConsultResponse> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
+    public Responses<StartConsultResponse> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
         var common = Extractor.extract(request);
-        return Response.ok();
+        return Responses.ok();
     }
 }

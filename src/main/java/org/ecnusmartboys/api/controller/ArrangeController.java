@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.ArrangeService;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.springframework.validation.annotation.Validated;
@@ -25,14 +25,14 @@ public class ArrangeController {
     @AuthRoles(Admin.ROLE)
     @ApiOperation("移除排班")
     @PostMapping("/remove")
-    public Response<Object> remove(@RequestBody RemoveArrangeRequest req) {
+    public Responses<Object> remove(@RequestBody RemoveArrangeRequest req) {
         return arrangeService.remove(req);
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("添加排班")
     @PostMapping("/add")
-    public Response<Object> addConsultant(@RequestBody @Validated AddArrangementRequest req) {
+    public Responses<Object> addConsultant(@RequestBody @Validated AddArrangementRequest req) {
         return arrangeService.addConsultant(req);
     }
 }

@@ -2,8 +2,8 @@ package org.ecnusmartboys.application.service;
 
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.SendSMSRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 
 public interface SMSService {
-    Response<String> sendSMS(SendSMSRequest req, Common common);
+    Responses<String> sendSMS(SendSMSRequest req, Common common);
 }

@@ -2,7 +2,7 @@ package org.ecnusmartboys.api.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.infrastructure.exception.*;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -24,33 +24,33 @@ public class ControllerExceptionHandlerAdvice {
      */
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(BusinessException.class)
-    public Response<?> businessExceptionHandler(BusinessException exception){
-        return Response.error(exception.getStatus(), exception.getMessage());
+    public Responses<?> businessExceptionHandler(BusinessException exception){
+        return Responses.error(exception.getStatus(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public Response<?> missingParamExceptionHandler(MissingServletRequestParameterException exception) {
-        return Response.error(exception.getParameterName() + "不能为空");
+    public Responses<?> missingParamExceptionHandler(MissingServletRequestParameterException exception) {
+        return Responses.error(exception.getParameterName() + "不能为空");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
-    public Response<?> validExceptionHandler(BindException exception) {
-        return Response.error(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    public Responses<?> validExceptionHandler(BindException exception) {
+        return Responses.error(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Response<?> validExceptionHandler(MethodArgumentNotValidException exception) {
-        return Response.error(
+    public Responses<?> validExceptionHandler(MethodArgumentNotValidException exception) {
+        return Responses.error(
                 exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({ResourceNotFoundException.class})
-    public Response<?> resourceNotFoundExceptionHandler(Exception exception) {
-        return Response.error(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+    public Responses<?> resourceNotFoundExceptionHandler(Exception exception) {
+        return Responses.error(HttpStatus.NOT_FOUND.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -58,40 +58,40 @@ public class ControllerExceptionHandlerAdvice {
             BadRequestException.class,
             IllegalArgumentException.class,
             MultipartException.class})
-    public Response<?> badRequestExceptionHandler(Exception exception) {
-        return Response.error(exception.getMessage());
+    public Responses<?> badRequestExceptionHandler(Exception exception) {
+        return Responses.error(exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InternalException.class)
-    public Response<?> internalExceptionHandler(InternalException exception) {
+    public Responses<?> internalExceptionHandler(InternalException exception) {
         log.error("InternalException: ", exception);
-        return Response.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务异常，请稍后重试");
+        return Responses.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务异常，请稍后重试");
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ForbiddenException.class)
-    public Response<?> forbiddenExceptionHandler(ForbiddenException exception) {
-        return Response.error(HttpStatus.FORBIDDEN.value(), exception.getMessage());
+    public Responses<?> forbiddenExceptionHandler(ForbiddenException exception) {
+        return Responses.error(HttpStatus.FORBIDDEN.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
-    public Response<?> internalExceptionHandler(UnauthorizedException exception) {
-        return Response.error(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
+    public Responses<?> internalExceptionHandler(UnauthorizedException exception) {
+        return Responses.error(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Response<?> methodNotAllowedExceptionHandler(HttpRequestMethodNotSupportedException exception) {
-        return Response.error(HttpStatus.METHOD_NOT_ALLOWED.value(), exception.getMessage());
+    public Responses<?> methodNotAllowedExceptionHandler(HttpRequestMethodNotSupportedException exception) {
+        return Responses.error(HttpStatus.METHOD_NOT_ALLOWED.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public Response<?> unhandledExceptionHandler(Exception exception) {
+    public Responses<?> unhandledExceptionHandler(Exception exception) {
         log.error("Unhandled InternalException: ", exception);
-        return Response.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务异常，请稍后重试");
+        return Responses.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务异常，请稍后重试");
     }
 
 }

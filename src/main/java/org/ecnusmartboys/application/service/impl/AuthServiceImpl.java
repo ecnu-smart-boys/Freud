@@ -7,7 +7,7 @@ import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.StaffLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.AuthService;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Visitor;
@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final SmsUtil smsUtil;
 
     @Override
-    public Response<UserInfo> loginWx(WxLoginRequest req) {
+    public Responses<UserInfo> loginWx(WxLoginRequest req) {
         var code2Session = wxUtil.code2Session(req.getCode());
         Assert.isTrue(code2Session != null && StringUtils.hasText(code2Session.getOpenid()), "获取openid失败");
         Visitor user;
@@ -49,11 +49,11 @@ public class AuthServiceImpl implements AuthService {
         }else{
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
-        return Response.ok(userInfoConvertor.fromEntity(user));
+        return Responses.ok(userInfoConvertor.fromEntity(user));
     }
 
     @Override
-    public Response<UserInfo> register(WxRegisterRequest req) {
+    public Responses<UserInfo> register(WxRegisterRequest req) {
         var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
         Assert.isTrue(validSms, "短信验证码错误");
 
@@ -61,11 +61,11 @@ public class AuthServiceImpl implements AuthService {
         visitor.setOpenID(wxUtil.code2Session(req.getCode()).getOpenid());
         userRepository.save(visitor);
 
-        return Response.ok(userInfoConvertor.fromEntity(visitor));
+        return Responses.ok(userInfoConvertor.fromEntity(visitor));
     }
 
     @Override
-    public Response<UserInfo> staffLogin(StaffLoginRequest req) {
+    public Responses<UserInfo> staffLogin(StaffLoginRequest req) {
         // 验证登录
         var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
         if (!validCaptcha) {
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
             throw ForbiddenException.DISABLED;
         }
         var result = userInfoConvertor.fromEntity(user);
-        return Response.ok(result);
+        return Responses.ok(result);
     }
 
 }

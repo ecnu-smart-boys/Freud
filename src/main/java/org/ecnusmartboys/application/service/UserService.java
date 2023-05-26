@@ -4,10 +4,10 @@ import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoRequest;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 
 public interface UserService {
-    Response<UserInfo> getUserInfo(Common common);
+    Responses<UserInfo> getUserInfo(Common common);
 
-    Response<Object> updateVisitorInfo(UpdateVisitorRequest req, Common common);
+    Responses<Object> updateVisitorInfo(UpdateVisitorRequest req, Common common);
 }

@@ -9,7 +9,7 @@ import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
 import org.ecnusmartboys.application.service.UserService;
-import org.ecnusmartboys.application.dto.response.Response;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,14 +30,14 @@ public class UserController {
     @AnonymousAccess
     @ApiOperation("获取用户信息")
     @GetMapping("/info")
-    public Response<UserInfo> getUserInfo(HttpServletRequest request) {
+    public Responses<UserInfo> getUserInfo(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return userService.getUserInfo(common);
     }
 
     @ApiOperation("更新访客用户信息")
     @PutMapping("/info")
-    public Response<Object> updateVisitorInfo(@RequestBody @Validated UpdateVisitorRequest req, HttpServletRequest request) {
+    public Responses<Object> updateVisitorInfo(@RequestBody @Validated UpdateVisitorRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return userService.updateVisitorInfo(req, common);
     }
