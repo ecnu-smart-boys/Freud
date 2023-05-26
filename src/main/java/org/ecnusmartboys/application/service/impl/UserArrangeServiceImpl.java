@@ -8,13 +8,11 @@ import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.repository.UserRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.ecnusmartboys.infrastructure.service.UserService.ROLE_CONSULTANT;
 
 @RequiredArgsConstructor
 @Service

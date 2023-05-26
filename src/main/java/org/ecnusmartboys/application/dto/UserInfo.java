@@ -32,6 +32,7 @@ public class UserInfo {
     private String emergencyContactName;
 
     private String emergencyContactPhone;
+
     //咨询师/督导信息
     private String idNumber;
 

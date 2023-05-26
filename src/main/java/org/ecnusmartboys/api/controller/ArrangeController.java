@@ -27,8 +27,6 @@ public class ArrangeController {
     @PostMapping("/remove")
     public Response<Object> remove(@RequestBody RemoveArrangeRequest req) {
         return arrangeService.remove(req);
-
-        //arrangementService.remove(new QueryWrapper<Arrangement>().eq("user_id", id).eq("date", date));
     }
 
     @AuthRoles(Admin.ROLE)
