@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     public Response<UserInfo> loginWx(WxLoginRequest req) {
         var code2Session = wxUtil.code2Session(req.getCode());
         Assert.isTrue(code2Session != null && StringUtils.hasText(code2Session.getOpenid()), "获取openid失败");
-        var u = (Visitor)userRepository.retrieveByOpenId(code2Session.getOpenid(), "visitor");
+        Visitor u = (Visitor)userRepository.retrieveByOpenId(code2Session.getOpenid());
         if (u != null && Boolean.TRUE.equals(u.isDisabled())) {
             throw ForbiddenException.DISABLED;
         }

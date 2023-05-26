@@ -1,7 +1,6 @@
 package org.ecnusmartboys.infrastructure.ws;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -13,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class WebSocketServer extends TextWebSocketHandler {
 
-    private final Map<Long, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+    private final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     public boolean send(Long userId, String message) {
         return false;
@@ -21,8 +20,7 @@ public class WebSocketServer extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        var userId = SecurityUtil.getCurrentUserId();
-        SecurityUtil.removeCurrentUser();
+        String userId = (String) session.getAttributes().get("user_id");
         if (userId == null) {
             log.debug("WebSocket connection closed because of no user id");
             session.close();

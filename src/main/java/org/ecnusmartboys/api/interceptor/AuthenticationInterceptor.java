@@ -3,7 +3,7 @@ package org.ecnusmartboys.api.interceptor;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
-import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request,
+    public boolean preHandle(@NotNull HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {

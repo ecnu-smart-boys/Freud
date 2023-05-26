@@ -1,7 +1,6 @@
 package org.ecnusmartboys.api.interceptor;
 
 import lombok.RequiredArgsConstructor;
-import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -32,10 +31,6 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
             return false;
         }
         Long userId = session.getAttribute("userId");
-        if (userId == null) {
-            return false;
-        }
-        SecurityUtil.setCurrentUserId(userId);
 
         return true;
     }

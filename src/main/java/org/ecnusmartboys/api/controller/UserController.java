@@ -11,8 +11,6 @@ import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
 import org.ecnusmartboys.application.dto.request.command.UpdateUserInfoRequest;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
-import org.ecnusmartboys.infrastructure.service.UserService;
-import org.ecnusmartboys.infrastructure.utils.SecurityUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

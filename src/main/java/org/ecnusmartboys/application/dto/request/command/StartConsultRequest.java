@@ -9,9 +9,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @ApiModel("发起咨询会话请求")
 public class StartConsultRequest {
-
     @NotNull(message = "咨询师id不能为空")
     @ApiModelProperty("咨询师id")
     private Long toId;
-
 }

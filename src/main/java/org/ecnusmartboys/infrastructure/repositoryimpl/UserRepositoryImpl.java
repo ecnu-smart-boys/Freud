@@ -7,15 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
-import org.ecnusmartboys.infrastructure.data.mysql.RoleDO;
+import org.ecnusmartboys.infrastructure.data.mysql.StaffInfoDO;
 import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
 import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
-import org.ecnusmartboys.infrastructure.mapper.RoleMapper;
 import org.ecnusmartboys.infrastructure.mapper.StaffInfoMapper;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Repository;
 
@@ -26,41 +23,51 @@ import java.util.List;
 @Repository
 public class UserRepositoryImpl implements UserRepository, InitializingBean {
     private final UserMapper userMapper;
-    private final RoleMapper roleMapper;
     private final StaffInfoMapper staffInfoMapper;
     private final VisitorInfoMapper visitorInfoMapper;
     private final UserConvertor userConvertor;
+
     @Override
-    public User retrieveByOpenId(String openID, String role) {
+    public User retrieveById(String ID) {
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getId, ID));
+        if (userDO == null) {
+            return null;
+        }
+        return convert(userDO);
+    }
+
+    @Override
+    public User retrieveByOpenId(String openID) {
         var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getOpenId, openID));
         if (userDO == null) {
             return null;
         }
-        var roleDO = getRole(userDO.getId(), role);
-        if (roleDO == null) {
-            return null;
-        }
-        return userConvertor.toUser(userDO, roleDO);
+        return convert(userDO);
     }
 
     @Override
-    public User retrieveByName(String name, String role) {
+    public User retrieveByName(String name) {
         var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getName, name));
         if (userDO == null) {
             return null;
         }
-        var roleDO = getRole(userDO.getId(), role);
-        if (roleDO == null) {
-            return null;
-        }
-        return userConvertor.toUser(userDO, roleDO);
+        return convert(userDO);
     }
 
-    private RoleDO getRole(Long id, String role) {
-        return roleMapper.selectOne(new LambdaQueryWrapper<RoleDO>()
-                .eq(RoleDO::getUserID, id)
-                .eq(RoleDO::getUserID, role)
-        );
+    private User convert(UserDO userDO){
+        String role = userDO.getRole();
+        switch (role) {
+            case Visitor.ROLE:
+                var visitorInfoDO = visitorInfoMapper.selectOne(new LambdaQueryWrapper<VisitorInfoDO>().eq(VisitorInfoDO::getUserId, userDO.getId()));
+                return userConvertor.toVisitor(userDO, visitorInfoDO);
+            case Admin.ROLE:
+                return userConvertor.toAdmin(userDO);
+            case Supervisor.ROLE:
+            case Consultant.ROLE:
+                var staffInfoDO = staffInfoMapper.selectOne(new LambdaQueryWrapper<StaffInfoDO>().eq(StaffInfoDO::getUserId, userDO.getId()));
+                return role.equals(Consultant.ROLE) ? userConvertor.toConsultant(userDO, staffInfoDO) : userConvertor.toSupervisor(userDO, staffInfoDO);
+        }
+        return userConvertor.toUser(userDO);
     }
 
     @Override
@@ -85,7 +92,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     @Override
     public void afterPropertiesSet() {
         // 创建超级管理员
-        Long count = roleMapper.selectCount(new LambdaQueryWrapper<RoleDO>().eq(RoleDO::getRole, Admin.ROLE));
+        Long count = userMapper.selectCount(new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, Admin.ROLE));
         if (count == 0) {
             UserDO userDO = new UserDO();
             userDO.setName("弗洛伊德");
@@ -94,11 +101,8 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             userDO.setGender(0);
             var rawPassword = "freud_admin" + System.currentTimeMillis();
             userDO.setPassword(BCrypt.hashpw(rawPassword));
+            userDO.setRole(Admin.ROLE);
             userMapper.insert(userDO);
-            RoleDO roleDO = new RoleDO();
-            roleDO.setRole(Admin.ROLE);
-            //TODO 不确定是这么返回的吗
-            roleDO.setUserID(String.valueOf(userDO.getId()));
             log.info("创建超级管理员成功，用户名：{}，密码：{}", userDO.getUsername(), rawPassword);
         }
     }

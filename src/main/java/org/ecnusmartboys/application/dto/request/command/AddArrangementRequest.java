@@ -12,7 +12,7 @@ import java.util.Date;
 public class AddArrangementRequest {
 
     @NotNull(message = "用户id不能为空")
-    private Long userId;
+    public String userId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "排班日期不能为空")

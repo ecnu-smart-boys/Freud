@@ -45,6 +45,8 @@ public class UserDO extends BaseDO {
     public static final String EMAIL = "email";
     private String email;
 
+    private String role;
+
     public static final String DISABLED = "is_disabled";
     @TableField(DISABLED)
     private Boolean disabled;

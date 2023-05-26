@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 @TableName(value = StaffInfoDO.TABLE_NAME, autoResultMap = true)
 public class StaffInfoDO extends BaseDO {
     public static final String TABLE_NAME = "staff_info";
+
+    private String userId;
+
     @ApiModelProperty("身份证号")
     private String idNumber;
 

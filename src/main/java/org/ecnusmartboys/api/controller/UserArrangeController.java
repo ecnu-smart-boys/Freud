@@ -11,15 +11,13 @@ import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Response;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
+import org.ecnusmartboys.domain.model.user.Admin;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static org.ecnusmartboys.infrastructure.service.UserService.*;
 
 @Slf4j
 @RestController
@@ -30,14 +28,14 @@ public class UserArrangeController {
 
     private final UserArrangeService userArrangeService;
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("获取咨询师列表")
     @GetMapping("/consultants")
     public Response<ConsultantsResponse> getConsultants(@RequestBody @Validated UserListReq req) {
         return userArrangeService.getConsultants(req);
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("获取督导列表")
     @GetMapping("/supervisors")
     public Response<SupervisorsResponse> getSupervisors(@RequestBody @Validated UserListReq req) {
@@ -59,7 +57,7 @@ public class UserArrangeController {
         return Response.ok(new SupervisorsResponse(supervisorInfoList, userService.getUserCount(ROLE_SUPERVISOR)));
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("获取访客列表")
     @GetMapping("/visitors")
     public Response<VisitorsDTO> getVisitors(@RequestBody @Validated UserListReq req) {
@@ -75,47 +73,23 @@ public class UserArrangeController {
         return Response.ok(new VisitorsDTO(visitorInfoList, userService.getUserCount(ROLE_VISITOR)));
     }
 
-    @AuthRoles(ROLE_ADMIN)
-    @ApiOperation("禁用咨询师")
-    @PutMapping("/disable/consultant/{id}")
-    public Response<Object> disableConsultant(@PathVariable Long id) {
+    @AuthRoles(Admin.ROLE)
+    @ApiOperation("禁用用户")
+    @PutMapping("/disable/{id}")
+    public Response<Object> disable(@PathVariable String id) {
         userService.disable(id, ROLE_CONSULTANT);
         return Response.ok("成功禁用咨询师");
     }
 
-    @AuthRoles(ROLE_ADMIN)
-    @ApiOperation("禁用督导")
-    @PutMapping("/disable/supervisor/{id}")
-    public Response<Object> disableSupervisor(@PathVariable Long id) {
-        userService.disable(id, ROLE_SUPERVISOR);
-        return Response.ok("成功禁用督导");
-    }
-
-    @AuthRoles(ROLE_ADMIN)
-    @ApiOperation("禁用访客")
-    @PutMapping("/disable/visitor/{id}")
-    public Response<Object> disableVisitor(@PathVariable Long id) {
-        userService.disable(id, ROLE_VISITOR);
-        return Response.ok("成功禁用访客");
-    }
-
-    @AuthRoles(ROLE_ADMIN)
-    @ApiOperation("启用访客")
-    @PutMapping("/enable/visitor/{id}")
-    public Response<Object> enableVisitor(@PathVariable Long id) {
+    @AuthRoles(Admin.ROLE)
+    @ApiOperation("启用用户")
+    @PutMapping("/enable/{id}")
+    public Response<Object> enable(@PathVariable String id) {
         userService.enable(id, ROLE_VISITOR);
         return Response.ok("成功启用访客");
     }
 
-    @AuthRoles(ROLE_ADMIN)
-    @ApiOperation("启用督导")
-    @PutMapping("/enable/supervisor/{id}")
-    public Response<Object> enableSupervisor(@PathVariable Long id) {
-        userService.enable(id, ROLE_SUPERVISOR);
-        return Response.ok("成功启用督导");
-    }
-
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("添加督导")
     @PostMapping("/add/supervisor")
     public Response<Object> addSupervisor(@RequestBody @Validated AddSupervisorRequest req) {
@@ -130,7 +104,7 @@ public class UserArrangeController {
         return Response.ok("成功添加督导");
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("更新督导")
     @PostMapping("/update/supervisor")
     public Response<Object> updateSupervisor(@RequestBody @Validated UpdateSupervisorRequest req) {
@@ -141,7 +115,7 @@ public class UserArrangeController {
         return Response.ok("成功更新督导");
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("添加咨询师")
     @PostMapping("/add/consultant")
     public Response<Object> addConsultant(@RequestBody @Validated AddConsultantRequest req) {
@@ -164,7 +138,7 @@ public class UserArrangeController {
         return Response.ok("成功添加咨询师");
     }
 
-    @AuthRoles(ROLE_ADMIN)
+    @AuthRoles(Admin.ROLE)
     @ApiOperation("更新咨询师")
     @PostMapping("/update/consultant")
     public Response<Object> updateConsultant(@RequestBody @Validated UpdateConsultantRequest req) {

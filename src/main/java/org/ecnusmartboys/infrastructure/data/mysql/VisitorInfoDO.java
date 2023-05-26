@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 public class VisitorInfoDO extends BaseDO {
     public static final String TABLE_NAME = "visitor_info";
 
+    private String userId;
+
     @ApiModelProperty(value = "紧急联系人", required = true)
     private String emergencyContact;
 
