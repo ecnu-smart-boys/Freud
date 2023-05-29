@@ -72,7 +72,7 @@ public class AuthServiceImpl implements AuthService {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
         Consultant user;
-        if(userRepository.retrieveByName(req.getUsername()) instanceof Consultant tmp){
+        if(userRepository.retrieveByUsername(req.getUsername()) instanceof Consultant tmp){
             if(tmp.isDisabled()){
                 throw ForbiddenException.DISABLED;
             }

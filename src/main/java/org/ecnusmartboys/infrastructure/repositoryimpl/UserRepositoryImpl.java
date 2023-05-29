@@ -2,8 +2,11 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
@@ -15,7 +18,9 @@ import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,47 +51,109 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     }
 
     @Override
-    public User retrieveByName(String name) {
-        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getName, name));
+    public User retrieveByUsername(String username) {
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getUsername, username));
         if (userDO == null) {
             return null;
         }
         return convert(userDO);
     }
 
+    @Override
+    public User retrieveByPhone(String phone) {
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getPhone, phone));
+        if (userDO == null) {
+            return null;
+        }
+        return convert(userDO);
+    }
+
+    @Override
+    public PageResult<User> retrieveByRoleAndPage(String role, Long current, Long size, String name) {
+        Page<UserDO> page = new Page<>(current - 1, size);
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, role);
+        if(!name.equals("")) {
+            wrapper.like(UserDO::getName, name);
+        }
+        userMapper.selectPage(page, wrapper);
+
+        List<UserDO> userDOS = page.getRecords();
+        List<User> users = new ArrayList<>();
+        userDOS.forEach(v -> {
+            users.add(convert(v));
+        });
+        return new PageResult<>(users, page.getTotal());
+    }
+
+
     private User convert(UserDO userDO){
         String role = userDO.getRole();
         switch (role) {
             case Visitor.ROLE:
-                var visitorInfoDO = visitorInfoMapper.selectOne(new LambdaQueryWrapper<VisitorInfoDO>().eq(VisitorInfoDO::getUserId, userDO.getId()));
+                var visitorInfoDO = visitorInfoMapper.selectOne(new LambdaQueryWrapper<VisitorInfoDO>().eq(VisitorInfoDO::getVisitorId, userDO.getId()));
                 return userConvertor.toVisitor(userDO, visitorInfoDO);
             case Admin.ROLE:
                 return userConvertor.toAdmin(userDO);
             case Supervisor.ROLE:
             case Consultant.ROLE:
-                var staffInfoDO = staffInfoMapper.selectOne(new LambdaQueryWrapper<StaffInfoDO>().eq(StaffInfoDO::getUserId, userDO.getId()));
+                var staffInfoDO = staffInfoMapper.selectOne(new LambdaQueryWrapper<StaffInfoDO>().eq(StaffInfoDO::getStaffId, userDO.getId()));
                 return role.equals(Consultant.ROLE) ? userConvertor.toConsultant(userDO, staffInfoDO) : userConvertor.toSupervisor(userDO, staffInfoDO);
         }
         return userConvertor.toUser(userDO);
     }
 
+
+
     @Override
-    public List<User> retrieveByRole(String role) {
-        return null;
+    @Transactional
+    public void save(User user) {
+        var userDO = userConvertor.toUserDO(user);
+        userMapper.insert(userDO);
+        if (user instanceof Visitor) {
+            var visitorInfoDO = userConvertor.toVisitorInfoDO((Visitor) user);
+            visitorInfoDO.setVisitorId(userDO.getId());
+            visitorInfoMapper.insert(visitorInfoDO);
+        } else if (user instanceof Consultant) {
+            var staffInfoDO = userConvertor.toStaffInfoDO((Consultant) user);
+            staffInfoDO.setStaffId(userDO.getId());
+            staffInfoMapper.insert(staffInfoDO);
+        } else if(user instanceof Supervisor) {
+            var staffInfoDO = userConvertor.toStaffInfoDO((Supervisor) user);
+            staffInfoDO.setStaffId(userDO.getId());
+            staffInfoMapper.insert(staffInfoDO);
+        }
     }
 
     @Override
-    public void save(User user) {
-        //TODO save or update
+    @Transactional
+    public void update(User user) {
         var userDO = userConvertor.toUserDO(user);
         userMapper.updateById(userDO);
         if (user instanceof Visitor) {
             var visitorInfoDO = userConvertor.toVisitorInfoDO((Visitor) user);
+            visitorInfoDO.setVisitorId(userDO.getId());
             visitorInfoMapper.updateById(visitorInfoDO);
         } else if (user instanceof Consultant) {
-            var staffInfo = userConvertor.toStaffInfoDO((Consultant) user);
-            staffInfoMapper.updateById(staffInfo);
+            var staffInfoDO = userConvertor.toStaffInfoDO((Consultant) user);
+            staffInfoDO.setStaffId(userDO.getId());
+            staffInfoMapper.updateById(staffInfoDO);
+        } else if(user instanceof Supervisor) {
+            var staffInfoDO = userConvertor.toStaffInfoDO((Supervisor) user);
+            staffInfoDO.setStaffId(userDO.getId());
+            staffInfoMapper.updateById(staffInfoDO);
         }
+    }
+
+    @Override
+    public List<String> retrieveIdsByArrangement(int dayOfWeek) {
+        var wrapper = new QueryWrapper<StaffInfoDO>().eq(
+            "arrangement & " + (1 << dayOfWeek), 1 << dayOfWeek);
+        var staffList = staffInfoMapper.selectList(wrapper);
+        List<String> results =  new ArrayList<>();
+        staffList.forEach(v -> {
+            results.add(v.getStaffId().toString());
+        });
+        return results;
     }
 
     @Override

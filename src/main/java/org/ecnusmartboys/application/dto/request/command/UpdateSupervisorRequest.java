@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 public class UpdateSupervisorRequest {
 
     @NotNull
-    private Long supervisorId;
+    private String id;
 
     @NotNull(message = "名字不能为空")
     @Pattern(regexp = "^[\\p{L}a-zA-Z]{2,32}$", message = "姓名格式不正确")
@@ -28,10 +28,6 @@ public class UpdateSupervisorRequest {
     @NotNull(message = "年龄不能为空")
     @Range(min = 10, max = 100, message = "年龄必须在10-100之间")
     private Integer age;
-
-    @NotNull(message = "邮箱不能为空")
-    @Email(message = "邮箱格式不正确")
-    private String email;
 
     @NotNull(message = "身份证号码不能为空")
     @IdNumber

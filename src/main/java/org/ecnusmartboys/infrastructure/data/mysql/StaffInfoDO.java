@@ -1,5 +1,7 @@
 package org.ecnusmartboys.infrastructure.data.mysql;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -18,7 +20,9 @@ import lombok.NoArgsConstructor;
 public class StaffInfoDO extends BaseDO {
     public static final String TABLE_NAME = "staff_info";
 
-    private String userId;
+    @ApiModelProperty("员工id")
+    @TableId
+    private Long staffId;
 
     @ApiModelProperty("身份证号")
     private String idNumber;
@@ -34,4 +38,7 @@ public class StaffInfoDO extends BaseDO {
 
     @ApiModelProperty("资质编号")
     private String qualificationCode = "";
+
+    @ApiModelProperty("排班计划")
+    private Integer arrangement;
 }

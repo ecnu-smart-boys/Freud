@@ -1,6 +1,8 @@
 package org.ecnusmartboys.infrastructure.data.mysql;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
@@ -13,10 +15,13 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @TableName(value = UserDO.TABLE_NAME, autoResultMap = true)
 public class UserDO extends BaseDO {
     public static final String TABLE_NAME = "sys_user";
+
+    @TableId(value = "id", type = IdType.AUTO)
+    protected Long id;
 
     public static final String OPEN_ID = "open_id";
     private String openId;

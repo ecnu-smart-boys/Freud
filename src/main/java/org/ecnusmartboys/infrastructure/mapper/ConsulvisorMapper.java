@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.repository;
+package org.ecnusmartboys.infrastructure.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,4 +16,7 @@ public interface ConsulvisorMapper extends BaseMapper<ConsulvisorDO> {
 
     @Select("SELECT * FROM consulvisor where supervisor_id = #{supervisorId}")
     List<ConsulvisorDO> selectBySupervisorId(Long supervisorId);
+
+    @Select("DELETE FROM consulvisor where consultant_id = #{consultantId}")
+    void deleteByConsultantId(@Param("consultantId") Long consultantId);
 }

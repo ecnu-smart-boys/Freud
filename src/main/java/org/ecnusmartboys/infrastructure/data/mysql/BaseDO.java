@@ -15,10 +15,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id", callSuper = false)
 public abstract class BaseDO {
-    @TableId(value = "id", type = IdType.AUTO)
-    protected Long id;
 
     protected Date createTime;
 

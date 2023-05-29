@@ -1,7 +1,6 @@
 package org.ecnusmartboys.api.validator;
 
 import org.ecnusmartboys.api.annotation.IdNumber;
-import org.ecnusmartboys.api.annotation.Phone;
 import org.ecnusmartboys.infrastructure.utils.Validator;
 
 import javax.validation.ConstraintValidator;

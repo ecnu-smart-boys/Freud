@@ -18,4 +18,5 @@ public interface UserConvertor {
     UserDO toUserDO(User user);
     VisitorInfoDO toVisitorInfoDO(Visitor visitor);
     StaffInfoDO toStaffInfoDO(Consultant consultant);
+    StaffInfoDO toStaffInfoDO(Supervisor supervisor);
 }

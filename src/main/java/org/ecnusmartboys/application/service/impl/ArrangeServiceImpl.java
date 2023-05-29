@@ -20,16 +20,16 @@ public class ArrangeServiceImpl implements ArrangeService {
 
     @Override
     public Responses<Object> addConsultant(AddArrangementRequest req) {
-        if(userRepository.retrieveById(req.getUserId()) == null) {
-            throw new BadRequestException("所要排班的督导不存在");
-        }
-
-        if(arrangementService.getArrangement(req) != null) {
-            throw new BadRequestException("请勿重复排班");
-        }
-
-        Arrangement arrangement = new Arrangement(req.getDate(), req.getUserId());
-        arrangementService.save(arrangement);
+//        if(userRepository.retrieveById(req.getUserId()) == null) {
+//            throw new BadRequestException("所要排班的督导不存在");
+//        }
+//
+//        if(arrangementService.getArrangement(req) != null) {
+//            throw new BadRequestException("请勿重复排班");
+//        }
+//
+//        Arrangement arrangement = new Arrangement(req.getDate(), req.getUserId());
+//        arrangementService.save(arrangement);
         return Responses.ok("成功添加排班");
     }
 }

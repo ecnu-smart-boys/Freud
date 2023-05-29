@@ -3,7 +3,7 @@ package org.ecnusmartboys.application.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ecnusmartboys.application.dto.UserInfo;
+import org.ecnusmartboys.application.dto.SupervisorInfo;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SupervisorsResponse {
 
-    private List<UserInfo> supervisors;
+    private List<SupervisorInfo> supervisors;
 
     private Long total;
 }

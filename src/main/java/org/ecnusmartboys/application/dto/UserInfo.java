@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class UserInfo {
 
-    private Long id;
+    private String id;
 
     private String username;
 
@@ -26,31 +26,31 @@ public class UserInfo {
 
     private Boolean disabled;
 
-    private List<String> roles;
+    private String role;
 
-    //访客信息
-    private String emergencyContactName;
-
-    private String emergencyContactPhone;
-
-    //咨询师/督导信息
-    private String idNumber;
-
-    @ApiModelProperty("工作单位")
-    private String department;
-
-    @ApiModelProperty("职称")
-    private String title;
-
-    @ApiModelProperty("资质")
-    private String qualification;
-
-    @ApiModelProperty("资质编号")
-    private String qualificationCode;
-
-    private Integer consultNum;
-
-    private Long accumulatedTime;
-
-    private List<String> supervisors;
+//    //访客信息
+//    private String emergencyContactName;
+//
+//    private String emergencyContactPhone;
+//
+//    //咨询师/督导信息
+//    private String idNumber;
+//
+//    @ApiModelProperty("工作单位")
+//    private String department;
+//
+//    @ApiModelProperty("职称")
+//    private String title;
+//
+//    @ApiModelProperty("资质")
+//    private String qualification;
+//
+//    @ApiModelProperty("资质编号")
+//    private String qualificationCode;
+//
+//    private Integer consultNum;
+//
+//    private Long accumulatedTime;
+//
+//    private List<String> supervisors;
 }

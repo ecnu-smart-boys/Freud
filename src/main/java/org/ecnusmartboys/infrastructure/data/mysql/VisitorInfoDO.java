@@ -1,6 +1,7 @@
 package org.ecnusmartboys.infrastructure.data.mysql;
 
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,9 @@ import lombok.NoArgsConstructor;
 public class VisitorInfoDO extends BaseDO {
     public static final String TABLE_NAME = "visitor_info";
 
-    private String userId;
+    @ApiModelProperty("访客id")
+    @TableId
+    private Long visitorId;
 
     @ApiModelProperty(value = "紧急联系人", required = true)
     private String emergencyContact;

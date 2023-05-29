@@ -58,5 +58,5 @@ public class AddConsultantRequest {
     private String title;
 
     @NotNull(message = "咨询师必须绑定督导")
-    private List<Long> supervisorIds;
+    private List<String> supervisorIds;
 }

@@ -22,15 +22,15 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request,
                                    ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        var x = ((ServletServerHttpRequest) request).getServletRequest().getParameter("x-freud");
-        if (x == null) {
-            return false;
-        }
-        var session = (Session) sessionRepository.findById(x);
-        if (session == null) {
-            return false;
-        }
-        Long userId = session.getAttribute("userId");
+//        var x = ((ServletServerHttpRequest) request).getServletRequest().getParameter("x-freud");
+//        if (x == null) {
+//            return false;
+//        }
+//        var session = (Session) sessionRepository.findById(x);
+//        if (session == null) {
+//            return false;
+//        }
+//        Long userId = session.getAttribute("userId");
 
         return true;
     }

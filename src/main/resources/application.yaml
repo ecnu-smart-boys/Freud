@@ -51,6 +51,9 @@ spring:
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml
   type-enums-package: org.ecnusmartboys.model.entity.enums
+  configuration:
+    # 分页插件拦截器
+    interceptor: com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor
 
 # set these values in application-local.yaml
 freud:
