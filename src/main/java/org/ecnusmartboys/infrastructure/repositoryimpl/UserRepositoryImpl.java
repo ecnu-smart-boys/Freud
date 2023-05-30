@@ -70,7 +70,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
 
     @Override
     public PageResult<User> retrieveByRoleAndPage(String role, Long current, Long size, String name) {
-        Page<UserDO> page = new Page<>(current - 1, size);
+        Page<UserDO> page = new Page<>(current , size);
         LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, role);
         if(!name.equals("")) {
             wrapper.like(UserDO::getName, name);
@@ -155,6 +155,22 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
         });
         return results;
     }
+
+    @Override
+    public List<User> retrieveByRole(String role, String name) {
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, role);
+        if(!name.equals("")) {
+            wrapper.like(UserDO::getName, name);
+        }
+        List<UserDO> userDOS = userMapper.selectList(wrapper);
+        List<User> users = new ArrayList<>();
+        userDOS.forEach(userDO -> {
+            users.add(userConvertor.toUser(userDO));
+        });
+        return users;
+    }
+
+
 
     @Override
     public void afterPropertiesSet() {

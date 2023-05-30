@@ -1,7 +1,9 @@
 package org.ecnusmartboys.application.dto.request.command;
 
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.ecnusmartboys.api.annotation.IdNumber;
 import org.hibernate.validator.constraints.Range;
 
@@ -11,6 +13,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel("更新督导请求")
 public class UpdateSupervisorRequest {
 

@@ -11,6 +11,9 @@ public class Validator {
     private final static char[] CHECK_CODE_LIST = new char[]{'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
     public final static String PATTERN_PHONE_STR = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$";
     private final static Pattern PATTERN_PHONE = Pattern.compile(PATTERN_PHONE_STR);
+    private final static Long FIRST_TIMESTAMP = 1672502401L;
+    private final static Long LAST_TIMESTAMP = 1735660799L;
+
 
     public static boolean validateID(String id) {
         if (id != null && !id.isEmpty()) {
@@ -80,5 +83,9 @@ public class Validator {
             return false;
         }
         return PATTERN_PHONE.matcher(phone).matches();
+    }
+
+    public static boolean validateTimestamp(Long timestamp) {
+        return timestamp >= FIRST_TIMESTAMP && timestamp <= LAST_TIMESTAMP;
     }
 }

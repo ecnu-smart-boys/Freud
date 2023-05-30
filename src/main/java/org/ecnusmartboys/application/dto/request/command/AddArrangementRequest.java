@@ -2,6 +2,7 @@ package org.ecnusmartboys.application.dto.request.command;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import org.ecnusmartboys.api.annotation.Timestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
@@ -12,11 +13,9 @@ import java.util.Date;
 public class AddArrangementRequest {
 
     @NotNull(message = "用户id不能为空")
-    public String userId;
+    private String userId;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "排班日期不能为空")
-    private Date date;
-
-    private String role;
+    @NotNull
+    @Timestamp
+    private Long timestamp;
 }

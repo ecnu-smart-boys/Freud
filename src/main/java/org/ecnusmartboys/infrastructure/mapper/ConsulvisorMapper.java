@@ -19,4 +19,7 @@ public interface ConsulvisorMapper extends BaseMapper<ConsulvisorDO> {
 
     @Select("DELETE FROM consulvisor where consultant_id = #{consultantId}")
     void deleteByConsultantId(@Param("consultantId") Long consultantId);
+
+    @Select("SELECT supervisor_id FROM consulvisor GROUP BY supervisor_id HAVING COUNT(supervisor_id) >= 10;")
+    List<Long> selectNotAvailableSupIds();
 }

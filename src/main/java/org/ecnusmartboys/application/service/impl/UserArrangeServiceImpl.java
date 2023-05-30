@@ -5,16 +5,16 @@ import org.ecnusmartboys.application.convertor.*;
 import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
+import org.ecnusmartboys.application.dto.request.query.NoArrangedRequest;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
-import org.ecnusmartboys.domain.model.user.Consultant;
-import org.ecnusmartboys.domain.model.user.Consulvisor;
-import org.ecnusmartboys.domain.model.user.Supervisor;
-import org.ecnusmartboys.domain.model.user.Visitor;
+import org.ecnusmartboys.domain.model.arrangement.Arrangement;
+import org.ecnusmartboys.domain.model.user.*;
+import org.ecnusmartboys.domain.repository.ArrangementRepository;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
@@ -22,15 +22,18 @@ import org.ecnusmartboys.infrastructure.exception.InternalException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class UserArrangeServiceImpl implements UserArrangeService {
     private final UserRepository userRepository;
     private final ConsulvisorRepository consulvisorRepository;
+    private final ArrangementRepository arrangementRepository;
 
     private final ConsultantInfoConvertor consultantInfoConvertor;
     private final SupervisorInfoConvertor supervisorInfoConvertor;
@@ -54,16 +57,16 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             consultantInfo.setAvgComment(5);
 
             // 获得绑定的督导
-            consultantInfo.setSupervisorNameList(new ArrayList<>());
+            consultantInfo.setSupervisorList(new ArrayList<>());
             var consulvisors = consulvisorRepository.retrieveByConId(consultantInfo.getId());
             consulvisors.forEach(consulvisor -> {
                 var supervisor = userRepository.retrieveById(consulvisor.getSupervisorId());
-                consultantInfo.getSupervisorNameList().add(new SupervisorName(supervisor.getId(), supervisor.getName()));
+                consultantInfo.getSupervisorList().add(new StaffBaseInfo(supervisor.getId(), supervisor.getName(), supervisor.getAvatar()));
             });
 
             consultantInfoList.add(consultantInfo);
         });
-        return Responses.ok(new ConsultantsResponse(consultantInfoList, pageResult.getTotal())); // TODO
+        return Responses.ok(new ConsultantsResponse(consultantInfoList, pageResult.getTotal()));
     }
 
     @Override
@@ -79,16 +82,16 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             supervisorInfo.setConsultTimes(0);
 
             // 获得咨询师列表
-            supervisorInfo.setConsultantNameList(new ArrayList<>());
+            supervisorInfo.setConsultantList(new ArrayList<>());
             var consulvisors = consulvisorRepository.retrieveBySupId(supervisorInfo.getId());
             consulvisors.forEach(consulvisor -> {
                 var consultant = userRepository.retrieveById(consulvisor.getConsultantId());
-                supervisorInfo.getConsultantNameList().add(new ConsultantName(consultant.getId(), consultant.getName()));
+                supervisorInfo.getConsultantList().add(new StaffBaseInfo(consultant.getId(), consultant.getName(), consultant.getAvatar()));
             });
 
             supervisorInfoList.add(supervisorInfo);
         });
-        return Responses.ok(new SupervisorsResponse(supervisorInfoList, pageResult.getTotal())); // TODO
+        return Responses.ok(new SupervisorsResponse(supervisorInfoList, pageResult.getTotal()));
     }
 
     @Override
@@ -97,7 +100,12 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         var pageResult = userRepository.retrieveByRoleAndPage(Visitor.ROLE, req.getCurrent(), req.getSize(), req.getName());
         var visitors = pageResult.getData();
         visitors.forEach( v -> {
-            visitorInfoList.add(visitorInfoConvertor.fromEntity((Visitor) v));
+            var visitor = visitorInfoConvertor.fromEntity((Visitor) v);
+
+            // TODO 总咨询时长
+            visitor.setTotalTime(0);
+
+            visitorInfoList.add(visitor);
         });
         return Responses.ok(new VisitorsResponse(visitorInfoList, pageResult.getTotal()));
     }
@@ -118,7 +126,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         }
 
         user.setDisabled(true);
-        userRepository.save(user);
+        userRepository.update(user);
 
         return Responses.ok("禁用用户成功");
     }
@@ -139,7 +147,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         }
 
         user.setDisabled(false);
-        userRepository.save(user);
+        userRepository.update(user);
 
         return Responses.ok("启用用户成功");
     }
@@ -206,6 +214,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             throw new BadRequestException("所要修改的咨询师不存在");
         }
 
+        // TODO 督导上限
         for(String supervisorId : req.getSupervisorIds()) {
             user = userRepository.retrieveById(supervisorId);
             if(!(user instanceof Supervisor)) {
@@ -221,5 +230,37 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             consulvisorRepository.save(new Consulvisor(user.getId(), supervisorId));
         }
         return Responses.ok("成功修改咨询师");
+    }
+
+    @Override
+    public Responses<Object> updateArrangement(UpdateArrangementRequest req) {
+        var user = userRepository.retrieveById(req.getId());
+        if((!(user instanceof Consultant) && !(user instanceof Supervisor))) {
+            throw new BadRequestException("所要排班的用户不存在");
+        }
+
+        if(user instanceof Consultant) {
+            ((Consultant) user).setArrangement(req.getArrangement());
+        } else {
+            ((Supervisor) user).setArrangement(req.getArrangement());
+        }
+        userRepository.update(user);
+
+        return Responses.ok("成功修改排班");
+    }
+
+    @Override
+    public Responses<List<StaffBaseInfo>> getAvailableSupervisors() {
+        List<StaffBaseInfo> result=  new ArrayList<>();
+        List<String> notAvailableSupIds = consulvisorRepository.retrieveNotAvailableSupIds();
+        Set<String> ids = new HashSet<>(notAvailableSupIds);;
+
+        List<User> supervisors = userRepository.retrieveByRole(Supervisor.ROLE, "");
+        supervisors.forEach(supervisor -> {
+            if(!ids.contains(supervisor.getId())) {
+                result.add(new StaffBaseInfo(supervisor.getId(), supervisor.getName(), supervisor.getAvatar()));
+            }
+        });
+        return Responses.ok(result);
     }
 }

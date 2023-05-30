@@ -59,7 +59,7 @@ public class ControllerExceptionHandlerAdvice {
             IllegalArgumentException.class,
             MultipartException.class})
     public Responses<?> badRequestExceptionHandler(Exception exception) {
-        return Responses.error(exception.getMessage());
+        return Responses.error(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -54,7 +54,7 @@ public class Responses<T> {
     }
 
     public static <T> Responses<T> ok(String message, T data) {
-        return new Responses<>(0, message, data);
+        return new Responses<>(200, message, data);
     }
 
     /**

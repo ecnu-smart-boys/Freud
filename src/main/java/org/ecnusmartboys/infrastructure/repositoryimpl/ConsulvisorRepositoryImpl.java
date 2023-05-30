@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,4 +44,14 @@ public class ConsulvisorRepositoryImpl implements ConsulvisorRepository {
         var consulvisorDOs = consulvisorMapper.selectBySupervisorId(Long.valueOf(id));
         return convertor.toConsulvisors(consulvisorDOs);
     }
+
+    @Override
+    public List<String> retrieveNotAvailableSupIds() {
+        List<Long> longs = consulvisorMapper.selectNotAvailableSupIds();
+        return longs.stream().map(String::valueOf)
+                .collect(Collectors.toList());
+
+    }
+
+
 }

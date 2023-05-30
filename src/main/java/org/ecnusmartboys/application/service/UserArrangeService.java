@@ -1,12 +1,16 @@
 package org.ecnusmartboys.application.service;
 
+import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
+import org.ecnusmartboys.application.dto.request.query.NoArrangedRequest;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
+
+import java.util.List;
 
 
 public interface UserArrangeService {
@@ -22,4 +26,8 @@ public interface UserArrangeService {
     Responses<Object> saveConsultant(AddConsultantRequest req);
 
     Responses<Object> updateConsultant(UpdateConsultantRequest req);
+
+    Responses<Object> updateArrangement(UpdateArrangementRequest req);
+
+    Responses<List<StaffBaseInfo>> getAvailableSupervisors();
 }

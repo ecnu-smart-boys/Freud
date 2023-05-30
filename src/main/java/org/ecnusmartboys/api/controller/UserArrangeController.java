@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
+import org.ecnusmartboys.application.dto.request.query.NoArrangedRequest;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 
 @Slf4j
@@ -85,7 +88,7 @@ public class UserArrangeController {
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("更新督导")
-    @PostMapping("/updateSupervisor")
+    @PutMapping("/updateSupervisor")
     public Responses<Object> updateSupervisor(@RequestBody @Validated UpdateSupervisorRequest req) {
         return userArrangeService.updateSupervisor(req);
     }
@@ -99,8 +102,23 @@ public class UserArrangeController {
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("更新咨询师")
-    @PostMapping("/updateConsultant")
+    @PutMapping("/updateConsultant")
     public Responses<Object> updateConsultant(@RequestBody @Validated UpdateConsultantRequest req) {
         return userArrangeService.updateConsultant(req);
     }
+
+    @AuthRoles(Admin.ROLE)
+    @ApiOperation("更新排班")
+    @PostMapping("/updateArrangement")
+    public Responses<Object> updateArrangement(@RequestBody @Validated UpdateArrangementRequest req) {
+        return userArrangeService.updateArrangement(req);
+    }
+
+    @AuthRoles(Admin.ROLE)
+    @ApiOperation("查询可以绑定的督导列表")
+    @GetMapping("/availableSupervisors")
+    public Responses<List<StaffBaseInfo>> getAvailableSupervisors() {
+        return userArrangeService.getAvailableSupervisors();
+    }
+
 }

@@ -7,6 +7,8 @@ import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = BaseConvertor.COMPONENT_MODEL,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserConvertor {

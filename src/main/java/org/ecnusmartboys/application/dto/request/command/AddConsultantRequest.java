@@ -1,7 +1,9 @@
 package org.ecnusmartboys.application.dto.request.command;
 
 import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.ecnusmartboys.api.annotation.IdNumber;
 import org.ecnusmartboys.api.annotation.Phone;
 import org.hibernate.validator.constraints.Range;
@@ -13,6 +15,8 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel("添加咨询师请求")
 public class AddConsultantRequest {
 

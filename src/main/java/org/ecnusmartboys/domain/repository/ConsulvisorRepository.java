@@ -12,4 +12,6 @@ public interface ConsulvisorRepository {
     List<Consulvisor> retrieveByConId(String id);
 
     List<Consulvisor> retrieveBySupId(String id);
+
+    List<String> retrieveNotAvailableSupIds();
 }

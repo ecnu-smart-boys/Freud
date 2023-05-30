@@ -30,6 +30,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             if (method.hasMethodAnnotation(AnonymousAccess.class)) {
                 return true;
             }
+
             // 不加AnonymousAccess注解表示登录才可以访问
             // TODO
         }

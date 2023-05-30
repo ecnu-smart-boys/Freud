@@ -25,7 +25,7 @@ public class SupervisorInfo extends UserInfo{
 
     private Integer consultTimes;
 
-    private List<ConsultantName> consultantNameList;
+    private List<StaffBaseInfo> consultantList;
 
     // TODO consultants
 }

@@ -8,4 +8,6 @@ public class VisitorInfo extends UserInfo{
     private String emergencyContact;
 
     private String emergencyPhone;
+
+    private Integer totalTime;
 }

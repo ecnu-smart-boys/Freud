@@ -14,4 +14,7 @@ public interface UserRepository {
     void save(User user);
     void update(User user);
     List<String> retrieveIdsByArrangement(int dayOfWeek);
+
+    List<User> retrieveByRole(String role, String name);
+
 }
