@@ -44,6 +44,598 @@ public class RedisUtil {
         this.redisTemplate = redisTemplate;
     }
 
+    /**
+     * 向有序集合中添加元素。
+     *
+     * @param key   键
+     * @param value 值
+     * @param score 分数
+     * @return 是否成功
+     */
+    public boolean zAdd(String key, Object value, double score) {
+        try {
+            return redisTemplate.opsForZSet().add(key, value, score);
+        } catch (Exception e) {
+            log.error("RedisUtil.zAdd error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定范围的元素。
+     *
+     * @param key   键
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 元素列表
+     */
+    public Set<Object> zRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().range(key, start, end);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRange error: {}", e.getMessage());
+            return Sets.newHashSet();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定范围的元素和分数。
+     *
+     * @param key   键
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 元素和分数的映射
+     */
+    public Map<Object, Double> zRangeWithScores(String key, long start, long end) {
+        try {
+            Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
+                redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+            Map<Object, Double> result = new HashMap<>();
+            for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
+                result.put(tuple.getValue(), tuple.getScore());
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRangeWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的排名。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 排名
+     */
+    public Long zRank(String key, Object value) {
+        try {
+            return redisTemplate.opsForZSet().rank(key, value);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRank error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 分数
+     */
+    public Double zScore(String key, Object value) {
+        try {
+            return redisTemplate.opsForZSet().score(key, value);
+        } catch (Exception e) {
+            log.error("RedisUtil.zScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 删除有序集合中指定元素。
+     *
+     * @param key    键
+     * @param values 元素列表
+     * @return 删除的元素数量
+     */
+    public Long zRemove(String key, Object... values) {
+        try {
+            return redisTemplate.opsForZSet().remove(key, values);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRemove error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中元素的数量。
+     *
+     * @param key 键
+     * @return 元素数量
+     */
+    public Long zSize(String key) {
+        try {
+            return redisTemplate.opsForZSet().size(key);
+        } catch (Exception e) {
+            log.error("RedisUtil.zSize error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素数量。
+     *
+     * @param key 键
+     * @param min 最小分数
+     * @param max 最大分数
+     * @return 元素数量
+     */
+    public Long zCount(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().count(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zCount error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从有序集合中删除指定排名范围内的元素。
+     *
+     * @param key   键
+     * @param start 开始排名
+     * @param end   结束排名
+     * @return 删除的元素数量
+     */
+    public Long zRemoveRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().removeRange(key, start, end);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRemoveRange error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从有序集合中删除指定分数范围内的元素。
+     *
+     * @param key 键
+     * @param min 最小分数
+     * @param max 最大分数
+     * @return 删除的元素数量
+     */
+    public Long zRemoveRangeByScore(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().removeRangeByScore(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRemoveRangeByScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的分数，如果元素不存在则添加元素并返回初始分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @param score 初始分数
+     * @return 分数
+     */
+    public Double zIncrementScore(String key, Object value, double score) {
+        try {
+            return redisTemplate.opsForZSet().incrementScore(key, value, score);
+        } catch (Exception e) {
+            log.error("RedisUtil.zIncrementScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的分数，如果元素不存在则添加元素并返回初始分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @param score 初始分数
+     * @param time  过期时间
+     * @return 分数
+     */
+    public Double zIncrementScore(String key, Object value, double score, long time) {
+        try {
+            Double result = redisTemplate.opsForZSet().incrementScore(key, value, score);
+            if (time > 0) {
+                redisTemplate.expire(key, time, TimeUnit.SECONDS);
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("RedisUtil.zIncrementScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的分数，如果元素不存在则添加元素并返回初始分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @param score 初始分数
+     * @param time  过期时间
+     * @return 分数
+     */
+    public Double zIncrementScore(String key, Object value, double score, Date time) {
+        try {
+            Double result = redisTemplate.opsForZSet().incrementScore(key, value, score);
+            if (time != null) {
+                redisTemplate.expireAt(key, time);
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("RedisUtil.zIncrementScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的排名和分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 排名和分数的映射
+     */
+    public Map<String, Double> zRankWithScore(String key, Object value) {
+        try {
+            Map<String, Double> map = new HashMap<>();
+            Double score = redisTemplate.opsForZSet().score(key, value);
+            if (score != null) {
+                map.put("score", score);
+                Long rank = redisTemplate.opsForZSet().rank(key, value);
+                if (rank != null) {
+                    map.put("rank", Double.valueOf(rank));
+                }
+            }
+            return map;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRankWithScore error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素和分数。
+     *
+     * @param key   键
+     * @param min   最小分数
+     * @param max   最大分数
+     * @param limit 返回数量限制
+     * @return 元素和分数的映射
+     */
+    public Map<Object, Double> zRangeByScoreWithScores(String key, double min, double max, long limit) {
+        try {
+            Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
+                redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, 0, limit);
+            Map<Object, Double> result = new HashMap<>();
+            for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
+                result.put(tuple.getValue(), tuple.getScore());
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRangeByScoreWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素和分数。
+     *
+     * @param key   键
+     * @param min   最小分数
+     * @param max   最大分数
+     * @param limit 返回数量限制
+     * @param skip  跳过元素数量
+     * @return 元素和分数的映射
+     */
+    public Map<Object, Double> zRangeByScoreWithScores(String key, double min, double max, long limit, long skip) {
+        try {
+            Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
+                redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, skip, limit);
+            Map<Object, Double> result = new HashMap<>();
+            for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
+                result.put(tuple.getValue(), tuple.getScore());
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRangeByScoreWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素数量。
+     *
+     * @param key 键
+     * @param min 最小分数
+     * @param max 最大分数
+     * @return 元素数量
+     */
+    public Long zCountByScore(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().count(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zCountByScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的排名和分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 排名和分数的映射
+     */
+    public Map<String, Double> zRevRankWithScore(String key, Object value) {
+        try {
+            Map<String, Double> map = new HashMap<>();
+            Double score = redisTemplate.opsForZSet().score(key, value);
+            if (score != null) {
+                map.put("score", score);
+                Long rank = redisTemplate.opsForZSet().reverseRank(key, value);
+                if (rank != null) {
+                    map.put("rank", Double.valueOf(rank));
+                }
+            }
+            return map;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRankWithScore error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素和分数。
+     *
+     * @param key 键
+     * @param min 分数最小值
+     * @param max 分数最大值
+     * @return 元素和分数的映射
+     */
+    public Map<Object, Double> zRevRangeByScoreWithScores(String key, double min, double max) {
+        try {
+            Set<Object> set = redisTemplate.opsForZSet().reverseRangeByScore(key, min, max);
+            Map<Object, Double> map = new HashMap<>();
+            if (set != null && !set.isEmpty()) {
+                for (Object obj : set) {
+                    Double score = redisTemplate.opsForZSet().score(key, obj);
+                    if (score != null) {
+                        map.put(obj, score);
+                    }
+                }
+            }
+            return map;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRangeByScoreWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定排名范围内的元素。
+     *
+     * @param key   键
+     * @param start 排名起始位置
+     * @param end   排名结束位置
+     * @return 元素集合
+     */
+    public Set<Object> zRevRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().reverseRange(key, start, end);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRange error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素。
+     *
+     * @param key 键
+     * @param min 分数最小值
+     * @param max 分数最大值
+     * @return 元素集合
+     */
+    public Set<Object> zRevRangeByScore(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().reverseRangeByScore(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRangeByScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的排名和分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 排名和分数的映射
+     */
+    public Map<String, Double> zRankWithScores(String key, Object value) {
+        try {
+            Map<String, Double> map = new HashMap<>();
+            Double score = redisTemplate.opsForZSet().score(key, value);
+            if (score != null) {
+                map.put("score", score);
+                Long rank = redisTemplate.opsForZSet().rank(key, value);
+                if (rank != null) {
+                    map.put("rank", Double.valueOf(rank));
+                }
+            }
+            return map;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRankWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素和分数。
+     *
+     * @param key 键
+     * @param min 分数最小值
+     * @param max 分数最大值
+     * @return 元素和分数的映射
+     */
+    public Map<Object, Double> zRangeByScoreWithScores(String key, double min, double max) {
+        try {
+            Set<Object> set = redisTemplate.opsForZSet().rangeByScore(key, min, max);
+            Map<Object, Double> map = new HashMap<>();
+            if (set != null && !set.isEmpty()) {
+                for (Object obj : set) {
+                    Double score = redisTemplate.opsForZSet().score(key, obj);
+                    if (score != null) {
+                        map.put(obj, score);
+                    }
+                }
+            }
+            return map;
+        } catch (Exception e) {
+            log.error("RedisUtil.zRangeByScoreWithScores error: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的排名。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 排名
+     */
+    public Long zRevRank(String key, Object value) {
+        try {
+            return redisTemplate.opsForZSet().reverseRank(key, value);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRank error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定元素的分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @return 分数
+     */
+    public Double zRevScore(String key, Object value) {
+        try {
+            return redisTemplate.opsForZSet().score(key, value);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中元素的数量。
+     *
+     * @param key 键
+     * @return 元素数量
+     */
+    public Long zRevCard(String key) {
+        try {
+            return redisTemplate.opsForZSet().zCard(key);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevCard error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 删除有序集合中指定元素。
+     *
+     * @param key    键
+     * @param values 元素
+     * @return 删除的数量
+     */
+    public Long zRevRemove(String key, Object... values) {
+        try {
+            return redisTemplate.opsForZSet().remove(key, values);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRemove error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 删除有序集合中指定排名范围内的元素。
+     *
+     * @param key   键
+     * @param start 排名起始位置
+     * @param end   排名结束位置
+     * @return 删除的数量
+     */
+    public Long zRevRemoveRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().removeRange(key, start, end);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRemoveRange error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 删除有序集合中指定分数范围内的元素。
+     *
+     * @param key 键
+     * @param min 分数最小值
+     * @param max 分数最大值
+     * @return 删除的数量
+     */
+    public Long zRevRemoveRangeByScore(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().removeRangeByScore(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevRemoveRangeByScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 增加有序集合中指定元素的分数。
+     *
+     * @param key   键
+     * @param value 元素
+     * @param delta 分数增量
+     * @return 新的分数
+     */
+    public Double zRevIncrementScore(String key, Object value, double delta) {
+        try {
+            return redisTemplate.opsForZSet().incrementScore(key, value, delta);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRevIncrementScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取有序集合中指定分数范围内的元素。
+     *
+     * @param key 键
+     * @param min 分数最小值
+     * @param max 分数最大值
+     * @return 元素集合
+     */
+    public Set<Object> zRangeByScore(String key, double min, double max) {
+        try {
+            return redisTemplate.opsForZSet().rangeByScore(key, min, max);
+        } catch (Exception e) {
+            log.error("RedisUtil.zRangeByScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+    
     public String getKey(Object table, Object key, Object field) {
         return table.toString() + ":" + key.toString() + ":" + field.toString();
     }
@@ -204,6 +796,10 @@ public class RedisUtil {
                 long count = redisTemplate.delete(keySet);
             }
         }
+    }
+
+    public long del(Collection<String> keys) {
+        return redisTemplate.delete(keys);
     }
 
     // ============================String=============================
@@ -707,9 +1303,10 @@ public class RedisUtil {
      * @param prefix 前缀
      * @param ids    id
      */
-    public void delByKeys(String prefix, Set<Long> ids) {
+    public void delByKeys(String prefix, Iterator<Long> ids) {
         Set<String> keys = new HashSet<>();
-        for (Long id : ids) {
+        for (Iterator<Long> it = ids; it.hasNext(); ) {
+            Long id = it.next();
             keys.addAll(redisTemplate.keys(new StringBuffer(prefix).append(id).toString()));
         }
         long count = redisTemplate.delete(keys);
