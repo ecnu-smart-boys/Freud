@@ -30,4 +30,6 @@ public class ConversationDO extends BaseDO {
     private Long startTime;
 
     private Long endTime;
+
+    private Long helpConversationId;
 }
