@@ -51,7 +51,7 @@ public class ArrangeController {
 
     @AuthRoles({Admin.ROLE})
     @ApiOperation("获得某日咨询师排班列表")
-    @GetMapping("/consultants")
+    @PutMapping("/consultants")
     public Responses<List<StaffBaseInfo>> getConsultants(@RequestParam @Timestamp Long timestamp) {
         return arrangeService.getConsultants(timestamp);
     }
@@ -73,14 +73,14 @@ public class ArrangeController {
     @AuthRoles(Admin.ROLE)
     @ApiOperation("查询某日尚未排班的咨询师列表")
     @GetMapping("/notArrangedConsultants")
-    public Responses<List<StaffBaseInfo>> getNoArrangedConsultants(@RequestBody @Validated NoArrangedRequest req) {
+    public Responses<List<StaffBaseInfo>> getNoArrangedConsultants(@Validated NoArrangedRequest req) {
         return arrangeService.getNotArranged(req, Consultant.ROLE);
     }
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("查询某日尚未排班的咨询师列表")
     @GetMapping("/notArranged/supervisors")
-    public Responses<List<StaffBaseInfo>> getNoArrangedSupervisors(@RequestBody @Validated NoArrangedRequest req) {
+    public Responses<List<StaffBaseInfo>> getNoArrangedSupervisors(@Validated NoArrangedRequest req) {
         return arrangeService.getNotArranged(req, Supervisor.ROLE);
     }
 
