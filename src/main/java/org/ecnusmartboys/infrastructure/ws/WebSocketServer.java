@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class WebSocketServer extends TextWebSocketHandler {
 
-    @Value("${frued.online.timeout:15}")
+    @Value("${freud.online.timeout:15}")
     private int timeout;
 
     private final Map<Long, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
