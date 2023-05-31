@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.19_7
+FROM openjdk:17
 
 ARG WORKDIR=/opt/freud
 
@@ -7,6 +7,9 @@ COPY target/lib ./lib
 
 EXPOSE 5508
 
+ENV LANG=zh_CN.UTF-8
+ENV LANGUAGE=zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
 ENV TZ=Asia/Shanghai
 ENV SPRING_PROFILES_ACTIVE=prod
 
