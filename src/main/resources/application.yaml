@@ -57,6 +57,8 @@ mybatis-plus:
 
 # set these values in application-local.yaml
 freud:
+  online:
+    timeout: 15 # 在线登录时长（分钟）
   weixin:
     app-id:
     secret:

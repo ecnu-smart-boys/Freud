@@ -10,4 +10,10 @@ public interface UserService {
 
     Responses<Object> updateVisitorInfo(UpdateVisitorRequest req, Common common);
 
+    /**
+     * 把用户踢下线
+     * @param userId
+     */
+    void offline(Long userId);
+
 }

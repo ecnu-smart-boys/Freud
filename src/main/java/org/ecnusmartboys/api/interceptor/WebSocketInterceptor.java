@@ -30,7 +30,8 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         if (session == null) {
             return false;
         }
-        Long userId = session.getAttribute("userId");
+        String userId = session.getAttribute("userId");
+        attributes.put("userId", Long.valueOf(userId));
 
         return true;
     }

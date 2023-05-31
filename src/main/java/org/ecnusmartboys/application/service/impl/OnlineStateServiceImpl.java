@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
 import org.ecnusmartboys.application.service.OnlineStateService;
 import org.ecnusmartboys.infrastructure.utils.RedisUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,7 +17,8 @@ public class OnlineStateServiceImpl implements OnlineStateService {
 
     private final RedisUtil redisUtil;
 
-    private static final long TIMEOUT_IN_MILLIS = 15 * 60 * 1000;
+    @Value("${freud.online.timeout:15}")
+    private int timeoutInMinutes;
     private static final String KEY_PREFIX = "onlineState:";
     private static final String TIMEOUT_KEY = "onlineStateTimeout";
 
@@ -38,7 +40,7 @@ public class OnlineStateServiceImpl implements OnlineStateService {
             }
             default -> {
                 // 超时更新
-                long score = System.currentTimeMillis() + TIMEOUT_IN_MILLIS;
+                long score = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(timeoutInMinutes);
                 redisUtil.zAdd(TIMEOUT_KEY, userId, score);
                 // 设置状态
                 redisUtil.set(key, state.ordinal());
@@ -60,7 +62,7 @@ public class OnlineStateServiceImpl implements OnlineStateService {
         List<Long> ids = new ArrayList<>(timeoutUserIdSet.size());
         List<String> keys = new ArrayList<>(timeoutUserIdSet.size());
         for (Object o : timeoutUserIdSet) {
-            ids.add((Long) o);
+            ids.add(Long.parseLong(o.toString()));
             keys.add(KEY_PREFIX + o);
         }
         redisUtil.zRemoveRangeByScore(TIMEOUT_KEY, 0, max);
