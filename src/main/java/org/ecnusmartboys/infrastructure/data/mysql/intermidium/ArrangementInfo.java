@@ -1,4 +1,4 @@
-package org.ecnusmartboys.domain.model.arrangement;
+package org.ecnusmartboys.infrastructure.data.mysql.intermidium;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

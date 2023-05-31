@@ -2,7 +2,7 @@ package org.ecnusmartboys.domain.repository;
 
 
 import org.ecnusmartboys.domain.model.arrangement.Arrangement;
-import org.ecnusmartboys.domain.model.arrangement.ArrangementInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.intermidium.ArrangementInfo;
 
 import java.util.Date;
 import java.util.List;

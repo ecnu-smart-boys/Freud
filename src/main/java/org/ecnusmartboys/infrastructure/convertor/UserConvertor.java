@@ -1,13 +1,11 @@
 package org.ecnusmartboys.infrastructure.convertor;
 
 import org.ecnusmartboys.domain.model.user.*;
-import org.ecnusmartboys.infrastructure.data.mysql.StaffInfoDO;
-import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
-import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.StaffInfoDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.UserDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.VisitorInfoDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-
-import java.util.List;
 
 @Mapper(componentModel = BaseConvertor.COMPONENT_MODEL,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)

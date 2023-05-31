@@ -3,8 +3,8 @@ package org.ecnusmartboys.infrastructure.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.ecnusmartboys.domain.model.arrangement.ArrangementInfo;
-import org.ecnusmartboys.infrastructure.data.mysql.ArrangementDO;
+import org.ecnusmartboys.infrastructure.data.mysql.intermidium.ArrangementInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.table.ArrangementDO;
 
 import java.util.List;
 

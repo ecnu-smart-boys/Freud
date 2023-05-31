@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.data.mysql;
+package org.ecnusmartboys.infrastructure.data.mysql.table;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;

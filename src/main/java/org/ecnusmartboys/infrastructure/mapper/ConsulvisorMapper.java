@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.ecnusmartboys.infrastructure.data.mysql.ConsulvisorDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.ConsulvisorDO;
 
 import java.util.List;
 

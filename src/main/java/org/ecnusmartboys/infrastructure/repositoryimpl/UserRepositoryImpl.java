@@ -1,6 +1,5 @@
 package org.ecnusmartboys.infrastructure.repositoryimpl;
 
-import cn.hutool.crypto.digest.BCrypt;
 import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,9 +10,9 @@ import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
-import org.ecnusmartboys.infrastructure.data.mysql.StaffInfoDO;
-import org.ecnusmartboys.infrastructure.data.mysql.UserDO;
-import org.ecnusmartboys.infrastructure.data.mysql.VisitorInfoDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.StaffInfoDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.UserDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.VisitorInfoDO;
 import org.ecnusmartboys.infrastructure.mapper.StaffInfoMapper;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;

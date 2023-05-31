@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.infrastructure.convertor.ConsulvisorConvertor;
-import org.ecnusmartboys.infrastructure.data.mysql.ConsulvisorDO;
 import org.ecnusmartboys.infrastructure.mapper.ConsulvisorMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

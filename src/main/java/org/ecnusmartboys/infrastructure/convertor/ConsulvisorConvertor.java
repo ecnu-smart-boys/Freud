@@ -1,7 +1,7 @@
 package org.ecnusmartboys.infrastructure.convertor;
 
 import org.ecnusmartboys.domain.model.user.Consulvisor;
-import org.ecnusmartboys.infrastructure.data.mysql.ConsulvisorDO;
+import org.ecnusmartboys.infrastructure.data.mysql.table.ConsulvisorDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
