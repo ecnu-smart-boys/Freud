@@ -18,7 +18,7 @@ public class UserDOArrangeTest {
 
     @Test
     public void testConsultants() {
-        var result = userArrangeService.getConsultants(new UserListReq());
+        var result = userArrangeService.getConsultants(new UserListReq(0L, 10L, "1"));
         System.out.println(result.toString());
     }
 
