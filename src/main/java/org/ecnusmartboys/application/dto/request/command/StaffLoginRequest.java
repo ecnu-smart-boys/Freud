@@ -26,6 +26,4 @@ public class StaffLoginRequest {
     @ApiModelProperty("验证码")
     private String captcha;
 
-    // 以什么角色登陆
-    private String role;
 }

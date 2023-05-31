@@ -71,13 +71,9 @@ public class AuthServiceImpl implements AuthService {
         if (!validCaptcha) {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
-        Consultant user;
-        if(userRepository.retrieveByUsername(req.getUsername()) instanceof Consultant tmp){
-            if(tmp.isDisabled()){
-                throw ForbiddenException.DISABLED;
-            }
-            user = tmp;
-        } else {
+
+        var user = userRepository.retrieveByUsername(req.getUsername());
+        if (user == null) {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
 

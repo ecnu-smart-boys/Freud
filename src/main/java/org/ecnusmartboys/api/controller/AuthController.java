@@ -64,7 +64,7 @@ public class AuthController {
         // 保存登录信息
         var session = request.getSession();
         session.setAttribute(SessionKey.UserID, user.getId());
-        session.setAttribute(SessionKey.Role, req.getRole());
+        session.setAttribute(SessionKey.Role, user.getRole());
         return res;
     }
 
