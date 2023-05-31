@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     public Responses<UserInfo> getUserInfo(Common common) {
         var user = userRepository.retrieveById(common.getUserId());
         if(user == null) {
-            throw new InternalException("用户不存在");
+            return Responses.ok(null);
         }
 
         var userInfo = userInfoConvertor.fromEntity(user);

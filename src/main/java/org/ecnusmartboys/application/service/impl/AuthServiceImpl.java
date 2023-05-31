@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
 
-        var validpw = BCrypt.checkpw(req.getPassword(), user.getPassword());
+        var validpw = user.getPassword().equals(req.getPassword());
         if (!validpw) {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }

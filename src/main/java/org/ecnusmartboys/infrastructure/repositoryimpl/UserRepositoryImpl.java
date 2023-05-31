@@ -1,6 +1,7 @@
 package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import cn.hutool.crypto.digest.BCrypt;
+import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -183,7 +184,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             userDO.setAge(167);
             userDO.setGender(0);
             var rawPassword = "freud_admin" + System.currentTimeMillis();
-            userDO.setPassword(BCrypt.hashpw(rawPassword));
+            userDO.setPassword(MD5.create().digestHex(rawPassword).toUpperCase());
             userDO.setRole(Admin.ROLE);
             userMapper.insert(userDO);
             log.info("创建超级管理员成功，用户名：{}，密码：{}", userDO.getUsername(), rawPassword);
