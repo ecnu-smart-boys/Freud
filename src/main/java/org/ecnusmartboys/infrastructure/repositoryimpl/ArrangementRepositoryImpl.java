@@ -11,6 +11,7 @@ import org.ecnusmartboys.infrastructure.mapper.ArrangementMapper;
 import org.springframework.stereotype.Repository;
 
 import java.text.SimpleDateFormat;
+import java.time.Month;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +43,12 @@ public class ArrangementRepositoryImpl implements ArrangementRepository {
     }
 
     @Override
-    public List<ArrangementInfo> retrieveMonthArrangement(Integer year, Integer month) {
-        return arrangementMapper.selectInfoByMonthAndDate(year, month);
+    public List<ArrangementInfo> retrieveMonthArrangement(int year, int month) {
+        return arrangementMapper.selectInfoByYearAndMonth(year, month);
+    }
+
+    @Override
+    public List<Integer> retrieveMonthArrangementByUserId(int year, int month, String userId) {
+        return arrangementMapper.selectDayByMonthAndDateAndUserId(year, month, Long.valueOf(userId));
     }
 }

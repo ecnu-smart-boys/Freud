@@ -1,6 +1,5 @@
 package org.ecnusmartboys.infrastructure.data.mysql.table;
 
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * 咨询记录
@@ -20,16 +21,18 @@ import lombok.NoArgsConstructor;
 public class ConversationDO extends BaseDO {
     public static final String TABLE_NAME = "conversation";
 
-    @TableId(value = "id", type = IdType.AUTO)
-    protected Long id;
+    @TableId(value = "conversation_id", type = IdType.AUTO)
+    protected Long conversationId;
 
     private Long fromId;
 
     private Long toId;
 
-    private Long startTime;
+    private Date startTime;
 
-    private Long endTime;
+    private Date endTime;
 
-    private Long helpConversationId;
+    private Long helperId;
+
+    private Boolean isConsultation;
 }

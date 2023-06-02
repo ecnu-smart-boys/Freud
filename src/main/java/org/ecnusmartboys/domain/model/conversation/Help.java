@@ -1,17 +1,17 @@
 package org.ecnusmartboys.domain.model.conversation;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.ecnusmartboys.domain.model.BaseEntity;
 import org.ecnusmartboys.domain.model.user.User;
 
-
 @Data
-public class Conversation extends BaseEntity {
-    private User fromUser;
-    private Comment fromUserComment;
-    private User toUser;
-    private Comment toUserComment;
+@AllArgsConstructor
+@NoArgsConstructor
+public class Help extends BaseEntity {
+
     private Long startTime;
     private Long endTime;
-    private Help helper;
+    private User supervisor;
 }

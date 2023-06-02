@@ -2,6 +2,7 @@ package org.ecnusmartboys.application.service;
 
 import org.ecnusmartboys.application.dto.DayArrangeInfo;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.request.query.GetMonthArrangementRequest;
@@ -23,4 +24,6 @@ public interface ArrangeService {
     Responses<List<DayArrangeInfo>> getMonthArrangement(GetMonthArrangementRequest req);
 
     Responses<List<StaffBaseInfo>> getNotArranged(NoArrangedRequest req, String role);
+
+    Responses<List<Integer>> getPersonalMonthArrangement(Common common);
 }

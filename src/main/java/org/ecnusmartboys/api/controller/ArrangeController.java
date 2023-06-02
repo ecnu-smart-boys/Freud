@@ -4,10 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.api.annotation.Timestamp;
 import org.ecnusmartboys.application.dto.DayArrangeInfo;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.request.Extra;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.request.query.GetMonthArrangementRequest;
@@ -21,6 +23,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -37,7 +40,7 @@ public class ArrangeController {
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("移除排班")
-    @PostMapping("/removeArrangement")
+    @PutMapping("/removeArrangement")
     public Responses<Object> remove(@RequestBody @Validated RemoveArrangeRequest req) {
         return arrangeService.remove(req);
     }
@@ -51,7 +54,7 @@ public class ArrangeController {
 
     @AuthRoles({Admin.ROLE})
     @ApiOperation("获得某日咨询师排班列表")
-    @PutMapping("/consultants")
+    @GetMapping("/consultants")
     public Responses<List<StaffBaseInfo>> getConsultants(@RequestParam @Timestamp Long timestamp) {
         return arrangeService.getConsultants(timestamp);
     }
@@ -78,10 +81,18 @@ public class ArrangeController {
     }
 
     @AuthRoles(Admin.ROLE)
-    @ApiOperation("查询某日尚未排班的咨询师列表")
-    @GetMapping("/notArranged/supervisors")
+    @ApiOperation("查询某日尚未排班的督导列表")
+    @GetMapping("/notArrangedSupervisors")
     public Responses<List<StaffBaseInfo>> getNoArrangedSupervisors(@Validated NoArrangedRequest req) {
         return arrangeService.getNotArranged(req, Supervisor.ROLE);
+    }
+
+    @AuthRoles({Consultant.ROLE, Supervisor.ROLE})
+    @ApiOperation("查询个人月排班")
+    @GetMapping("/personalArrangement")
+    public Responses<List<Integer>> getPersonalArrangement(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return arrangeService.getPersonalMonthArrangement(common);
     }
 
 }

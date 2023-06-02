@@ -3,6 +3,7 @@ package org.ecnusmartboys.application.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.application.dto.DayArrangeInfo;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AddArrangementRequest;
 import org.ecnusmartboys.application.dto.request.command.RemoveArrangeRequest;
 import org.ecnusmartboys.application.dto.request.query.GetMonthArrangementRequest;
@@ -17,6 +18,8 @@ import org.ecnusmartboys.domain.repository.ArrangementRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -129,6 +132,22 @@ public class ArrangeServiceImpl implements ArrangeService {
             if(!ids.contains(user.getId())) {
                 result.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
+        });
+        return Responses.ok(result);
+    }
+
+    @Override
+    public Responses<List<Integer>> getPersonalMonthArrangement(Common common) {
+        List<Integer> result = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        int daysInMonth = currentDate.lengthOfMonth();
+        for(int i = 0; i < daysInMonth; i++) {
+            result.add(0);
+        }
+
+        var days = arrangementRepository.retrieveMonthArrangementByUserId(currentDate.getYear(), currentDate.getMonthValue(), common.getUserId());
+        days.forEach(day -> {
+            result.set(day - 1, 1);
         });
         return Responses.ok(result);
     }

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = CommentDO.TABLE_NAME, autoResultMap = true)
 public class CommentDO extends BaseDO {
-    public static final String TABLE_NAME = "conversation_comment";
+    public static final String TABLE_NAME = "comment";
     @TableId(value = "id", type = IdType.AUTO)
     protected Long id;
 

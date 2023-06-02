@@ -53,17 +53,17 @@ public class IMCallbackTest {
                 new TIMSoundMsgElement.SoundMsgContent(
                         "https://", "uuid88000d", 1000, 2, 1));
         List<TIMMsgElement> msgBody = new ArrayList<>();
-        msgBody.add(msg);
+//        msgBody.add(msg);
         msgBody.add(imageMsg);
-        msgBody.add(soundMsg);
+//        msgBody.add(soundMsg);
 
         SendMsgRequest request = SendMsgRequest.builder()
-                .fromAccount("1222_1")
-                .toAccount("1_1")
+                .fromAccount("1255_1")
+                .toAccount("2_1")
                 .msgRandom(123L)
                 .msgBody(msgBody)
                 .syncOtherMachine(SyncOtherMachine.YES)
-                .msgTimeStamp(1631934058)
+                .msgTimeStamp((int) (new Date().getTime() / 1000))
                 .msgLifeTime(604800)
                 .build();
         var result = client.message.sendMsg(request);

@@ -16,5 +16,8 @@ public interface ArrangementMapper extends BaseMapper<ArrangementDO> {
 
     @Select("SELECT Day(DATE) as day, role, COUNT(id) AS total FROM (SELECT * FROM arrangement WHERE YEAR(DATE) = #{year} AND MONTH(DATE) = #{month})AS \n" +
             "sub, sys_user WHERE sub.user_id = id GROUP BY DATE, role;\n")
-    List<ArrangementInfo> selectInfoByMonthAndDate(Integer year, Integer month);
+    List<ArrangementInfo> selectInfoByYearAndMonth(Integer year, Integer month);
+
+    @Select("SELECT Day(DATE) as day FROM arrangement WHERE YEAR(DATE) = #{year} AND MONTH(DATE) = #{month} and user_id = #{userId}")
+    List<Integer> selectDayByMonthAndDateAndUserId(int year, int month, Long userId);
 }
