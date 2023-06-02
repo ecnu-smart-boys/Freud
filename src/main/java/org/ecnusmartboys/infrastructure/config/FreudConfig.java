@@ -58,13 +58,4 @@ public class FreudConfig implements WebMvcConfigurer {
         return loggingFilter;
     }
 
-    @Bean
-    public MybatisPlusPropertiesCustomizer mybatisPlusPropertiesCustomizer() {
-        return properties -> {
-            MybatisConfiguration configuration = new MybatisConfiguration();
-            configuration.setDefaultEnumTypeHandler(MybatisEnumTypeHandler.class);
-            properties.setConfiguration(configuration);
-        };
-    }
-
 }

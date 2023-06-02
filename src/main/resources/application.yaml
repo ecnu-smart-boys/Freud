@@ -9,13 +9,15 @@ logging:
       CommonsRequestLoggingFilter: debug
   file:
     path: logs
-    max-history: 30
+  logback:
+    rollingpolicy:
+      max-history: 30
 
 spring:
   application:
     name: freud
   datasource:
-    url: jdbc:mysql://${mysql.host:localhost}/freud?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Hongkong
+    url: jdbc:mysql://${mysql.host:localhost}/freud?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: ${mysql.username:root}
     password: ${mysql.password:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
