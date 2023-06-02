@@ -21,7 +21,7 @@ public class UserDO extends BaseDO {
     protected Long id;
 
     public static final String OPEN_ID = "open_id";
-    private String openId;
+    private String openID;
 
     public static final String USERNAME = "username";
     private String username;

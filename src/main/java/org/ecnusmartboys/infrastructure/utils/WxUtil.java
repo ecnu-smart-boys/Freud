@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.infrastructure.config.WeixinMpConfig;
 import org.ecnusmartboys.infrastructure.data.wx.AccessTokenResponse;
 import org.ecnusmartboys.infrastructure.data.wx.Code2SessionResponse;
+import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.exception.InternalException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.Cipher;
@@ -46,7 +49,14 @@ public class WxUtil {
                 + "&secret=" + config.getSecret()
                 + "&js_code=" + code
                 + "&grant_type=authorization_code";
-        return restTemplate.getForObject(url, Code2SessionResponse.class, new HashMap<>());
+        var resp = restTemplate.getForObject(url, Code2SessionResponse.class, new HashMap<>());
+        if (resp == null || !StringUtils.hasLength(resp.getOpenid())) {
+            if (resp != null) {
+                throw new BadRequestException(resp.getErrmsg());
+            }
+            throw new InternalException("code2Session return null");
+        }
+        return resp;
     }
 
     @Cacheable(cacheNames = "access_token#7000", key = "'wx_access_token'")

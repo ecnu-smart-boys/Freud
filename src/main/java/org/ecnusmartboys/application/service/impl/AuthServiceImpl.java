@@ -54,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Responses<UserInfo> register(WxRegisterRequest req) {
-        var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
-        Assert.isTrue(validSms, "短信验证码错误");
+        //var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
+        //Assert.isTrue(validSms, "短信验证码错误");
 
         Visitor visitor = wxRegisterReqConvertor.toEntity(req);
         visitor.setOpenID(wxUtil.code2Session(req.getCode()).getOpenid());
@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
         // 验证登录
         var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
         if (!validCaptcha) {
-            throw UnauthorizedException.AUTHENTICATION_FAIL;
+            throw new UnauthorizedException("验证码错误");
         }
 
         var user = userRepository.retrieveByUsername(req.getUsername());
