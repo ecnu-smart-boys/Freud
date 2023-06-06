@@ -11,7 +11,6 @@ import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.AuthService;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Visitor;
-import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.ForbiddenException;
 import org.ecnusmartboys.application.convertor.UserInfoConvertor;
@@ -27,7 +26,6 @@ import org.springframework.util.StringUtils;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
-    private final OnlineUserRepository onlineUserRepository;
 
     private final CaptchaUtil captchaUtil;
 
@@ -56,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Responses<UserInfo> register(WxRegisterRequest req) {
-        var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
-        Assert.isTrue(validSms, "短信验证码错误");
+        //var validSms = smsUtil.verifyCode(req.getPhone(), req.getSmsCodeId(), req.getSmsCode());
+        //Assert.isTrue(validSms, "短信验证码错误");
 
         Visitor visitor = wxRegisterReqConvertor.toEntity(req);
         visitor.setOpenID(wxUtil.code2Session(req.getCode()).getOpenid());
@@ -69,10 +67,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Responses<UserInfo> staffLogin(StaffLoginRequest req) {
         // 验证登录
-//        var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
-//        if (!validCaptcha) {
-//            throw UnauthorizedException.AUTHENTICATION_FAIL;
-//        }
+        var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
+        if (!validCaptcha) {
+            throw new UnauthorizedException("验证码错误");
+        }
 
         var user = userRepository.retrieveByUsername(req.getUsername());
         if (user == null) {
@@ -87,8 +85,6 @@ public class AuthServiceImpl implements AuthService {
             throw ForbiddenException.DISABLED;
         }
         var result = userInfoConvertor.fromEntity(user);
-        // TODO
-        onlineUserRepository.Join(user);
         return Responses.ok(result);
     }
 

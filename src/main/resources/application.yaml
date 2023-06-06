@@ -52,7 +52,7 @@ spring:
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml
-  type-enums-package: org.ecnusmartboys.model.entity.enums
+  type-enums-package: org.ecnusmartboys.application.dto.enums
   configuration:
     # 分页插件拦截器
     interceptor: com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor

@@ -43,7 +43,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
 
     @Override
     public User retrieveByOpenId(String openID) {
-        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getOpenId, openID));
+        var userDO = userMapper.selectOne(new LambdaQueryWrapper<UserDO>().eq(UserDO::getOpenID, openID));
         if (userDO == null) {
             return null;
         }
