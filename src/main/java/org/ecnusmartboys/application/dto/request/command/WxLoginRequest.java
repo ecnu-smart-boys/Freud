@@ -9,6 +9,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class WxLoginRequest {
 
-    @NotNull
+    @NotNull(message = "code不能为空")
     String code;
 }

@@ -1,19 +1,20 @@
 package org.ecnusmartboys.application.dto.request.command;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-@ApiModel("发起咨询会话请求")
-public class StartConsultRequest {
-    @NotNull(message = "咨询师id不能为空")
-    @ApiModelProperty("咨询师id")
+public class CallHelpRequest {
+
+    @ApiModelProperty("求助督导的id")
+    @NotNull
     private String toId;
 
+    @ApiModelProperty("被求助的会话id")
     @NotNull
-    @ApiModelProperty("我的id")
+    private String conversationId;
+
     private String myId;
 }

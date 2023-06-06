@@ -73,6 +73,7 @@ public class AuthController {
     @PostMapping("/logout")
     public Responses<Object> logout(HttpServletRequest request) {
         var session = request.getSession();
+        // TODO
         session.invalidate();
         return Responses.ok();
     }

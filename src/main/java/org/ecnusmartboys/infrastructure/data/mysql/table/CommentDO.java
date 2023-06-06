@@ -2,6 +2,7 @@ package org.ecnusmartboys.infrastructure.data.mysql.table;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,8 @@ public class CommentDO extends BaseDO {
     private Integer score;
 
     private String text;
+
+    public static final String COMMENTED = "is_commented";
+    @TableField(COMMENTED)
+    private Boolean commented;
 }

@@ -17,4 +17,6 @@ public class Supervisor extends User{
     private String qualificationCode;
 
     private Integer arrangement;
+
+    private Integer maxConversations;
 }

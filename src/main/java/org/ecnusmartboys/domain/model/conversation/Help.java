@@ -11,6 +11,7 @@ import org.ecnusmartboys.domain.model.user.User;
 @NoArgsConstructor
 public class Help extends BaseEntity {
 
+    private String helpId;
     private Long startTime;
     private Long endTime;
     private User supervisor;

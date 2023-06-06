@@ -38,4 +38,18 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "(SELECT * FROM sys_user) AS b " +
             "WHERE from_id = id order by start_time desc limit 4")
     List<ConversationDO> selectRecentByToId(String toId);
+
+    @Select("SELECT * FROM conversation " +
+            "where end_time IS NOT NULL and to_id = #{toId} and is_consultation = 1")
+    List<ConversationDO> selectConsultationByToId(String toId);
+
+    @Select("SELECT * FROM conversation " +
+            "where end_time IS NOT NULL and to_id = #{toId} and is_consultation = 0")
+    List<ConversationDO> selectHelpByToId(String toId);
+
+    @Select("SELECT * FROM conversation " +
+            "where end_time IS NOT NULL and from_id = #{fromId} and is_consultation = 1")
+    List<ConversationDO> selectConsultationByFromId(String fromId);
+
+
 }

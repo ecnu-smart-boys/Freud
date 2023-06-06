@@ -1,6 +1,7 @@
 package org.ecnusmartboys.infrastructure.data.mysql.table;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,7 @@ public class ConversationDO extends BaseDO {
 
     private Long helperId;
 
+    public static final String CONSULTATION = "is_consultation";
+    @TableField(CONSULTATION)
     private Boolean isConsultation;
 }

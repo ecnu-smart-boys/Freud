@@ -13,4 +13,6 @@ public class  Consultant extends User{
     private String title;
 
     private Integer arrangement;
+
+    private Integer maxConversations;
 }

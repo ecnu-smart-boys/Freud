@@ -3,8 +3,11 @@ package org.ecnusmartboys.application.dto.request.query;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ecnusmartboys.api.annotation.Timestamp;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
@@ -12,10 +15,10 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class NoArrangedRequest {
 
-    @Size(max = 32, message = "名字长度不能超过32位")
+    @Pattern(regexp = "^[\\p{L}a-zA-Z]{0,32}$", message = "姓名格式不正确")
     private String name = "";
 
     @NotNull(message = "时间戳不能为空")
-    @Min(value = 0, message = "时间戳不能为负数")
+    @Timestamp
     private Long timestamp;
 }

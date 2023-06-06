@@ -40,4 +40,7 @@ public class StaffInfoDO extends BaseDO {
 
     @ApiModelProperty("排班计划")
     private Integer arrangement;
+
+    @ApiModelProperty("最大同时在线会话数量")
+    private Integer maxConversations;
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @ApiModel("更新咨询师请求")
 public class UpdateConsultantRequest {
 
-    @NotNull
+    @NotNull(message = "修改的咨询师不能为空")
     private String id;
 
     @NotNull(message = "名字不能为空")

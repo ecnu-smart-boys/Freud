@@ -8,6 +8,7 @@ import org.ecnusmartboys.api.annotation.Timestamp;
 import org.ecnusmartboys.infrastructure.utils.Validator;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class ConsultRecordListReq {
     private Long size = 5L;
 
     @ApiModelProperty("名字模糊查询，默认为空")
+    @Pattern(regexp = "^[\\p{L}a-zA-Z]{0,32}$", message = "姓名格式不正确")
     private String name = "";
 
     @ApiModelProperty("日期查询，默认为空")

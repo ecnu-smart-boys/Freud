@@ -13,9 +13,11 @@ import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.arrangement.Arrangement;
+import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.ArrangementRepository;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
+import org.ecnusmartboys.domain.repository.ConversationRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
@@ -33,7 +35,8 @@ import java.util.stream.Collectors;
 public class UserArrangeServiceImpl implements UserArrangeService {
     private final UserRepository userRepository;
     private final ConsulvisorRepository consulvisorRepository;
-    private final ArrangementRepository arrangementRepository;
+    private final ConversationRepository conversationRepository;
+
 
     private final ConsultantInfoConvertor consultantInfoConvertor;
     private final SupervisorInfoConvertor supervisorInfoConvertor;
@@ -51,10 +54,23 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         consultants.forEach( v -> {
             var consultantInfo = consultantInfoConvertor.fromEntity((Consultant) v);
 
-            // TODO 累计咨询次数，咨询时间，平均评价
-            consultantInfo.setConsultTimes(0);
-            consultantInfo.setTotalTime(0);
-            consultantInfo.setAvgComment(5);
+            // 累计咨询次数，咨询时间
+            List<Conversation> conversations = conversationRepository.retrieveConsultationByToId(v.getId());
+            int totalTime = 0;
+            int totalScore = 0;
+            for(Conversation conversation : conversations) {
+                totalTime = (int) (totalTime + (conversation.getEndTime() - conversation.getStartTime()));
+                totalScore += conversation.getFromUserComment().getScore();
+            }
+            consultantInfo.setTotalTime(totalTime);
+            consultantInfo.setConsultTimes(conversations.size());
+
+            // 平均评价
+            if(conversations.size() == 0) {
+                consultantInfo.setAvgComment(0);
+            } else {
+                consultantInfo.setAvgComment(totalScore / conversations.size());
+            }
 
             // 获得绑定的督导
             consultantInfo.setSupervisorList(new ArrayList<>());
@@ -77,9 +93,14 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         supervisors.forEach( v -> {
             var supervisorInfo = supervisorInfoConvertor.fromEntity( (Supervisor) v);
 
-            // TODO 累计咨询次数，咨询时间
-            supervisorInfo.setTotalTime(0);
-            supervisorInfo.setConsultTimes(0);
+            // 总咨询时长和咨询次数
+            List<Conversation> conversations = conversationRepository.retrieveHelpByToId(v.getId());
+            int totalTime = 0;
+            for(Conversation conversation : conversations) {
+                totalTime = (int) (totalTime + (conversation.getEndTime() - conversation.getStartTime()));
+            }
+            supervisorInfo.setTotalTime(totalTime);
+            supervisorInfo.setConsultTimes(conversations.size());
 
             // 获得咨询师列表
             supervisorInfo.setConsultantList(new ArrayList<>());
@@ -102,8 +123,12 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         visitors.forEach( v -> {
             var visitor = visitorInfoConvertor.fromEntity((Visitor) v);
 
-            // TODO 总咨询时长
-            visitor.setTotalTime(0);
+            // 总咨询时长
+            List<Conversation> conversations = conversationRepository.retrieveConsultationByFromId(v.getId());
+            int totalTime = 0;
+            for(Conversation conversation : conversations) {
+                totalTime = (int) (totalTime + (conversation.getEndTime() - conversation.getStartTime()));
+            }
 
             visitorInfoList.add(visitor);
         });

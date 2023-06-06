@@ -31,6 +31,7 @@ public class CaptchaUtil {
     public Captcha generateCaptcha() {
         ArithmeticCaptcha captcha = new ArithmeticCaptcha(CAPTCHA_WIDTH, CAPTCHA_HEIGHT, CAPTCHA_LENGTH);
         String verCode = captcha.text().toLowerCase();
+        System.out.println(verCode);
         if (verCode.contains(".")) {
             verCode = verCode.split("\\.")[0];
         }

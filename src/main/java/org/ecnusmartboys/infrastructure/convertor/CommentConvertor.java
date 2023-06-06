@@ -9,4 +9,6 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentConvertor {
     Comment toComment(CommentDO commentDO);
+
+    CommentDO toCommentDO(Comment comment);
 }
