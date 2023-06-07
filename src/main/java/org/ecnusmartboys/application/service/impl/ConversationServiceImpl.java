@@ -1,6 +1,7 @@
 package org.ecnusmartboys.application.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.ConsultRecordInfo;
 import org.ecnusmartboys.application.dto.HelpRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ConversationServiceImpl implements ConversationService {
@@ -390,7 +392,6 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Scheduled(cron = "*/15 * * * * *")
     public void timeout() {
-        System.out.println(new Date());
         var idleConversations = onlineUserRepository.getIdleConversation();
         var timeoutConversations = onlineUserRepository.kickOutTimeoutConversations();
 
@@ -401,7 +402,7 @@ public class ConversationServiceImpl implements ConversationService {
                 // error
                 continue;
             }
-            System.out.println(conversation.getId() + " 超时结束");
+            log.info("会话 {} 超时结束", conversation.getId());
             endConversation(conversation);
         }
 

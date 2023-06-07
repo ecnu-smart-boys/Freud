@@ -178,7 +178,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     @Override
     public void giveSecondChance(List<String> conversations) {
         conversations.forEach(conversation -> {
-            System.out.println(conversation + " 被赋予二次机会");
+            log.info(conversation + " 被赋予二次机会");
             secondChances.put(conversation, System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(END_CONVERSATION));
         });
     }

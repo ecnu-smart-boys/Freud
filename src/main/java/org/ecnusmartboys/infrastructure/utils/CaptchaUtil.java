@@ -2,6 +2,7 @@ package org.ecnusmartboys.infrastructure.utils;
 
 import com.wf.captcha.ArithmeticCaptcha;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.application.dto.Captcha;
@@ -11,6 +12,7 @@ import org.springframework.util.Assert;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CaptchaUtil {
@@ -31,7 +33,7 @@ public class CaptchaUtil {
     public Captcha generateCaptcha() {
         ArithmeticCaptcha captcha = new ArithmeticCaptcha(CAPTCHA_WIDTH, CAPTCHA_HEIGHT, CAPTCHA_LENGTH);
         String verCode = captcha.text().toLowerCase();
-        System.out.println(verCode);
+        log.debug("生成验证码: {}", verCode);
         if (verCode.contains(".")) {
             verCode = verCode.split("\\.")[0];
         }
