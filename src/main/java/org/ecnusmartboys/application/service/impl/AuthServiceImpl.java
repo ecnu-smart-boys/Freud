@@ -12,12 +12,15 @@ import org.ecnusmartboys.application.service.AuthService;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Visitor;
 import org.ecnusmartboys.domain.repository.UserRepository;
+import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.exception.BusinessException;
 import org.ecnusmartboys.infrastructure.exception.ForbiddenException;
 import org.ecnusmartboys.application.convertor.UserInfoConvertor;
 import org.ecnusmartboys.infrastructure.exception.UnauthorizedException;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;
 import org.ecnusmartboys.infrastructure.utils.SmsUtil;
 import org.ecnusmartboys.infrastructure.utils.WxUtil;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -59,7 +62,11 @@ public class AuthServiceImpl implements AuthService {
 
         Visitor visitor = wxRegisterReqConvertor.toEntity(req);
         visitor.setOpenID(wxUtil.code2Session(req.getCode()).getOpenid());
-        userRepository.save(visitor);
+        try {
+            userRepository.save(visitor);
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException("用户已注册");
+        }
 
         return Responses.ok(userInfoConvertor.fromEntity(visitor));
     }
