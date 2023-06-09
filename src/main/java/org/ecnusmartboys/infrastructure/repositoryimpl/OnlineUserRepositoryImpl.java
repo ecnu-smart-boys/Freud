@@ -2,7 +2,8 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.application.dto.SupervisorInfo;
+import org.ecnusmartboys.application.dto.OnlineStaffInfo;
+import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
 import org.ecnusmartboys.domain.model.online.ConsultationInfo;
 import org.ecnusmartboys.domain.model.online.HelpInfo;
 import org.ecnusmartboys.domain.model.online.OnlineConsultant;
@@ -41,9 +42,9 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     private final Map<String, Long> secondChances;
 
     public OnlineUserRepositoryImpl() {
-        onlineConsultants = new HashSet<>();
-        onlineSupervisors = new HashSet<>();
-        onlineVisitors = new HashSet<>();
+        onlineConsultants = new TreeSet<>();
+        onlineSupervisors = new TreeSet<>();
+        onlineVisitors = new TreeSet<>();
         consultantConversations = new HashMap<>();
         supervisorConversations = new HashMap<>();
         conversations = new HashMap<>();
@@ -55,11 +56,11 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     public void Join(User user) {
         if(Objects.equals(user.getRole(), Consultant.ROLE)) {
             onlineConsultants.add(Long.valueOf(user.getId()));
-            fetchConsultant(Long.parseLong(user.getId()));
+            fetchConsultant(Long.parseLong(user.getId())).setMaxConcurrent(((Consultant)user).getMaxConversations());
 
         } else if(Objects.equals(user.getRole(), Supervisor.ROLE)) {
             onlineSupervisors.add(Long.valueOf(user.getId()));
-            fetchSupervisor(Long.parseLong(user.getId()));
+            fetchSupervisor(Long.parseLong(user.getId())).setMaxConcurrent(((Supervisor)user).getMaxConversations());;
 
         }  else if(Objects.equals(user.getRole(), Visitor.ROLE)) {
             onlineVisitors.add(Long.valueOf(user.getId()));
@@ -239,11 +240,88 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         }
     }
 
+    @Override
+    public OnlineInfoResponse getOnlineConsultantsInfo(long current, long size) {
+        int liveConversations = 0;
+        List<OnlineStaffInfo> consultants = new ArrayList<>();
+        List<Long> temp = new ArrayList<>(onlineConsultants);
+        int total = temp.size();
+
+        for(long i = (current - 1) * size; i < current * size; i++) {
+            if(i >= total) {
+                break;
+            }
+            var onlineStaffInfo = new OnlineStaffInfo();
+            onlineStaffInfo.setUserId(temp.get((int) i).toString());
+
+            OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
+            if(consultant.getVisitors().size() != 0) {
+                onlineStaffInfo.setState(1);
+                liveConversations += consultant.getVisitors().size();
+            }
+            consultants.add(onlineStaffInfo);
+        }
+        return new OnlineInfoResponse(consultants, liveConversations, total);
+    }
+
+    @Override
+    public OnlineInfoResponse getOnlineSupervisorsInfo(long current, long size) {
+        int liveConversations = 0;
+        List<OnlineStaffInfo> consultants = new ArrayList<>();
+        List<Long> temp = new ArrayList<>(onlineSupervisors);
+        int total = temp.size();
+
+        for(long i = (current - 1) * size; i < current * size; i++) {
+            if(i >= total) {
+                break;
+            }
+            var onlineStaffInfo = new OnlineStaffInfo();
+            onlineStaffInfo.setUserId(temp.get((int) i).toString());
+
+            OnlineSupervisor supervisor = fetchSupervisor(temp.get((int) i));
+            if(supervisor.getConsultants().size() != 0) {
+                onlineStaffInfo.setState(1);
+                liveConversations += supervisor.getConsultants().size();
+            }
+            consultants.add(onlineStaffInfo);
+        }
+        return new OnlineInfoResponse(consultants, liveConversations, total);
+    }
+
+    @Override
+    public OnlineInfoResponse getOnlineBoundConsultantInfo(long current, long size, Set<String> consultantIds) {
+        List<Long> temp = new ArrayList<>();
+        for(var consultantId : onlineConsultants) {
+            if(consultantIds.contains(consultantId.toString())) {
+                temp.add(consultantId);
+            }
+        }
+
+        List<OnlineStaffInfo> consultants = new ArrayList<>();
+        int liveConversations = 0;
+
+        for(long i = (current - 1) * size; i < current * size; i++) {
+            if(i >= temp.size()) {
+                break;
+            }
+            var onlineStaffInfo = new OnlineStaffInfo();
+            onlineStaffInfo.setUserId(temp.get((int) i).toString());
+
+            OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
+            if(consultant.getVisitors().size() != 0) {
+                onlineStaffInfo.setState(1);
+                liveConversations += consultant.getVisitors().size();
+            }
+            consultants.add(onlineStaffInfo);
+        }
+        return new OnlineInfoResponse(consultants, liveConversations, temp.size());
+    }
+
 
     private OnlineConsultant fetchConsultant(long userId) {
         if(!consultantConversations.containsKey(userId)) {
             OnlineConsultant consultant = new OnlineConsultant();
-            consultant.setMaxConcurrent(5); // TODO
+//            consultant.setMaxConcurrent(5); // TODO
             consultantConversations.put(userId, consultant);
         }
 
@@ -253,7 +331,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     private OnlineSupervisor fetchSupervisor(long userId) {
         if(!supervisorConversations.containsKey(userId)) {
             OnlineSupervisor supervisor = new OnlineSupervisor();
-            supervisor.setMaxConcurrent(1); // TODO
+//            supervisor.setMaxConcurrent(1); // TODO
             supervisorConversations.put(userId, supervisor);
         }
 

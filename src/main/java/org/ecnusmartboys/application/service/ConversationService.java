@@ -3,6 +3,7 @@ package org.ecnusmartboys.application.service;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
+import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 
@@ -24,6 +25,8 @@ public interface ConversationService {
 
     Responses<ConsultRecordsResponse> getRecentConsultations(Common common);
 
+    Responses<ConsultRecordsResponse> getBoundConsultations(ConsultRecordListReq req, Common common);
+
     Responses<HelpRecordsResponse> getRecentHelps(Common common);
 
     Responses<List<ConversationInfo>> getTodayHelps(Common common);
@@ -43,4 +46,14 @@ public interface ConversationService {
     Responses<Object> probeHelp(ProbeRequest req, Common common);
 
     Responses<Object> setting(SettingRequest req, Common common);
+
+    Responses<RankResponse> getRank();
+
+    Responses<Integer> getMaxConversations(Common common);
+
+    Responses<OnlineInfoResponse> getOnlineConsultantInfo(OnlineStaffListRequest req);
+
+    Responses<OnlineInfoResponse> getOnlineSupervisorInfo(OnlineStaffListRequest req);
+
+    Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(OnlineStaffListRequest req, Common common);
 }

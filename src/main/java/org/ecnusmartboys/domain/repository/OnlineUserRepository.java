@@ -1,10 +1,12 @@
 package org.ecnusmartboys.domain.repository;
 
+import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
 import org.ecnusmartboys.domain.model.online.ConsultationInfo;
 import org.ecnusmartboys.domain.model.online.HelpInfo;
 import org.ecnusmartboys.domain.model.user.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OnlineUserRepository {
 
@@ -43,4 +45,25 @@ public interface OnlineUserRepository {
     boolean isStaffInConversation(String userId);
 
     void updateSetting(String userId, Integer maxConversations);
+
+    /**
+     * 分页查询当前在线的咨询师状态和总咨询数
+     * @param current 页码
+     * @param size 页码大小
+     */
+    OnlineInfoResponse getOnlineConsultantsInfo(long current, long size);
+
+    /**
+     * 分页查询当前在线的督导状态和总咨询数
+     * @param current 页码
+     * @param size 页码大小
+     */
+    OnlineInfoResponse getOnlineSupervisorsInfo(long current, long size);
+
+    /**
+     * 分页查询当前在线且与某督导绑定的咨询师状态和总咨询数
+     * @param current 页码
+     * @param size 页码大小
+     */
+    OnlineInfoResponse getOnlineBoundConsultantInfo(long current, long size, Set<String> consultantIds);
 }

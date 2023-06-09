@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.ConsultRecordInfo;
 import org.ecnusmartboys.application.dto.HelpRecordInfo;
+import org.ecnusmartboys.application.dto.RankUserInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
+import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.service.ConversationService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.user.Consultant;
+import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.User;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
@@ -23,10 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -90,6 +91,13 @@ public class ConversationServiceImpl implements ConversationService {
         var conversations = conversationRepository.retrieveRecent(common.getUserId());
         var records = convertToConsultationList(conversations);
         return Responses.ok(new ConsultRecordsResponse(records, conversations.size()));
+    }
+
+    @Override
+    public Responses<ConsultRecordsResponse> getBoundConsultations(ConsultRecordListReq req, Common common) {
+        var pageResult =  conversationRepository.retrieveBoundConsultations(req.getCurrent(), req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
+        var records = convertToConsultationList(pageResult.getData());
+        return Responses.ok(new ConsultRecordsResponse(records, pageResult.getTotal()));
     }
 
     @Override
@@ -282,6 +290,73 @@ public class ConversationServiceImpl implements ConversationService {
 
         return Responses.ok("成功修改咨询设置");
     }
+
+    @Override
+    public Responses<RankResponse> getRank() {
+        // 获得咨询数量排行
+        List<RankUserInfo> list1 = new ArrayList<>();
+        var rank1 = conversationRepository.retrieveThisMonthConsultationsInOrder();
+        rank1.forEach(rankInfo -> {
+            var user = userRepository.retrieveById(rankInfo.getUserId());
+            list1.add(new RankUserInfo(user.getAvatar(), user.getName(), rankInfo.getTotal()));
+        });
+
+        // 获得好评数量排行
+        List<RankUserInfo> list2 = new ArrayList<>();
+        var rank2 = conversationRepository.retrieveThisMonthGoodCommentInOrder();
+        rank2.forEach(rankInfo -> {
+            var user = userRepository.retrieveById(rankInfo.getUserId());
+            list2.add(new RankUserInfo(user.getAvatar(), user.getName(), rankInfo.getTotal()));
+        });
+        return Responses.ok(new RankResponse(list1, list2));
+    }
+
+    @Override
+    public Responses<Integer> getMaxConversations(Common common) {
+        var user = userRepository.retrieveById(common.getUserId());
+        if (user instanceof Consultant) {
+            return Responses.ok(((Consultant) user).getMaxConversations());
+        }
+
+        return Responses.ok(((Supervisor) user).getMaxConversations());
+    }
+
+    @Override
+    public Responses<OnlineInfoResponse> getOnlineConsultantInfo(OnlineStaffListRequest req) {
+        var result = onlineUserRepository.getOnlineConsultantsInfo(req.getCurrent(), req.getSize());
+        var staffs = result.getStaffs();
+        staffs.forEach(staff -> {
+            staff.setName(userRepository.retrieveById(staff.getUserId()).getName());
+        });
+        return Responses.ok(result);
+    }
+
+    @Override
+    public Responses<OnlineInfoResponse> getOnlineSupervisorInfo(OnlineStaffListRequest req) {
+        var result = onlineUserRepository.getOnlineSupervisorsInfo(req.getCurrent(), req.getSize());
+        var staffs = result.getStaffs();
+        staffs.forEach(staff -> {
+            staff.setName(userRepository.retrieveById(staff.getUserId()).getName());
+        });
+        return Responses.ok(result);
+    }
+
+    @Override
+    public Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(OnlineStaffListRequest req, Common common) {
+        List<Consulvisor> consulvisors = consulvisorRepository.retrieveBySupId(common.getUserId());
+        Set<String> consultantIds = new HashSet<>();
+        consulvisors.forEach(consulvisor -> {
+            consultantIds.add(consulvisor.getConsultantId());
+        });
+
+        var result = onlineUserRepository.getOnlineBoundConsultantInfo(req.getCurrent(), req.getSize(), consultantIds);
+        var staffs = result.getStaffs();
+        staffs.forEach(staff -> {
+            staff.setName(userRepository.retrieveById(staff.getUserId()).getName());
+        });
+        return Responses.ok(result);
+    }
+
 
     @NotNull
     private List<ConsultRecordInfo> convertToConsultationList(List<Conversation> conversations) {

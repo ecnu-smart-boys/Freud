@@ -93,3 +93,5 @@ public class IMController {
         return Responses.ok(new PageResult<>(result.getRecords(), result.getTotal()));
     }
 }
+
+

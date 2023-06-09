@@ -152,7 +152,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
 
         user.setDisabled(true);
         userRepository.update(user);
-
+        // TODO 强制下线
         return Responses.ok("禁用用户成功");
     }
 

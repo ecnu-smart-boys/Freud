@@ -4,6 +4,7 @@ import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.conversation.Comment;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
+import org.ecnusmartboys.domain.model.conversation.RankInfo;
 
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,8 @@ public interface ConversationRepository {
     PageResult<Conversation> retrieveAllConsultations(Long current, Long size, String name, Long timestamp);
 
     PageResult<Conversation> retrieveConsultationsByToUser(Long current, Long size, String name, Long timestamp, String toId);
+
+    PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId);
 
     List<ConversationInfo> retrieveByDate(Date date);
 
@@ -46,4 +49,7 @@ public interface ConversationRepository {
     List<Conversation> retrieveConsultationByFromId(String fromId);
 
 
+    List<RankInfo> retrieveThisMonthConsultationsInOrder();
+
+    List<RankInfo> retrieveThisMonthGoodCommentInOrder();
 }

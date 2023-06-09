@@ -5,14 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.PageResult;
-import org.ecnusmartboys.domain.model.conversation.Comment;
-import org.ecnusmartboys.domain.model.conversation.Conversation;
-import org.ecnusmartboys.domain.model.conversation.Help;
+import org.ecnusmartboys.domain.model.conversation.*;
 import org.ecnusmartboys.domain.repository.ConversationRepository;
 import org.ecnusmartboys.infrastructure.convertor.CommentConvertor;
 import org.ecnusmartboys.infrastructure.convertor.ConversationConvertor;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
-import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
+import org.ecnusmartboys.infrastructure.data.mysql.intermidium.RankDO;
 import org.ecnusmartboys.infrastructure.data.mysql.table.CommentDO;
 import org.ecnusmartboys.infrastructure.data.mysql.table.ConversationDO;
 import org.ecnusmartboys.infrastructure.mapper.CommentMapper;
@@ -53,6 +51,13 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public PageResult<Conversation> retrieveConsultationsByToUser(Long current, Long size, String name, Long timestamp, String toId) {
         List<ConversationDO> conversationDOS = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), Long.valueOf(toId));
+        var conversations = convert2List(conversationDOS, current, size);
+        return new PageResult<>(conversations, conversationDOS.size());
+    }
+
+    @Override
+    public PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId) {
+        List<ConversationDO> conversationDOS = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), Long.valueOf(supervisorId));
         var conversations = convert2List(conversationDOS, current, size);
         return new PageResult<>(conversations, conversationDOS.size());
     }
@@ -175,6 +180,28 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     public List<Conversation> retrieveConsultationByFromId(String fromId) {
         List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByFromId(fromId);
         return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+    }
+
+    @Override
+    public List<RankInfo> retrieveThisMonthConsultationsInOrder() {
+        int month = 6; // TODO
+        List<RankInfo> result = new ArrayList<>();
+        List<RankDO> ranks = conversationMapper.selectMonthConsultantsInOrder(month);
+        ranks.forEach(rankDO -> {
+            result.add(new RankInfo(rankDO.getUserId().toString(), rankDO.getTotal()));
+        });
+        return result;
+    }
+
+    @Override
+    public List<RankInfo> retrieveThisMonthGoodCommentInOrder() {
+        int month = 6; // TODO
+        List<RankInfo> result = new ArrayList<>();
+        List<RankDO> ranks = conversationMapper.selectMonthGoodCommentInOrder(month);
+        ranks.forEach(rankDO -> {
+            result.add(new RankInfo(rankDO.getUserId().toString(), rankDO.getTotal()));
+        });
+        return result;
     }
 
     private List<Conversation> convert2List(List<ConversationDO> conversationDOS, Long current, Long size) {

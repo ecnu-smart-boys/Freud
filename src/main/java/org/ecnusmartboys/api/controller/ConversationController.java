@@ -10,6 +10,7 @@ import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
+import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.service.ConversationService;
 import org.ecnusmartboys.domain.model.user.Admin;
@@ -82,6 +83,14 @@ public class ConversationController {
     public Responses<HelpRecordsResponse> getSupervisorHelpRecords(@Validated ConsultRecordListReq req, HttpServletRequest request){
         var common = Extractor.extract(request);
         return conversationService.getSupervisorHelpRecords(req, common);
+    }
+
+    @AuthRoles(Supervisor.ROLE)
+    @ApiOperation("督导获得绑定咨询师的咨询记录")
+    @GetMapping("/supervisor/boundConsultations")
+    public Responses<ConsultRecordsResponse> getBoundConsultations(@Validated ConsultRecordListReq req, HttpServletRequest request){
+        var common = Extractor.extract(request);
+        return conversationService.getBoundConsultations(req, common);
     }
 
     @AuthRoles(Supervisor.ROLE)
@@ -177,6 +186,43 @@ public class ConversationController {
     public Responses<Object> setting(@RequestBody @Validated SettingRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.setting(req, common);
+    }
+
+    @AuthRoles(Admin.ROLE)
+    @GetMapping("/rank")
+    @ApiOperation("获得当月咨询数量排行和好评排行")
+    public Responses<RankResponse> getRank() {
+        return conversationService.getRank();
+    }
+
+    @AuthRoles({Consultant.ROLE, Supervisor.ROLE})
+    @GetMapping("/maxConversations")
+    @ApiOperation("获得在线最大会话数量")
+    public Responses<Integer> getMaxConversations(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getMaxConversations(common);
+    }
+
+    @AuthRoles(Admin.ROLE)
+    @GetMapping("/onlineConsultantInfo")
+    @ApiOperation("管理员获得当前在线咨询师和咨询数量")
+    public Responses<OnlineInfoResponse> getOnlineConsultantInfo(@Validated OnlineStaffListRequest req) {
+        return conversationService.getOnlineConsultantInfo(req);
+    }
+
+    @AuthRoles(Admin.ROLE)
+    @GetMapping("/onlineSupervisorInfo")
+    @ApiOperation("管理员获得当前在线督导和求助数量")
+    public Responses<OnlineInfoResponse> getOnlineSupervisorInfo(@Validated OnlineStaffListRequest req) {
+        return conversationService.getOnlineSupervisorInfo(req);
+    }
+
+    @AuthRoles(Supervisor.ROLE)
+    @GetMapping("/onlineBoundConsultantInfo")
+    @ApiOperation("督导获得当前在线且与他绑定的咨询师和咨询数量")
+    public Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(@Validated OnlineStaffListRequest req, HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getOnlineBoundConsultantInfo(req, common);
     }
 
 
