@@ -83,7 +83,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     @Override
-    public boolean consultationExists(String fromId, String toId) {
+    public boolean consultationExists(String fromId, String toId) { // TODO 检查
         var consultant = consultantConversations.get(Long.valueOf(toId));
         return consultant.getVisitors().contains(Long.valueOf(fromId));
     }
@@ -256,7 +256,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
             if(consultant.getVisitors().size() != 0) {
-                onlineStaffInfo.setState(1);
+                onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }
             consultants.add(onlineStaffInfo);
@@ -280,7 +280,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
             OnlineSupervisor supervisor = fetchSupervisor(temp.get((int) i));
             if(supervisor.getConsultants().size() != 0) {
-                onlineStaffInfo.setState(1);
+                onlineStaffInfo.setState(2);
                 liveConversations += supervisor.getConsultants().size();
             }
             consultants.add(onlineStaffInfo);
@@ -309,12 +309,25 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
             if(consultant.getVisitors().size() != 0) {
-                onlineStaffInfo.setState(1);
+                onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }
             consultants.add(onlineStaffInfo);
         }
         return new OnlineInfoResponse(consultants, liveConversations, temp.size());
+    }
+
+    @Override
+    public int getConsultantState(String id) {
+        if(!onlineConsultants.contains(Long.valueOf(id))) {
+            return 0;
+        }
+
+        OnlineConsultant consultant = fetchConsultant(Long.parseLong(id));
+        if(consultant.getVisitors().size() == 0) {
+            return 1;
+        }
+        return 2;
     }
 
 

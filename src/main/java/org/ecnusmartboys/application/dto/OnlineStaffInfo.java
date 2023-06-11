@@ -18,6 +18,6 @@ public class OnlineStaffInfo {
     @ApiModelProperty("咨询师或督导姓名")
     private String name;
 
-    @ApiModelProperty("当前状态，1表示忙碌，0表示空闲")
-    private int state = 0;
+    @ApiModelProperty("当前状态，1表示在线，2表示忙碌")
+    private int state = 1;
 }

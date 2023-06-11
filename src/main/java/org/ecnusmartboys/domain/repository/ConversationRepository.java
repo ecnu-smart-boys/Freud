@@ -16,6 +16,11 @@ public interface ConversationRepository {
 
     PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId);
 
+    /**
+     * 获得该访客已经结束的咨询记录列表
+     */
+    List<Conversation> retrieveConsultationByVisitorId(String visitorId);
+
     List<ConversationInfo> retrieveByDate(Date date);
 
     List<ConversationInfo> retrieveByDateAndToId(Date date, String toId);
@@ -42,14 +47,50 @@ public interface ConversationRepository {
 
     String bindHelp(String conversationId, String supervisorId);
 
+    /**
+     * 根据咨询师id，获得所有已完结的咨询会话
+     */
     List<Conversation> retrieveConsultationByToId(String toId);
 
+    /**
+     * 根据督导/咨询师id，获得所有在线的咨询会话
+     */
+    List<Conversation> retrieveOnlineConversationsByToId(String toId);
+
+    /**
+     * 根据督导id，获得所有已完结的求助会话
+     */
     List<Conversation> retrieveHelpByToId(String toId);
 
+    /**
+     * 根据访客id，获得所有已完结的咨询会话
+     */
     List<Conversation> retrieveConsultationByFromId(String fromId);
 
+//    /**
+//     * 根据访客id，获得所有在线的咨询会话
+//     */
+//    List<Conversation> retrieveOnlineConsultationByFromId(String fromId); TODO
 
+    /**
+     * 获得这个月的咨询会话排名
+     */
     List<RankInfo> retrieveThisMonthConsultationsInOrder();
 
+    /**
+     * 获得这个月的好评排名
+     */
     List<RankInfo> retrieveThisMonthGoodCommentInOrder();
+
+    /**
+     * 通过求助督导id获得会话记录
+     * @param helperId 求助督导id
+     * @return 会话
+     */
+    Conversation retrieveByHelperId(String helperId);
+
+    /**
+     * 通过fromId和toId来确定一个在线的会话
+     */
+    Conversation retrieveByFromIdAndToId(String fromId, String toId);
 }

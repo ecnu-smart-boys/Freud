@@ -14,5 +14,7 @@ public class Comment {
 
     private String text;
 
+    private String tag;
+
     private Boolean commented;
 }

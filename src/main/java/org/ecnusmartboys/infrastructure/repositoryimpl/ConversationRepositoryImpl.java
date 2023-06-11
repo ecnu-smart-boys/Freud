@@ -50,16 +50,22 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public PageResult<Conversation> retrieveConsultationsByToUser(Long current, Long size, String name, Long timestamp, String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), Long.valueOf(toId));
+        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), toId);
         var conversations = convert2List(conversationDOS, current, size);
         return new PageResult<>(conversations, conversationDOS.size());
     }
 
     @Override
     public PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), Long.valueOf(supervisorId));
+        List<ConversationDO> conversationDOS = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), supervisorId);
         var conversations = convert2List(conversationDOS, current, size);
         return new PageResult<>(conversations, conversationDOS.size());
+    }
+
+    @Override
+    public List<Conversation> retrieveConsultationByVisitorId(String visitorId) {
+        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByVisitorId(visitorId);
+        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
     }
 
     @Override
@@ -107,7 +113,8 @@ public class ConversationRepositoryImpl implements ConversationRepository {
         conversationMapper.updateById(conversationDO);
 
         if(conversationDO.getIsConsultation()) {
-            // 咨询，创建两个空评论
+            // 是一次咨询，创建两个空评论
+            // 访客评论
             CommentDO commentDO1 = new CommentDO();
             commentDO1.setConversationId(conversationDO.getConversationId());
             commentDO1.setUserId(conversationDO.getFromId());
@@ -171,6 +178,12 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
+    public List<Conversation> retrieveOnlineConversationsByToId(String toId) {
+        List<ConversationDO> conversationDOS = conversationMapper.selectOnlineConversationsByToId(toId);
+        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+    }
+
+    @Override
     public List<Conversation> retrieveHelpByToId(String toId) {
         List<ConversationDO> conversationDOS = conversationMapper.selectHelpByToId(toId);
         return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
@@ -181,6 +194,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
         List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByFromId(fromId);
         return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
     }
+
 
     @Override
     public List<RankInfo> retrieveThisMonthConsultationsInOrder() {
@@ -202,6 +216,29 @@ public class ConversationRepositoryImpl implements ConversationRepository {
             result.add(new RankInfo(rankDO.getUserId().toString(), rankDO.getTotal()));
         });
         return result;
+    }
+
+    @Override
+    public Conversation retrieveByHelperId(String helperId) {
+        ConversationDO conversationDO = conversationMapper.selectByHelperId(helperId);
+        if(conversationDO == null) {
+            return null;
+        }
+        return convert(conversationDO);
+    }
+
+    @Override
+    public Conversation retrieveByFromIdAndToId(String fromId, String toId) {
+        ConversationDO conversationDO = conversationMapper.selectByFromIdAndToId(fromId, toId);
+        if(conversationDO != null) {
+            return convert(conversationDO);
+        }
+
+        conversationDO = conversationMapper.selectByFromIdAndToId(toId, fromId);
+        if(conversationDO != null) {
+            return convert(conversationDO);
+        }
+        return null;
     }
 
     private List<Conversation> convert2List(List<ConversationDO> conversationDOS, Long current, Long size) {

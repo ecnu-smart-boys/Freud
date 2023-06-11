@@ -31,6 +31,8 @@ public class CommentDO extends BaseDO {
 
     private String text;
 
+    private String tag;
+
     public static final String COMMENTED = "is_commented";
     @TableField(COMMENTED)
     private Boolean commented;

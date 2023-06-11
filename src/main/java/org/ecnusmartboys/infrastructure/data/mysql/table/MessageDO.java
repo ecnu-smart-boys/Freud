@@ -17,7 +17,12 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "message", autoResultMap = true)
 public class MessageDO extends BaseDO {
+
+    private Long id;
+
     private String msgKey;
+
+    private String conversationId;
 
     private String fromId;
 
@@ -31,7 +36,7 @@ public class MessageDO extends BaseDO {
     /**
      * 消息发送时间(秒)
      */
-    private Integer time;
+    private long time;
 
     @TableField("is_revoked")
     private boolean revoked;

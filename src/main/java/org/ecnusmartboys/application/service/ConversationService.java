@@ -1,5 +1,7 @@
 package org.ecnusmartboys.application.service;
 
+import org.ecnusmartboys.application.dto.conversation.OnlineConversation;
+import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
@@ -16,6 +18,8 @@ public interface ConversationService {
     Responses<ConsultRecordsResponse> getConsultConsultations(ConsultRecordListReq req, Common common);
 
     Responses<HelpRecordsResponse> getSupervisorHelpRecords(ConsultRecordListReq req, Common common);
+
+    Responses<List<WxConsultRecordInfo>> getVisitorConsultations(Common common);
 
     Responses<List<ConversationInfo>> getTodayConsultations();
 
@@ -39,7 +43,9 @@ public interface ConversationService {
 
     Responses<Object> endHelp(EndHelpRequest req, Common common);
 
-    Responses<EndConsultResponse> comment(CommentRequest req, Common common);
+    Responses<EndConsultResponse> visitorComment(VisitorCommentRequest req, Common common);
+
+    Responses<EndConsultResponse> consultantComment(ConsultantCommentRequest req, Common common);
 
     Responses<Object> probeConsultation(ProbeRequest req, Common common);
 
@@ -56,4 +62,20 @@ public interface ConversationService {
     Responses<OnlineInfoResponse> getOnlineSupervisorInfo(OnlineStaffListRequest req);
 
     Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(OnlineStaffListRequest req, Common common);
+
+    Responses<WebConversationInfoResponse> getSupervisorOwnHelpInfo(String helpId, Common common);
+
+    Responses<WebConversationInfoResponse> getBoundConsultantsInfo(String conversationId, Common common);
+
+    Responses<WebConversationInfoResponse> getConsultantOwnConsultationInfo(String conversationId, Common common);
+
+    Responses<WebConversationInfoResponse> getAdminConsultationInfo(String conversationId, Common common);
+
+    Responses<List<OnlineConversation>> getOnlineConversationsList(Common common);
+
+    Responses<WebConversationInfoResponse> getOnlineConsultationInfo(String conversationId, Common common);
+
+    Responses<WebConversationInfoResponse> getOnlineHelpInfo(String conversationId, Common common);
+
+
 }

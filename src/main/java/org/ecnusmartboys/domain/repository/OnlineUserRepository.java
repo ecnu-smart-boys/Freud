@@ -66,4 +66,11 @@ public interface OnlineUserRepository {
      * @param size 页码大小
      */
     OnlineInfoResponse getOnlineBoundConsultantInfo(long current, long size, Set<String> consultantIds);
+
+    /**
+     * 获得咨询师状态
+     * @param id 咨询师id
+     * @return 0：不在线，1 在线，2 忙碌
+     */
+    int getConsultantState(String id);
 }

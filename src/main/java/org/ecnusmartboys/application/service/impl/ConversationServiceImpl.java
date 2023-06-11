@@ -5,6 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.ConsultRecordInfo;
 import org.ecnusmartboys.application.dto.HelpRecordInfo;
 import org.ecnusmartboys.application.dto.RankUserInfo;
+import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
+import org.ecnusmartboys.application.dto.conversation.HelpInfo;
+import org.ecnusmartboys.application.dto.conversation.OnlineConversation;
+import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
@@ -12,6 +16,7 @@ import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.service.ConversationService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
+import org.ecnusmartboys.domain.model.conversation.Help;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.model.user.Supervisor;
@@ -60,6 +65,22 @@ public class ConversationServiceImpl implements ConversationService {
         var pageResult = conversationRepository.retrieveConsultationsByToUser(req.getCurrent(), req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
         var records = convertToHelpList(pageResult.getData());
         return Responses.ok(new HelpRecordsResponse(records, pageResult.getTotal()));
+    }
+
+    @Override
+    public Responses<List<WxConsultRecordInfo>> getVisitorConsultations(Common common) {
+        List<WxConsultRecordInfo> result = new ArrayList<>();
+        var consultations = conversationRepository.retrieveConsultationByVisitorId(common.getUserId());
+        consultations.forEach(conversation -> {
+            WxConsultRecordInfo info = new WxConsultRecordInfo();
+            info.setAvatar(conversation.getToUser().getAvatar()); // 咨询师头像
+            info.setStartTime(conversation.getStartTime()); // 开始时间
+            info.setEndTime(conversation.getEndTime()); // 结束时间
+            info.setConsultantName(conversation.getToUser().getName()); // 咨询师姓名
+            info.setScore(onlineUserRepository.getConsultantState(conversation.getToUser().getId())); // 咨询师状态
+            result.add(info);
+        });
+        return Responses.ok(result);
     }
 
     @Override
@@ -232,7 +253,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public Responses<EndConsultResponse> comment(CommentRequest req, Common common) {
+    public Responses<EndConsultResponse> visitorComment(VisitorCommentRequest req, Common common) {
         var comment = conversationRepository.retrieveComment(req.getConversationId(), common.getUserId());
         // 评论不存在
         if(comment == null) {
@@ -249,6 +270,28 @@ public class ConversationServiceImpl implements ConversationService {
         comment.setCommented(true);
         comment.setText(req.getText());
         comment.setScore(req.getScore());
+
+        conversationRepository.saveComment(comment);
+        return Responses.ok("评价成功");
+    }
+
+    @Override
+    public Responses<EndConsultResponse> consultantComment(ConsultantCommentRequest req, Common common) {
+        var comment = conversationRepository.retrieveComment(req.getConversationId(), common.getUserId());
+        if(comment == null) {
+            throw new BadRequestException("会话不存在，无法评论");
+
+        } else if(!Objects.equals(comment.getUserId(), comment.getId())) {
+            throw new BadRequestException("你没有资格评论");
+
+        } else if(comment.getCommented()) {
+            throw new BadRequestException("该会话你已经评论过了");
+        }
+
+        // 包装评论信息
+        comment.setCommented(true);
+        comment.setText(req.getText());
+        comment.setTag(req.getTag());
 
         conversationRepository.saveComment(comment);
         return Responses.ok("评价成功");
@@ -357,6 +400,103 @@ public class ConversationServiceImpl implements ConversationService {
         return Responses.ok(result);
     }
 
+    @Override
+    public Responses<WebConversationInfoResponse> getSupervisorOwnHelpInfo(String helpId, Common common) {
+        Conversation consultation = conversationRepository.retrieveByHelperId(helpId);
+        if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+            throw new BadRequestException("该督导不存在这条会话记录");
+        }
+        if(consultation.getEndTime() != null) {
+            throw new BadRequestException("该会话尚未结束");
+        }
+
+
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
+
+    @Override
+    public Responses<WebConversationInfoResponse> getBoundConsultantsInfo(String conversationId, Common common) {
+        Conversation consultation = conversationRepository.retrieveById(conversationId);
+        if(consultation == null || !consultation.isConsultation()) {
+            throw new BadRequestException("该咨询记录不存在");
+
+        } else if(consultation.getEndTime() == null) {
+            throw new BadRequestException("该会话正在进行中，不可访问");
+        }
+
+        var toId = consultation.getToUser().getId();
+        List<Consulvisor> consulvisors = consulvisorRepository.retrieveBySupId(common.getUserId());
+        List<String> consultantIds = new ArrayList<>();
+        consulvisors.forEach(consulvisor -> {
+            consultantIds.add(consulvisor.getConsultantId());
+        });
+        if(!consultantIds.contains(toId)) {
+            throw new BadRequestException("该咨询师未绑定，不可查看其咨询详情");
+        }
+
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
+
+    @Override
+    public Responses<WebConversationInfoResponse> getConsultantOwnConsultationInfo(String conversationId, Common common) {
+        Conversation consultation = conversationRepository.retrieveById(conversationId);
+        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
+            throw new BadRequestException("该咨询师不存在该会话消息");
+
+        } else if(consultation.getEndTime() == null) {
+            throw new BadRequestException("该会话正在进行中，不可查看其咨询详情");
+        }
+
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
+
+    @Override
+    public Responses<WebConversationInfoResponse> getAdminConsultationInfo(String conversationId, Common common) {
+        Conversation consultation = conversationRepository.retrieveById(conversationId);
+        if(consultation == null || !consultation.isConsultation()) {
+            throw new BadRequestException("该咨询记录不存在");
+
+        }  else if(consultation.getEndTime() == null) {
+            throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
+        }
+
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
+
+    @Override
+    public Responses<List<OnlineConversation>> getOnlineConversationsList(Common common) {
+        List<OnlineConversation> result = new ArrayList<>();
+        var conversations = conversationRepository.retrieveOnlineConversationsByToId(common.getUserId());
+        conversations.forEach(conversation -> {
+            result.add(new OnlineConversation(conversation.getId(), conversation.getFromUser().getId(), conversation.getFromUser().getAvatar()));
+        });
+        return Responses.ok(result);
+    }
+
+    @Override
+    public Responses<WebConversationInfoResponse> getOnlineConsultationInfo(String conversationId, Common common) {
+        var consultation = conversationRepository.retrieveById(conversationId);
+        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
+            throw new BadRequestException("该咨询师不存在该在线会话");
+
+        } else if(consultation.getEndTime() != null) {
+            throw new BadRequestException("该会话已经结束，它不是在线会话");
+        }
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
+
+    @Override
+    public Responses<WebConversationInfoResponse> getOnlineHelpInfo(String helpId, Common common) {
+        var consultation = conversationRepository.retrieveByHelperId(helpId);
+        if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+            throw new BadRequestException("该督导不存在该在线会话");
+
+        } else if(consultation.getEndTime() != null) {
+            throw new BadRequestException("该会话已经结束，它不是在线会话");
+        }
+
+        return Responses.ok(convertToWebConversationInfo(consultation));
+    }
 
     @NotNull
     private List<ConsultRecordInfo> convertToConsultationList(List<Conversation> conversations) {
@@ -401,6 +541,47 @@ public class ConversationServiceImpl implements ConversationService {
         return records;
     }
 
+    /**
+     * 将会话类转为会话信息，显示在web端，可以显示督导信息
+     */
+    private WebConversationInfoResponse convertToWebConversationInfo(Conversation consultation) {
+        WebConversationInfoResponse conversationInfoResponse = new WebConversationInfoResponse();
+        ConsultationInfo consultationInfo =
+                new ConsultationInfo(consultation.getToUser().getName(), consultation.getToUser().getAvatar(), consultation.getToUser().getPhone(),
+                        consultation.getFromUser().getName(), consultation.getFromUser().getAvatar(), consultation.getStartTime(), System.currentTimeMillis());
+
+        // 会话未结束
+        if(consultation.getEndTime() != null) {
+            consultationInfo.setLastTime(consultation.getEndTime());
+            // 评论
+            conversationInfoResponse.setVisitorScore(consultation.getFromUserComment().getScore()); // 评分
+            conversationInfoResponse.setVisitorText(consultation.getFromUserComment().getText()); // 访客评价
+            conversationInfoResponse.setTag(consultation.getToUserComment().getTag()); // 咨询师评价标签
+            conversationInfoResponse.setConsultantText(consultation.getToUserComment().getText()); // 咨询师评价内容
+        }
+        conversationInfoResponse.setConsultationInfo(consultationInfo);
+
+        // 求助了督导
+        if(consultation.getHelper() != null) {
+            conversationInfoResponse.setHelpInfo(convertToHelpInfo(consultation.getHelper()));
+        }
+
+        return conversationInfoResponse;
+    }
+
+    private HelpInfo convertToHelpInfo(Help help) {
+        HelpInfo helpInfo = new HelpInfo(help.getSupervisor().getAvatar(), help.getSupervisor().getName(), help.getStartTime(), System.currentTimeMillis(), false);
+
+        // 求助已经结束
+        if(help.getEndTime() != null) {
+            helpInfo.setEndTime(help.getEndTime());
+            helpInfo.setEnd(true);
+        }
+        return helpInfo;
+    }
+
+
+
     private void updateHelpQueue(String supervisorId) {
         while (true) {
             var helpInfo = onlineUserRepository.popFrontHelp(supervisorId);
@@ -422,7 +603,11 @@ public class ConversationServiceImpl implements ConversationService {
             // 排队期间，咨询师和访客的会话已经结束，不需要求助了
             if(conversation.getEndTime() != null) {
                 continue;
+            } else if(conversation.getHelper() != null) {
+                // 排队期间，已经成功求助了另一个督导，不需要求助了
+                continue;
             }
+
             // 就是你了
             // 将该咨询师插入该督导当前咨询队列或等待队列
             if(onlineUserRepository.callHelpRequest(helpInfo.getConsultantId(), helpInfo.getSupervisorId(), helpInfo.getConversationId())) {
@@ -449,10 +634,10 @@ public class ConversationServiceImpl implements ConversationService {
             if(!onlineUserRepository.isConsultantOnline(consultationInfo.getConsultantId())) {
                 continue;
             }
-            // 排队期间，访客等不及了，干脆下线了 TODO
-//            if(!onlineUserRepository.isVisitorOnline(consultationInfo.getVisitorId())) {
-//                continue;
-//            }
+            // 排队期间，访客等不及了，干脆下线了
+            if(!onlineUserRepository.isVisitorOnline(consultationInfo.getVisitorId())) {
+                continue;
+            }
             // 就是你了
             if(onlineUserRepository.consultRequest(consultationInfo.getVisitorId(), consultationInfo.getConsultantId())) {
                 // 又要排队了，并发问题，基本不可能

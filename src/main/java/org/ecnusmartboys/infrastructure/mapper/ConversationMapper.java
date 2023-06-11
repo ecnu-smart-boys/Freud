@@ -24,14 +24,17 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "WHERE end_time IS NOT NULL and to_id = #{toId} and (#{date} = '1970-01-01' or DATE(start_time) = #{date})) AS a, " +
             "(SELECT * FROM sys_user WHERE (#{name} = '' or NAME LIKE #{name})) AS b " +
             "WHERE from_id = id;")
-    List<ConversationDO> selectConsultationsByToId(String name, String date, Long toId);
+    List<ConversationDO> selectConsultationsByToId(String name, String date, String toId);
 
     @Select("SELECT conversation.* FROM " +
             "(SELECT * FROM consulvisor WHERE supervisor_id = #{supervisorId}) " +
             "AS cs JOIN (SELECT NAME, id FROM sys_user WHERE (#{name} = '' or NAME LIKE #{name})) " +
             "AS USER ON cs.consultant_id = user.id," +
             "conversation WHERE to_id = id AND end_time IS NOT NULL and (#{date} = '1970-01-01' or DATE(start_time) = #{date})")
-    List<ConversationDO> selectBoundConsultations(String name, String format, Long supervisorId);
+    List<ConversationDO> selectBoundConsultations(String name, String format, String supervisorId);
+
+    @Select("SELECT * from conversation where from_id = #{visitorId} and end_time IS NOT NULL")
+    List<ConversationDO> selectConsultationByVisitorId(String visitorId);
 
     @Select("SELECT * FROM conversation " +
             "where end_time IS NOT NULL and DATE(start_time) = #{date} and is_consultation = 0")
@@ -51,9 +54,16 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "where end_time IS NOT NULL and to_id = #{toId} and is_consultation = 1")
     List<ConversationDO> selectConsultationByToId(String toId);
 
+    @Select("SELECT * FROM conversation where end_time IS NULL and to_id = #{toId}")
+    List<ConversationDO> selectOnlineConversationsByToId(String toId);
+
     @Select("SELECT * FROM conversation " +
             "where end_time IS NOT NULL and to_id = #{toId} and is_consultation = 0")
     List<ConversationDO> selectHelpByToId(String toId);
+
+    @Select("SELECT * FROM conversation " +
+            "where end_time IS NULL and to_id = #{toId} and is_consultation = 0")
+    List<ConversationDO> selectOnlineHelpByToId(String toId);
 
     @Select("SELECT * FROM conversation " +
             "where end_time IS NOT NULL and from_id = #{fromId} and is_consultation = 1")
@@ -72,4 +82,9 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
     List<RankDO> selectMonthGoodCommentInOrder(int month);
 
 
+    @Select("SELECT * from conversation where helper_id = #{helperId}")
+    ConversationDO selectByHelperId(String helperId);
+
+    @Select("SELECT * FROM conversation where from_id = #{fromId} and to_id = #{toId} and end_time is NULL")
+    ConversationDO selectByFromIdAndToId(String fromId, String toId);
 }

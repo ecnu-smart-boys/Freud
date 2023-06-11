@@ -9,7 +9,7 @@ import org.ecnusmartboys.domain.model.user.User;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Help extends BaseEntity {
+public class Help {
 
     private String helpId;
     private Long startTime;
