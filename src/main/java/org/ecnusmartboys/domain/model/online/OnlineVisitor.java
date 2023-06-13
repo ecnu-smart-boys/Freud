@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class OnlineVisitor {
 
-    private final static long NULL_CONSULTANT = -1L;
+    public final static long NULL_CONSULTANT = -1L;
 
     private Long consultant;
 
@@ -36,8 +36,10 @@ public class OnlineVisitor {
         return true;
     }
 
-    public void endWaiting() {
+    public long endWaiting() {
+        var temp = this.wait;
         this.wait = NULL_CONSULTANT;
+        return temp;
     }
 
     public boolean isBusy() {

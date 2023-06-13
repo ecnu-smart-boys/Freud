@@ -103,17 +103,6 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     @Override
-    public boolean consultationExists(String fromId, String toId) {
-        return false;
-    }
-
-//    @Override
-//    public boolean consultationExists(String fromId, String toId) { // TODO 检查
-//        var consultant = consultantConversations.get(Long.valueOf(toId));
-//        return consultant.getVisitors().contains(Long.valueOf(fromId));
-//    }
-
-    @Override
     public boolean consultRequest(String visitorId, String consultantId) {
         var consultant = fetchConsultant(Long.parseLong(consultantId));
         var visitor = fetchVisitor(Long.parseLong(visitorId));
@@ -125,13 +114,13 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         }
 
         // 排队
-        for(ConsultationInfo consultationInfo : consultant.getWaitingList()) {
-            if(Objects.equals(consultationInfo.getVisitorId(), visitorId)) {
+        for(var waitingId : consultant.getWaitingList()) {
+            if(Objects.equals(waitingId, visitorId)) {
                 // 避免重复排队
                 return true;
             }
         }
-        consultant.getWaitingList().add(new ConsultationInfo(visitorId, consultantId)); // +
+        consultant.getWaitingList().add(visitorId); // +
         visitor.startWaiting(Long.parseLong(consultantId)); // +
 
         return true;
@@ -140,10 +129,12 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     @Override
     public boolean callHelpRequest(String consultantId, String supervisorId, String conversationId) {
         var supervisor = fetchSupervisor(Long.parseLong(supervisorId));
+        var consultant = fetchConsultant(Long.parseLong(consultantId));
 
         // 直接开始求助
         if(supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
             supervisor.getConsultants().add(Long.valueOf(consultantId));
+            consultant.getSupervisors().add(Long.valueOf(supervisorId));
             return false;
         }
 
@@ -152,35 +143,37 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     @Override
-    public void removeConsultation(String visitorId, String consultantId) {
+    public void removeConsultation(String consultationId, String visitorId, String consultantId) {
         var visitor = fetchVisitor(Long.parseLong(visitorId));
         var consultant = fetchConsultant(Long.parseLong(consultantId));
         // 将访客从咨询集合中删除
         consultant.getVisitors().remove(Long.valueOf(visitorId));
         visitor.endConsultation();
 
-        conversations.remove(consultantId);
-        secondChances.remove(consultantId);
+        conversations.remove(consultationId);
+        secondChances.remove(consultationId);
     }
 
     @Override
-    public void removeHelp(String consultantId, String supervisorId) {
+    public void removeHelp(String helpId, String consultantId, String supervisorId) {
         var supervisor = fetchSupervisor(Long.parseLong(supervisorId));
+        var consultant = fetchConsultant(Long.parseLong(consultantId));
         // 将咨询师从求助集合中删除
         supervisor.getConsultants().remove(Long.valueOf(consultantId));
+        consultant.getSupervisors().remove(Long.valueOf(supervisorId));
 
-        conversations.remove(consultantId);
-        secondChances.remove(consultantId);
+        conversations.remove(helpId);
+        secondChances.remove(helpId);
     }
 
     @Override
-    public ConsultationInfo popFrontConsultation(String consultantId) {
+    public String popFrontConsultation(String consultantId) {
         var consultant = fetchConsultant(Long.parseLong(consultantId));
         if(consultant.getWaitingList().size() == 0) {
             return null;
         }
 
-        return consultant.getWaitingList().remove(0);
+        return consultant.getWaitingList().remove(0).toString();
     }
 
     @Override
@@ -337,10 +330,10 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         }
 
         OnlineConsultant consultant = fetchConsultant(Long.parseLong(id));
-        if(consultant.getVisitors().size() == 0) {
-            return 1;
+        if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
+            return 2;
         }
-        return 2;
+        return 1;
     }
 
     @Override
@@ -354,6 +347,45 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         onlineSupervisors.add(Long.valueOf(userId));
         OnlineSupervisor supervisor = fetchSupervisor(Long.parseLong(userId));
         return supervisor.getConsultants().size();
+    }
+
+    @Override
+    public boolean cancelWaiting(String visitorId) {
+        var visitor = fetchVisitor(Long.parseLong(visitorId));
+        long consultantId = visitor.endWaiting();
+        if(consultantId == OnlineVisitor.NULL_CONSULTANT) {
+            return false;
+        }
+
+        OnlineConsultant consultant = fetchConsultant(consultantId);
+        int index = 0;
+        for(; index < consultant.getWaitingList().size(); index++) {
+            if(Objects.equals(consultant.getWaitingList().get(index), visitorId)) {
+                break;
+            }
+        }
+
+        consultant.getWaitingList().remove(index);
+        return true;
+    }
+
+    @Override
+    public Set<String> retrieveAvailableSupervisors(String consultantId) {
+        var consultant = fetchConsultant(Long.parseLong(consultantId));
+        var supervisors = consultant.getSupervisors();
+
+        Set<String> result = new HashSet<>();
+        onlineSupervisors.forEach(id -> {
+            OnlineSupervisor supervisor = fetchSupervisor(id);
+            if(supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
+                result.add(id.toString());
+            }
+        });
+
+        supervisors.forEach(sId -> {
+            result.remove(sId.toString());
+        });
+        return result;
     }
 
 

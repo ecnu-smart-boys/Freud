@@ -3,11 +3,17 @@ package org.ecnusmartboys.application.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.doocs.im.constant.SyncOtherMachine;
+import io.github.doocs.im.model.message.TIMMsgElement;
+import io.github.doocs.im.model.message.TIMTextMsgElement;
+import io.github.doocs.im.model.request.SendMsgRequest;
+import io.github.doocs.im.model.response.SendMsgResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.ConsultRecordInfo;
 import org.ecnusmartboys.application.dto.HelpRecordInfo;
 import org.ecnusmartboys.application.dto.RankUserInfo;
+import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.conversation.HelpInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
@@ -17,6 +23,8 @@ import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
 import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
+import org.ecnusmartboys.application.dto.ws.EndConsultationNotification;
+import org.ecnusmartboys.application.dto.ws.EndHelpNotification;
 import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.ConversationService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
@@ -30,12 +38,16 @@ import org.ecnusmartboys.domain.repository.ConversationRepository;
 import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
+import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -44,6 +56,9 @@ import java.util.*;
 public class ConversationServiceImpl implements ConversationService {
 
     private final static long ONE_DAY = 24 * 60 * 60 * 1000L;
+
+    @Resource
+    IMConfig imConfig;
 
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
@@ -218,6 +233,21 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
+    public Responses<List<StaffBaseInfo>> getAvailableSupervisors(Common common) {
+        var consulvisors = consulvisorRepository.retrieveByConId(common.getUserId());
+        List<StaffBaseInfo> infos = new ArrayList<>();
+
+        Set<String> ids = onlineUserRepository.retrieveAvailableSupervisors(common.getUserId());
+        consulvisors.forEach(consulvisor -> {
+            if(ids.contains(consulvisor.getSupervisorId())) {
+                User user = userRepository.retrieveById(consulvisor.getSupervisorId());
+                infos.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
+            }
+        });
+        return Responses.ok(infos);
+    }
+
+    @Override
     @Transactional
     public Responses<Object> callHelp(CallHelpRequest req, Common common) {
         // 首先查看该督导是否在线
@@ -247,25 +277,37 @@ public class ConversationServiceImpl implements ConversationService {
 
         } else if(conversation.getEndTime() != null) {
             throw new BadRequestException("该会话已经结束");
+        }
 
-        } else if(conversation.getHelper() != null) {
-            throw new BadRequestException("该会话已经求助了一个督导了");
+        if(conversationRepository.retrieveByFromIdAndToId(common.getUserId(), req.getToId()) != null) {
+            throw new RuntimeException("你在某个会话中正在求助这个督导，请换一个督导");
         }
 
         // 将该咨询师插入该督导当前咨询队列或等待队列
         if(onlineUserRepository.callHelpRequest(common.getUserId(), req.getToId(), req.getConversationId())) {
-            return Responses.ok("咨询师忙碌，请换一个咨询师");
+            throw new BadRequestException("该督导忙碌，请换一个督导");
         }
 
         // 给本次咨询绑定求助会话
-        var conversationId = conversationRepository.bindHelp(conversation.getId(), req.getToId());
+        var help = conversationRepository.bindHelp(conversation.getId(), req.getToId());
 
         // 初始化该会话的计时
-        onlineUserRepository.resetConversation(conversationId);
+        onlineUserRepository.resetConversation(help.getId());
 
-        // ws通知督导
+        // ws发消息给督导
+        LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
+                help.getFromUser().getName(), help.getFromUser().getAvatar(), false);
+        var notify = new Notify("startHelp", notifySupervisor);
+        try {
+            webSocketServer.notifyUser(Long.valueOf(help.getToUser().getId()), mapper.writeValueAsString(notify));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        return Responses.ok("请开始通信");
+        LeftConversation notifyConsultant = new LeftConversation(help.getId(), help.getToUser().getId(),
+                help.getToUser().getName(), help.getToUser().getAvatar(), false);
+
+        return Responses.ok(notifyConsultant);
     }
 
     @Override
@@ -285,6 +327,14 @@ public class ConversationServiceImpl implements ConversationService {
         endConversation(help);
         // 通知对方
         return Responses.ok("成功结束求助");
+    }
+
+    @Override
+    public Responses<Object> cancelWaiting(String userId) {
+        if(!onlineUserRepository.cancelWaiting(userId)) {
+            throw new RuntimeException("你未处于排队状态");
+        }
+        return Responses.ok("取消排队成功");
     }
 
     @Override
@@ -330,24 +380,6 @@ public class ConversationServiceImpl implements ConversationService {
 
         conversationRepository.saveComment(comment);
         return Responses.ok("评价成功");
-    }
-
-    @Override
-    public Responses<Object> probeConsultation(ProbeRequest req, Common common) {
-        if(!onlineUserRepository.isConsultantOnline(req.getConsultantId())) {
-            throw new RuntimeException("该咨询师已经下线了");
-        }
-
-//        if(onlineUserRepository.consultationExists(common.getUserId(), req.getConsultantId())) {
-//            return Responses.ok("排队结束，请开始聊天");
-//        }
-        return Responses.ok("还在排队中");
-    }
-
-    @Override
-    public Responses<Object> probeHelp(ProbeRequest req, Common common) {
-        // TODO
-        return null;
     }
 
     @Override
@@ -631,7 +663,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private HelpInfo convertToHelpInfo(Help help) {
-        HelpInfo helpInfo = new HelpInfo(help.getSupervisor().getId(), help.getSupervisor().getAvatar(), help.getSupervisor().getName(),
+        HelpInfo helpInfo = new HelpInfo(help.getHelpId(), help.getSupervisor().getId(), help.getSupervisor().getAvatar(), help.getSupervisor().getName(),
                                     help.getStartTime(), System.currentTimeMillis(), false);
         // 求助已经结束
         if(help.getEndTime() != null) {
@@ -643,26 +675,26 @@ public class ConversationServiceImpl implements ConversationService {
 
     private void updateConsultationQueue(String consultantId) {
         while(true) {
-            var consultationInfo = onlineUserRepository.popFrontConsultation(consultantId);
-            if(consultationInfo == null) {
+            var visitorId = onlineUserRepository.popFrontConsultation(consultantId);
+            if(visitorId == null) {
                 // 排队队列为空
                 break;
             }
 
             // 排队期间，咨询师已经下线
-            if(!onlineUserRepository.isConsultantOnline(consultationInfo.getConsultantId())) {
+            if(!onlineUserRepository.isConsultantOnline(consultantId)) {
                 continue;
             }
             // 排队期间，访客等不及了，干脆下线了
-            if(!onlineUserRepository.isVisitorOnline(consultationInfo.getVisitorId())) {
+            if(!onlineUserRepository.isVisitorOnline(visitorId)) {
                 continue;
             }
             // 就是你了
-            if(onlineUserRepository.consultRequest(consultationInfo.getVisitorId(), consultationInfo.getConsultantId())) {
+            if(onlineUserRepository.consultRequest(visitorId, consultantId)) {
                 // 又要排队了，并发问题，基本不可能
                 break;
             }
-            var conversation = conversationRepository.startConsultation(consultationInfo.getVisitorId(), consultationInfo.getConsultantId());
+            var conversation = conversationRepository.startConsultation(visitorId, consultantId);
             // 初始化该会话的计时
             onlineUserRepository.resetConversation(conversation.getId());
 
@@ -704,9 +736,40 @@ public class ConversationServiceImpl implements ConversationService {
         }
 
         // TODO 超过10分钟没有产生新的消息的会话，系统会先发送一条确认结束咨询的提示
+        idleConversations.forEach(conversationId -> {
+            var conversation = conversationRepository.retrieveById(conversationId);
+            sendConfirmMsg(conversation.getToUser().getId(), conversation.getFromUser().getId());
+            log.info("会话 {} 发送了确认提示消息", conversation.getId());
+        });
+
 
         // 将这些会话加入到二次机会队列中，5分钟内若没有新的消息，那么会销毁、
         onlineUserRepository.giveSecondChance(idleConversations);
+    }
+
+    /**
+     * 系统自动发送一条确认结束咨询的提示
+     */
+    private void sendConfirmMsg(String fromId, String toId) {
+        TIMTextMsgElement msg = new TIMTextMsgElement("请问还有什么需要继续咨询的吗？");
+        List<TIMMsgElement> msgBody = new ArrayList<>();
+        msgBody.add(msg);
+        SendMsgRequest request = SendMsgRequest.builder()
+                .fromAccount(fromId)
+                .toAccount(toId)
+                .msgRandom(123L)
+                .msgBody(msgBody)
+                .syncOtherMachine(SyncOtherMachine.YES)
+                .msgTimeStamp((int) (new Date().getTime() / 1000))
+                .msgLifeTime(604800)
+                .build();
+        SendMsgResult result = null;
+        try {
+            result = imConfig.adminClient().message.sendMsg(request);
+            log.info(result.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void endConversation(Conversation conversation) {
@@ -715,7 +778,7 @@ public class ConversationServiceImpl implements ConversationService {
             // 结束求助会话
             conversationRepository.endConversation(conversation.getId());
             // 更新督导当前会话列表
-            onlineUserRepository.removeHelp(conversation.getFromUser().getId(), conversation.getToUser().getId());
+            onlineUserRepository.removeHelp(conversation.getId(), conversation.getFromUser().getId(), conversation.getToUser().getId());
             // 通知督导和咨询师
             notifyEndToUsers(conversation);
 
@@ -729,13 +792,11 @@ public class ConversationServiceImpl implements ConversationService {
                 // 结束求助会话
                 conversationRepository.endConversation(help.getId());
                 // 更新在线用户信息
-                onlineUserRepository.removeHelp(help.getFromUser().getId(), help.getToUser().getId());
-                // 通知督导和咨询师
-                notifyEndToUsers(help);
+                onlineUserRepository.removeHelp(help.getId(), help.getFromUser().getId(), help.getToUser().getId());
             }
 
             // 更新在线用户信息
-            onlineUserRepository.removeConsultation(conversation.getFromUser().getId(), conversation.getToUser().getId());
+            onlineUserRepository.removeConsultation(conversation.getId(), conversation.getFromUser().getId(), conversation.getToUser().getId());
             // 通知访客和咨询师
             notifyEndToUsers(conversation);
             updateConsultationQueue(conversation.getToUser().getId());
@@ -743,13 +804,16 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private void notifyEndToUsers(Conversation conversation) {
-        if(conversation.isConsultation()) {
-            // 咨询聊天
+        if(!conversation.isConsultation()) {
+            // 求助
             try {
-                // 发送给咨询师
-                var notify = new Notify("endConsultation", conversation.getId());
+                var consultation = conversationRepository.retrieveByHelperId(conversation.getId());
+                EndHelpNotification end = new EndHelpNotification(consultation.getId(), conversation.getId(),
+                        conversation.getFromUser().getName(), conversation.getToUser().getName());
+                // 发送求助结束信息给咨询师
+                var notify = new Notify("endHelp", end);
                 webSocketServer.notifyUser(Long.valueOf(conversation.getToUser().getId()), mapper.writeValueAsString(notify));
-                // 发送给访客
+                // 发送求助结束信息给督导
                 webSocketServer.notifyUser(Long.valueOf(conversation.getFromUser().getId()), mapper.writeValueAsString(notify));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -759,11 +823,22 @@ public class ConversationServiceImpl implements ConversationService {
 
         // 求助
         try {
+            EndConsultationNotification end = new EndConsultationNotification(conversation.getId(), "",
+                    conversation.getFromUser().getName(), conversation.getToUser().getName(), "");
+            var notify = new Notify("endConsultation", end);
+            if(conversation.getHelper() != null) {
+                // 求助了督导
+                end.setSupervisorName(conversation.getHelper().getSupervisor().getName());
+                end.setHelpId(conversation.getHelper().getHelpId());
+                // 发送给督导
+                webSocketServer.notifyUser(Long.valueOf(conversation.getHelper().getSupervisor().getId()), mapper.writeValueAsString(notify));
+            }
             // 发送给咨询师
-            var notify = new Notify("endHelp", conversation.getId());
             webSocketServer.notifyUser(Long.valueOf(conversation.getToUser().getId()), mapper.writeValueAsString(notify));
+
             // 发送给访客
-            webSocketServer.notifyUser(Long.valueOf(conversation.getFromUser().getId()), mapper.writeValueAsString(notify));
+            var notifyVisitor = new Notify("endConsultation", conversation.getId());
+            webSocketServer.notifyUser(Long.valueOf(conversation.getFromUser().getId()), mapper.writeValueAsString(notifyVisitor));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

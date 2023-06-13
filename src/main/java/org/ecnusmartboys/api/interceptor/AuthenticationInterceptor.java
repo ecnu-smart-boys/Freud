@@ -42,7 +42,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             }
             // 如果没有AnonymousAccess注解，必须登录
             var user = userRepository.selectById(userId);
-            if (user == null) {
+            if (user == null || user.getDisabled()) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }

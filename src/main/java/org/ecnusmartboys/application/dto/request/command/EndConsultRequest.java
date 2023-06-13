@@ -11,6 +11,4 @@ public class EndConsultRequest {
     @NotNull(message = "会话id不能为空")
     @ApiModelProperty("会话id")
     private String conversationId;
-
-//    private String myId;
 }

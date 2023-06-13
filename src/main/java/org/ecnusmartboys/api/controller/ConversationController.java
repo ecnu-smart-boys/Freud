@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -197,57 +198,45 @@ public class ConversationController {
         return conversationService.startConversation(req, common);
     }
 
-//    @AuthRoles({Visitor.ROLE, Consultant.ROLE})
-    @AnonymousAccess
+    @AuthRoles({Visitor.ROLE, Consultant.ROLE})
     @PostMapping("/endConsultation")
     @ApiOperation("结束咨询会话")
     public Responses<EndConsultResponse> endConsultation(@RequestBody @Validated EndConsultRequest req, HttpServletRequest request){
         var common = Extractor.extract(request);
-//        Common common = new Common();
-//        common.setUserId(req.getMyId());
         return conversationService.endConsultation(req, common);
     }
 
-//    @AuthRoles(Consultant.ROLE)
-    @AnonymousAccess
+    @AuthRoles(Consultant.ROLE)
+    @GetMapping("/availableSupervisors")
+    @ApiOperation("咨询师获得绑定且在线且不处于忙碌状态的督导列表")
+    public Responses<List<StaffBaseInfo>> getAvailableSupervisors(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getAvailableSupervisors(common);
+    }
+
+    @AuthRoles(Consultant.ROLE)
     @PostMapping("/callHelp")
     @ApiOperation("求助督导")
     public Responses<Object> callHelp(@RequestBody @Validated CallHelpRequest req, HttpServletRequest request) {
-//        var common = Extractor.extract(request);
-        Common common = new Common();
-        common.setUserId(req.getMyId());
+        var common = Extractor.extract(request);
         return conversationService.callHelp(req, common);
     }
 
-//    @AuthRoles({Supervisor.ROLE, Consultant.ROLE})
-    @AnonymousAccess
+    @AuthRoles({Supervisor.ROLE, Consultant.ROLE})
     @PostMapping("/endHelp")
     @ApiOperation("结束求助")
     public Responses<Object> endHelp(@RequestBody @Validated EndHelpRequest req, HttpServletRequest request) {
-//        var common = Extractor.extract(request);
-        Common common = new Common();
-        common.setUserId(req.getMyId());
+        var common = Extractor.extract(request);
         return conversationService.endHelp(req, common);
     }
 
-//    @AuthRoles(Visitor.ROLE)
-    @AnonymousAccess
-    @ApiOperation("访客探测排队是否结束")
-    @PostMapping("/probeConsultation")
-    public Responses<Object> probeConsultation(@RequestBody @Validated ProbeRequest req, HttpServletRequest request) {
+    @AuthRoles(Visitor.ROLE)
+    @ApiOperation("访客取消排队")
+    @PostMapping("/cancelWaiting")
+    public Responses<Object> cancelWaiting(HttpServletRequest request) {
         var common = Extractor.extract(request);
-        return conversationService.probeConsultation(req, common);
+        return conversationService.cancelWaiting(common.getUserId());
     }
-
-//        @AuthRoles(Consultant.ROLE)
-    @AnonymousAccess
-    @ApiOperation("咨询师探测排队是否结束")
-    @PostMapping("/probeHelp")
-    public Responses<Object> probeHelp(@RequestBody @Validated ProbeRequest req, HttpServletRequest request) {
-        var common = Extractor.extract(request);
-        return conversationService.probeHelp(req, common);
-    }
-
 
     @AuthRoles(Visitor.ROLE)
     @PostMapping("/visitorComment")

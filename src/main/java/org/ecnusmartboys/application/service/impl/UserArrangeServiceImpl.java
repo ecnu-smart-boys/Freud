@@ -1,6 +1,11 @@
 package org.ecnusmartboys.application.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.doocs.im.ImClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.convertor.*;
 import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -11,22 +16,27 @@ import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
+import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.arrangement.Arrangement;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.user.*;
 import org.ecnusmartboys.domain.repository.*;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.exception.BusinessException;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
+import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserArrangeServiceImpl implements UserArrangeService {
@@ -35,7 +45,6 @@ public class UserArrangeServiceImpl implements UserArrangeService {
     private final ConversationRepository conversationRepository;
     private final OnlineUserRepository onlineUserRepository;
 
-
     private final ConsultantInfoConvertor consultantInfoConvertor;
     private final SupervisorInfoConvertor supervisorInfoConvertor;
     private final VisitorInfoConvertor visitorInfoConvertor;
@@ -43,6 +52,11 @@ public class UserArrangeServiceImpl implements UserArrangeService {
     private final UpdateSupReqConvertor updateSupReqConvertor;
     private final AddConReqConvertor addConReqConvertor;
     private final UpdateConReqConvertor updateConReqConvertor;
+
+    private final ImClient adminClient;
+    private final WebSocketServer webSocketServer;
+    private final ObjectMapper mapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
     public Responses<ConsultantsResponse> getConsultants(UserListReq req) {
@@ -150,8 +164,24 @@ public class UserArrangeServiceImpl implements UserArrangeService {
 
         user.setDisabled(true);
         userRepository.update(user);
+
+        // 将用户踢下线
         onlineUserRepository.logout(user.getId());
-        // 发送websocket TODO
+        webSocketServer.close(Long.valueOf(user.getId()));
+        var kickRequest = io.github.doocs.im.model.request.KickRequest.builder().userId(user.getId()).build();
+        try {
+            adminClient.account.kick(kickRequest);
+        } catch (IOException e) {
+            log.error("IM踢下线失败, userId {}, {}", user.getId(), e.getMessage());
+        }
+
+        // 通知用户被禁用(如果在线的话)
+        var notify = new Notify("endConsultation", null);
+        try {
+            webSocketServer.notifyUser(Long.valueOf(user.getId()), mapper.writeValueAsString(notify));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return Responses.ok("禁用用户成功");
     }
 
@@ -218,6 +248,11 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             if(!(user instanceof Supervisor)) {
                 throw new BadRequestException("所要绑定的督导不存在");
             }
+
+            var consulvisors = consulvisorRepository.retrieveBySupId(user.getId());
+            if(consulvisors.size() >= 10) {
+                throw new RuntimeException("督导" + user.getName() + "绑定的咨询师已达上线");
+            }
         }
 
         var user = addConReqConvertor.toEntity(req);
@@ -238,11 +273,20 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             throw new BadRequestException("所要修改的咨询师不存在");
         }
 
-        // TODO 督导上限
+        // 咨询师正在通话中
+        if(onlineUserRepository.isStaffInConversation(req.getId())) {
+            throw new BadRequestException("咨询师正在通话中，无法修改");
+        }
+
         for(String supervisorId : req.getSupervisorIds()) {
             user = userRepository.retrieveById(supervisorId);
             if(!(user instanceof Supervisor)) {
                 throw new BadRequestException("所要绑定的督导不存在");
+            }
+
+            var consulvisors = consulvisorRepository.retrieveBySupId(user.getId());
+            if(consulvisors.size() >= 10) {
+                throw new RuntimeException("督导" + user.getName() + "绑定的咨询师已达上线");
             }
         }
 

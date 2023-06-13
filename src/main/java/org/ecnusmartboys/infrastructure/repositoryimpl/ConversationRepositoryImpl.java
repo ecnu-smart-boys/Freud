@@ -157,7 +157,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     @Transactional
-    public String bindHelp(String conversationId, String supervisorId) {
+    public Conversation bindHelp(String conversationId, String supervisorId) {
         ConversationDO conversationDO = conversationMapper.selectById(conversationId);
 
         ConversationDO helpDO = new ConversationDO();
@@ -168,7 +168,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
         conversationDO.setHelperId(helpDO.getConversationId());
         conversationMapper.updateById(conversationDO);
-        return conversationDO.getConversationId().toString();
+        return convert(conversationMapper.selectById(helpDO.getConversationId()));
     }
 
     @Override

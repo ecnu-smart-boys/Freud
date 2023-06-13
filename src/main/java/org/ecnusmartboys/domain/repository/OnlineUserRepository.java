@@ -40,17 +40,15 @@ public interface OnlineUserRepository {
      */
     boolean isVisitorBusy(String userId);
 
-    boolean consultationExists(String fromId, String toId);
-
     boolean consultRequest(String visitorId, String consultantId);
 
     boolean callHelpRequest(String consultantId, String supervisorId, String conversationId);
 
-    void removeConsultation(String visitorId, String consultantId);
+    void removeConsultation(String consultationId, String visitorId, String consultantId);
 
-    void removeHelp(String consultantId, String supervisorId);
+    void removeHelp(String helpId, String consultantId, String supervisorId);
 
-    ConsultationInfo popFrontConsultation(String consultantId);
+    String popFrontConsultation(String consultantId);
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -98,4 +96,14 @@ public interface OnlineUserRepository {
      * 获得用户在线会话数
      */
     int getOnlineConversationNumber(String userId, String role);
+
+    /**
+     * 访客取消排队
+     */
+    boolean cancelWaiting(String visitorId);
+
+    /**
+     * 获得在线且不忙碌的督导集合
+     */
+    Set<String> retrieveAvailableSupervisors(String consultantId);
 }

@@ -21,16 +21,16 @@ public class TimeoutKickScheduler {
 
     @Scheduled(cron = "15 * * * * ?")
     public void timeoutKick(){
-//        var timeoutUsers = onlineStateService.timeoutKick();
-//        for (Long userId : timeoutUsers) {
-//            webSocketServer.close(userId);
-//            var kickRequest = io.github.doocs.im.model.request.KickRequest.builder().userId(userId.toString()).build();
-//            try {
-//                adminClient.account.kick(kickRequest);
-//            } catch (IOException e) {
-//                log.error("IM踢下线失败, userId {}, {}", userId, e.getMessage());
-//            }
-//        }
+        var timeoutUsers = onlineStateService.timeoutKick();
+        for (Long userId : timeoutUsers) {
+            webSocketServer.close(userId);
+            var kickRequest = io.github.doocs.im.model.request.KickRequest.builder().userId(userId.toString()).build();
+            try {
+                adminClient.account.kick(kickRequest);
+            } catch (IOException e) {
+                log.error("IM踢下线失败, userId {}, {}", userId, e.getMessage());
+            }
+        }
     }
 
 }

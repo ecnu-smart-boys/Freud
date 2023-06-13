@@ -2,6 +2,7 @@ package org.ecnusmartboys.application.dto.conversation;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @ApiModel("求助会话的信息")
 public class HelpInfo {
+
+    @ApiModelProperty("求助id")
+    private String helpId;
 
     @ApiModelProperty("督导id")
     private String supervisorId;

@@ -1,5 +1,6 @@
 package org.ecnusmartboys.application.service;
 
+import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -41,17 +42,17 @@ public interface ConversationService {
 
     Responses<EndConsultResponse> endConsultation(EndConsultRequest req, Common common);
 
+    Responses<List<StaffBaseInfo>> getAvailableSupervisors(Common common);
+
     Responses<Object> callHelp(CallHelpRequest req, Common common);
 
     Responses<Object> endHelp(EndHelpRequest req, Common common);
 
+    Responses<Object> cancelWaiting(String userId);
+
     Responses<EndConsultResponse> visitorComment(VisitorCommentRequest req, Common common);
 
     Responses<EndConsultResponse> consultantComment(ConsultantCommentRequest req, Common common);
-
-    Responses<Object> probeConsultation(ProbeRequest req, Common common);
-
-    Responses<Object> probeHelp(ProbeRequest req, Common common);
 
     Responses<Object> setting(SettingRequest req, Common common);
 

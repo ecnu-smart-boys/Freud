@@ -45,7 +45,7 @@ public interface ConversationRepository {
      */
     Conversation startConsultation(String fromId, String toId);
 
-    String bindHelp(String conversationId, String supervisorId);
+    Conversation bindHelp(String conversationId, String supervisorId);
 
     /**
      * 根据咨询师id，获得所有已完结的咨询会话

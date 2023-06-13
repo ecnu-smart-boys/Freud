@@ -15,7 +15,7 @@ public class OnlineConsultant {
 
     Set<Long> visitors;
 
-    List<ConsultationInfo> waitingList;
+    List<String> waitingList;
 
     Integer maxConcurrent;
 
