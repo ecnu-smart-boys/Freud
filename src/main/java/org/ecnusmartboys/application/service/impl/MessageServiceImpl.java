@@ -74,16 +74,16 @@ public class MessageServiceImpl implements MessageService {
                         // 没有这个在线会话，这是个野消息
                         return Responses.ok();
                     }
-                    
+
                     int new_key = tracker.increment();
 
                     String msgBody = mapper.writeValueAsString(cb.getMsgBody());
-                    String newBody = parseMsgBody((String) new_key, msgBody);
+                    String newBody = parseMsgBody(tracker.getConversationId() + "_" + new_key, msgBody);
 
                     // 保存消息
                     Message message = new Message();
-                    message.setMsgKey(cb.getMsgKey()); // 消息的唯一标识
-                    message.setConversationId(conversation.getId());
+                    message.setMsgKey(String.valueOf(new_key)); // 消息标识
+                    message.setConversationId(tracker.getConversationId());
                     message.setFromId(cb.getFromAccount());
                     message.setToId(cb.getToAccount());
                     message.setMsgBody(newBody); // 消息体
@@ -92,7 +92,7 @@ public class MessageServiceImpl implements MessageService {
                     messageRepository.save(message);
 
                     // 重置超时计时
-                    onlineUserRepository.resetConversation(conversation.getId());
+                    onlineUserRepository.resetConversation(tracker.getConversationId());
 
                     // websocket，提醒用户同步消息 TODO
 
@@ -273,12 +273,13 @@ public class MessageServiceImpl implements MessageService {
 
                 if(Objects.equals(messageBodies[index].getMsgType(), SoundElem.TYPE)) {
                     // 语音类型，解析为sound类型
-                    parseSoundContent(msgKey, index, (SoundElem)messageBodies[index].getMsgContent());
+                    parseSoundContent(msgKey, index, (SoundElem) messageBodies[index].getMsgContent());
                     continue;
                 }
 
                 if(Objects.equals(messageBodies[index].getMsgType(), ImageElem.TYPE)) {
                     // 图片类型，解析为image类型
+                    parseImageContent(msgKey, index, (ImageElem) messageBodies[index].getMsgContent());
                     continue;
                 }
 
