@@ -193,6 +193,8 @@ public class ConversationServiceImpl implements ConversationService {
         var conversation = conversationRepository.startConsultation(common.getUserId(), req.getToId());
         // 初始化该会话的计时
         onlineUserRepository.resetConversation(conversation.getId());
+        // 开始跟踪该会话的消息记录
+        onlineUserRepository.addConversation(conversation.getId(), common.getUserId(), req.getToId());
 
         // ws通知咨询师
         LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -290,9 +292,10 @@ public class ConversationServiceImpl implements ConversationService {
 
         // 给本次咨询绑定求助会话
         var help = conversationRepository.bindHelp(conversation.getId(), req.getToId());
-
         // 初始化该会话的计时
         onlineUserRepository.resetConversation(help.getId());
+        // 开始跟踪该会话的消息记录
+        onlineUserRepository.addConversation(help.getId(), common.getUserId(), req.getToId());
 
         // ws发消息给督导
         LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
@@ -697,6 +700,8 @@ public class ConversationServiceImpl implements ConversationService {
             var conversation = conversationRepository.startConsultation(visitorId, consultantId);
             // 初始化该会话的计时
             onlineUserRepository.resetConversation(conversation.getId());
+            // 开始跟踪该会话的消息记录
+            onlineUserRepository.addConversation(conversation.getId(), visitorId, consultantId);
 
             // ws通知双方会话开始
             LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),

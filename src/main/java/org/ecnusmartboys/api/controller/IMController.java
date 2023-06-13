@@ -86,13 +86,15 @@ public class IMController {
 
     /************************* 获取在线会话的消息 *************************/
 
-    @AuthRoles(Consultant.ROLE)
-    @ApiOperation("咨询师查看当前会话的求助消息记录(求助已结束，IM端已经将求助会话消除)")
-    @GetMapping("/helpMsg")
-    public Responses<MsgListResponse> getHelpMsg(@Validated SingleMsgRequest req, HttpServletRequest request) {
-        var common = Extractor.extract(request);
-        return messageService.getHelpMsg(req, common);
-    }
+//    @AuthRoles(Consultant.ROLE)
+//    @ApiOperation("咨询师查看当前会话的求助消息记录(求助已结束，IM端已经将求助会话消除)")
+//    @GetMapping("/helpMsg")
+//    public Responses<MsgListResponse> getHelpMsg(@Validated SingleMsgRequest req, HttpServletRequest request) {
+//        var common = Extractor.extract(request);
+//        return messageService.getHelpMsg(req, common);
+//    }
+
+
 
 }
 

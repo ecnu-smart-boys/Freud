@@ -2,6 +2,7 @@ package org.ecnusmartboys.domain.repository;
 
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
 import org.ecnusmartboys.domain.model.online.ConsultationInfo;
+import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
 import org.ecnusmartboys.domain.model.online.HelpInfo;
 import org.ecnusmartboys.domain.model.user.User;
 
@@ -106,4 +107,8 @@ public interface OnlineUserRepository {
      * 获得在线且不忙碌的督导集合
      */
     Set<String> retrieveAvailableSupervisors(String consultantId);
+
+    void addConversation(String conversationId, String fromId, String toId);
+
+    ConversationMsgTracker fetchTracker(String fromAccount, String toAccount);
 }

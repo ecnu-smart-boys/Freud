@@ -35,6 +35,8 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     private static final int SEND_NULL_MSG = 2; // TODO
     private static final int END_CONVERSATION = 1; // TODO
 
+    private final Map<Long, ConversationMsgTracker> tracker; // 用于追踪每个在线会话的消息数
+
 
     // TODO 可以用redis替换
     private final Map<String, Long> conversations;
@@ -49,6 +51,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         visitorConversations = new HashMap<>();
         conversations = new HashMap<>();
         secondChances = new HashMap<>();
+        tracker = new HashMap<>();
     }
 
 
@@ -138,7 +141,6 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             return false;
         }
 
-        // 求助人数已满
         return true;
     }
 
@@ -152,6 +154,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
         conversations.remove(consultationId);
         secondChances.remove(consultationId);
+        removeConversation(visitorId, consultantId);
     }
 
     @Override
@@ -164,6 +167,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
         conversations.remove(helpId);
         secondChances.remove(helpId);
+        removeConversation(consultantId, supervisorId);
     }
 
     @Override
@@ -388,6 +392,31 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         return result;
     }
 
+    @Override
+    public ConversationMsgTracker fetchTracker(String fromId, String toId) {
+        long cId = Long.parseLong(fromId);
+        long sId = Long.parseLong(toId);
+        long identifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
+        if(!tracker.containsKey(identifier)) {
+            return null;
+        }
+        return tracker.get(identifier);
+    }
+
+    public void addConversation(String conversationId, String fromId, String toId) {
+        long cId = Long.parseLong(fromId);
+        long sId = Long.parseLong(toId);
+        long identifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
+        tracker.put(identifier, new ConversationMsgTracker(conversationId));
+    }
+
+    private void removeConversation(String fromId, String toId) {
+        long cId = Long.parseLong(fromId);
+        long sId = Long.parseLong(toId);
+        long identifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
+        tracker.remove(identifier);
+    }
+
 
     private OnlineConsultant fetchConsultant(long userId) {
         if(!consultantConversations.containsKey(userId)) {
@@ -413,6 +442,8 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         }
         return visitorConversations.get(userId);
     }
+
+
 
 }
 

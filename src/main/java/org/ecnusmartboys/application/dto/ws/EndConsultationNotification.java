@@ -13,9 +13,9 @@ public class EndConsultationNotification {
 
     private String helpId;
 
-    private String VisitorName;
+    private String visitorName;
 
-    private String ConsultantName;
+    private String consultantName;
 
     private String supervisorName;
 }

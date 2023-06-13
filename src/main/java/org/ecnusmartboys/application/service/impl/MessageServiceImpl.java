@@ -69,15 +69,16 @@ public class MessageServiceImpl implements MessageService {
             switch (param.getCallbackCommand()) {
                 case AFTER_SEND_MSG: {
                     var cb = mapper.readValue(body, AfterSendMsgCallback.class);
-                    // 通过from_id 和 to_id获得聊天的会话
-                    Conversation conversation = conversationRepository.retrieveByFromIdAndToId(cb.getFromAccount(), cb.getToAccount());
-                    if(conversation == null) {
+                    var tracker = onlineUserRepository.fetchTracker(cb.getFromAccount(), cb.getToAccount());
+                    if(tracker == null) {
                         // 没有这个在线会话，这是个野消息
                         return Responses.ok();
                     }
+                    
+                    int new_key = tracker.increment();
 
                     String msgBody = mapper.writeValueAsString(cb.getMsgBody());
-                    String newBody = parseMsgBody(cb.getMsgKey(), msgBody);
+                    String newBody = parseMsgBody((String) new_key, msgBody);
 
                     // 保存消息
                     Message message = new Message();
