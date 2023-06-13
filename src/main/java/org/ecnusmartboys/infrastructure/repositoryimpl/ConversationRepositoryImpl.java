@@ -145,14 +145,14 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
-    public String startConsultation(String fromId, String toId) {
+    public Conversation startConsultation(String fromId, String toId) {
         ConversationDO conversationDO = new ConversationDO();
         conversationDO.setFromId(Long.valueOf(fromId));
         conversationDO.setToId(Long.valueOf(toId));
         conversationDO.setIsConsultation(true);
 
         conversationMapper.insert(conversationDO);
-        return conversationDO.getConversationId().toString();
+        return convert(conversationDO);
     }
 
     @Override
@@ -178,8 +178,8 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
-    public List<Conversation> retrieveOnlineConversationsByToId(String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectOnlineConversationsByToId(toId);
+    public List<Conversation> retrieveConversationListByToId(String toId) {
+        List<ConversationDO> conversationDOS = conversationMapper.selectConversationListByToId(toId);
         return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
     }
 
@@ -241,10 +241,17 @@ public class ConversationRepositoryImpl implements ConversationRepository {
         return null;
     }
 
+    @Override
+    public void remove(String conversationId) {
+        ConversationDO conversationDO = conversationMapper.selectById(conversationId);
+        conversationDO.setIsShown(true);
+        conversationMapper.updateById(conversationDO);
+    }
+
     private List<Conversation> convert2List(List<ConversationDO> conversationDOS, Long current, Long size) {
         List<Conversation> conversations = new ArrayList<>();
         int total = conversationDOS.size();
-        for(long i = (current - 1) * size; i < current * size; i++) {
+        for(long i = current * size; i < (current + 1) * size; i++) {
             if(i >= total) {
                 break;
             }
@@ -279,7 +286,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
             helper.setHelpId(help.getConversationId().toString());
             helper.setStartTime(help.getStartTime().getTime());
             if(help.getEndTime() != null) {
-                helper.setEndTime(helper.getEndTime());
+                helper.setEndTime(help.getEndTime().getTime());
             }
             helper.setSupervisor(userConvertor.toUser(userMapper.selectById(help.getToId())));
             conversation.setHelper(helper);

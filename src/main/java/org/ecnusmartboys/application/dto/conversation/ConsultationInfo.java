@@ -12,13 +12,19 @@ import lombok.NoArgsConstructor;
 @ApiModel("咨询会话的信息")
 public class ConsultationInfo {
 
+    @ApiModelProperty("咨询师id")
+    private String consultantId;
+
+    @ApiModelProperty("访客id")
+    private String visitorId;
+
     @ApiModelProperty("咨询师姓名")
     private String consultantName;
 
     @ApiModelProperty("咨询师头像")
     private String consultantAvatar;
 
-    @ApiModelProperty("咨询师电话")
+    @ApiModelProperty("访客电话")
     private String phone;
 
     @ApiModelProperty("访客姓名")

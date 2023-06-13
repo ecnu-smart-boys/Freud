@@ -19,9 +19,10 @@ public class WxRegisterRequest {
 
     @NotNull(message = "访客性别不能为空")
     @ApiModelProperty(value = "访客性别", required = true)
+    @Range(min = 1, max = 2, message = "性别只能取值为 1 或 2")
     private Integer gender;
 
-    @Range(min = 0, message = "访客年龄必须在大于之间")
+    @Range(min = 10, max = 100, message = "年龄必须在10-100之间")
     @NotNull(message = "访客年龄不能为空")
     @ApiModelProperty(value = "访客年龄", required = true)
     private Integer age;

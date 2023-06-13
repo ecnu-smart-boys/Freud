@@ -107,7 +107,7 @@ public class ConversationController {
         return conversationService.getRecentWeek();
     }
 
-    @AuthRoles(Admin.ROLE)
+    @AuthRoles(Consultant.ROLE)
     @ApiOperation("咨询师获得今日咨询信息")
     @GetMapping("/consultant/todayConsultations")
     public Responses<List<ConversationInfo>> getTodayOwnConsultations(HttpServletRequest request) {
@@ -168,17 +168,24 @@ public class ConversationController {
         return conversationService.getOnlineBoundConsultantInfo(req, common);
     }
 
+    @AuthRoles({Supervisor.ROLE, Consultant.ROLE})
+    @GetMapping("/onlineConversationNumber")
+    @ApiOperation("督导或者咨询师得到当前在线会话数")
+    public Responses<Integer> getOnlineConversationNumber(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getOnlineConversationNumber(common);
+    }
 
     /************************* 进行在线咨询会话 *************************/
 
 //    @AuthRoles(Visitor.ROLE)
     @AnonymousAccess
     @PostMapping("/consult")
-    @ApiOperation("发起咨询会话")
-    public Responses<StartConsultResponse> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
-//        var common = Extractor.extract(request);
-        Common common = new Common();
-        common.setUserId(req.getMyId());
+    @ApiOperation("访客发起咨询会话")
+    public Responses<Object> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
+        var common = Extractor.extract(request);
+//        Common common = new Common();
+//        common.setUserId(req.getMyId());
         return conversationService.startConversation(req, common);
     }
 
@@ -288,7 +295,7 @@ public class ConversationController {
 
     @AuthRoles({Consultant.ROLE, Supervisor.ROLE})
     @ApiOperation(value = "咨询师/督导获得在线会话列表")
-    @GetMapping("onlineConversationsList")
+    @GetMapping("conversationsList")
     public Responses<List<OnlineConversation>> getOnlineConversationsList(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getOnlineConversationsList(common);
@@ -308,6 +315,14 @@ public class ConversationController {
     public Responses<WebConversationInfoResponse> getOnlineHelpInfo(@RequestParam String conversationId, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getOnlineHelpInfo(conversationId, common);
+    }
+
+    @AuthRoles({Supervisor.ROLE, Consultant.ROLE})
+    @ApiOperation("督导或咨询师将会话从列表中移除")
+    @PostMapping("remove")
+    public Responses<Object> removeConversation(@RequestBody @Validated RemoveConversationRequest req, HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.removeConversation(req, common);
     }
 
 

@@ -3,6 +3,7 @@ package org.ecnusmartboys.application.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
 import org.ecnusmartboys.application.service.OnlineStateService;
+import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.infrastructure.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class OnlineStateServiceImpl implements OnlineStateService {
 
     private final RedisUtil redisUtil;
+    private final OnlineUserRepository onlineUserRepository;
 
     @Value("${freud.online.timeout:15}")
     private int timeoutInMinutes;
@@ -64,6 +66,7 @@ public class OnlineStateServiceImpl implements OnlineStateService {
         for (Object o : timeoutUserIdSet) {
             ids.add(Long.parseLong(o.toString()));
             keys.add(KEY_PREFIX + o);
+            onlineUserRepository.logout(o.toString());
         }
         redisUtil.zRemoveRangeByScore(TIMEOUT_KEY, 0, max);
         redisUtil.del(keys);

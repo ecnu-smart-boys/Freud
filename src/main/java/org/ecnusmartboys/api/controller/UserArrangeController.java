@@ -5,20 +5,16 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
-import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
-import org.ecnusmartboys.application.dto.request.query.NoArrangedRequest;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
 import org.ecnusmartboys.application.dto.response.ConsultantsResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
-import org.ecnusmartboys.application.service.UserService;
 import org.ecnusmartboys.domain.model.user.Admin;
-import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +31,7 @@ import java.util.List;
 public class UserArrangeController {
 
     private final UserArrangeService userArrangeService;
+
 
     @AuthRoles(Admin.ROLE)
     @ApiOperation("获取咨询师列表")

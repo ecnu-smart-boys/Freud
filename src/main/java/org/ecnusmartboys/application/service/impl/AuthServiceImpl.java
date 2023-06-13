@@ -4,6 +4,7 @@ import cn.hutool.crypto.digest.BCrypt;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.application.convertor.WxRegisterReqConvertor;
 import org.ecnusmartboys.application.dto.UserInfo;
+import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.StaffLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
@@ -11,6 +12,7 @@ import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.AuthService;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Visitor;
+import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.BusinessException;
@@ -29,6 +31,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
+    private final OnlineUserRepository onlineUserRepository;
 
     private final CaptchaUtil captchaUtil;
 
@@ -49,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
                 throw ForbiddenException.DISABLED;
             }
             user = tmp;
+            onlineUserRepository.join(user);
         }else{
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
@@ -84,15 +88,22 @@ public class AuthServiceImpl implements AuthService {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
 
-        var validpw = user.getPassword().equals(req.getPassword());
-        if (!validpw) {
-            throw UnauthorizedException.AUTHENTICATION_FAIL;
-        }
+//        var validpw = user.getPassword().equals(req.getPassword());
+//        if (!validpw) {
+//            throw UnauthorizedException.AUTHENTICATION_FAIL;
+//        }
         if (Boolean.TRUE.equals(user.isDisabled())) {
             throw ForbiddenException.DISABLED;
         }
+        // TODO 今日是否排班
+        onlineUserRepository.join(user);
         var result = userInfoConvertor.fromEntity(user);
         return Responses.ok(result);
+    }
+
+    @Override
+    public void logout(Common common) {
+        onlineUserRepository.logout(common.getUserId());
     }
 
 }

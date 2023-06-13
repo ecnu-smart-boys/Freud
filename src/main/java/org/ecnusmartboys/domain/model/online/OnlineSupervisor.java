@@ -15,14 +15,9 @@ public class OnlineSupervisor {
 
     Set<Long> consultants;
 
-    List<HelpInfo> waitingList;
-
     Integer maxConcurrent;
-
-    Long userId;
 
     public OnlineSupervisor() {
         consultants = new HashSet<>();
-        waitingList = new ArrayList<>();
     }
 }

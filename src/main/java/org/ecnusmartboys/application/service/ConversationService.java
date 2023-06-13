@@ -35,7 +35,7 @@ public interface ConversationService {
 
     Responses<List<ConversationInfo>> getTodayHelps(Common common);
 
-    Responses<StartConsultResponse> startConversation(StartConsultRequest req, Common common);
+    Responses<Object> startConversation(StartConsultRequest req, Common common);
 
     Responses<EndConsultResponse> endConsultation(EndConsultRequest req, Common common);
 
@@ -63,6 +63,8 @@ public interface ConversationService {
 
     Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(OnlineStaffListRequest req, Common common);
 
+    Responses<Integer> getOnlineConversationNumber(Common common);
+
     Responses<WebConversationInfoResponse> getSupervisorOwnHelpInfo(String helpId, Common common);
 
     Responses<WebConversationInfoResponse> getBoundConsultantsInfo(String conversationId, Common common);
@@ -76,6 +78,8 @@ public interface ConversationService {
     Responses<WebConversationInfoResponse> getOnlineConsultationInfo(String conversationId, Common common);
 
     Responses<WebConversationInfoResponse> getOnlineHelpInfo(String conversationId, Common common);
+
+    Responses<Object> removeConversation(RemoveConversationRequest req, Common common);
 
 
 }

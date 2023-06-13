@@ -11,6 +11,8 @@ import org.ecnusmartboys.infrastructure.data.mysql.table.MessageDO;
 import org.ecnusmartboys.infrastructure.mapper.MessageMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Repository
@@ -20,8 +22,10 @@ public class MessageRepositoryImpl implements MessageRepository {
     private final MessageMapper messageMapper;
 
     @Override
-    public PageResult<Message> retrieveByConversationId(String id, long consultationCurrent, long consultationSize) {
-        return null;
+    public PageResult<Message> retrieveByConversationId(String conversationId, long consultationCurrent, long consultationSize) {
+        var total = messageMapper.selectCount(new LambdaQueryWrapper<MessageDO>().eq(MessageDO::getConversationId, conversationId));
+        List<MessageDO> DOs = messageMapper.selectMessageByPage(conversationId, consultationCurrent, consultationSize);
+        return new PageResult<>(messageConvertor.toMessages(DOs), total);
     }
 
     @Override
@@ -44,4 +48,6 @@ public class MessageRepositoryImpl implements MessageRepository {
         }
         return messageConvertor.toMessage(messageDO);
     }
+
+
 }

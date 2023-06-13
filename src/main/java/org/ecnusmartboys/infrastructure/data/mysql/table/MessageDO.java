@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 /**
  * 咨询消息
  */
@@ -36,8 +38,10 @@ public class MessageDO extends BaseDO {
     /**
      * 消息发送时间(秒)
      */
-    private long time;
+    private Date time;
 
     @TableField("is_revoked")
     private boolean revoked;
+
+
 }

@@ -11,10 +11,10 @@ import javax.validation.constraints.Min;
 public class OnlineStaffListRequest {
 
     @ApiModelProperty("页码")
-    @Min(value = 0, message = "页码不能为负数")
-    private long current = 0;
+    @Min(value = 1, message = "页码不能为负数")
+    private long current = 1;
 
     @ApiModelProperty("页码大小")
-    @Min(value = 0, message = "页码大小必须是一个大于0的整数")
+    @Min(value = 1, message = "页码大小必须是一个大于0的整数")
     private long size = 5L;
 }

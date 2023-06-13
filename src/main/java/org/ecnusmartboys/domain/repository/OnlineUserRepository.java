@@ -10,13 +10,35 @@ import java.util.Set;
 
 public interface OnlineUserRepository {
 
-    void Join(User user);
+    /**
+     * 用户登录，更新在线用户列表
+     */
+    void join(User user);
 
+    /**
+     * 用户下线，更新在线用户列表
+     */
+    void logout(String userId);
+
+    /**
+     * 判断咨询师是否在线
+     */
     boolean isConsultantOnline(String consultantId);
 
+    /**
+     * 判断督导是否在线
+     */
     boolean isSupervisorOnline(String supervisorId);
 
+    /**
+     * 判断访客是否在线
+     */
     boolean isVisitorOnline(String visitorId);
+
+    /**
+     * 判断访客是否忙碌
+     */
+    boolean isVisitorBusy(String userId);
 
     boolean consultationExists(String fromId, String toId);
 
@@ -27,8 +49,6 @@ public interface OnlineUserRepository {
     void removeConsultation(String visitorId, String consultantId);
 
     void removeHelp(String consultantId, String supervisorId);
-
-    HelpInfo popFrontHelp(String supervisorId);
 
     ConsultationInfo popFrontConsultation(String consultantId);
 
@@ -73,4 +93,9 @@ public interface OnlineUserRepository {
      * @return 0：不在线，1 在线，2 忙碌
      */
     int getConsultantState(String id);
+
+    /**
+     * 获得用户在线会话数
+     */
+    int getOnlineConversationNumber(String userId, String role);
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.constance.SessionKey;
 import org.ecnusmartboys.application.dto.UserInfo;
@@ -73,7 +74,8 @@ public class AuthController {
     @PostMapping("/logout")
     public Responses<Object> logout(HttpServletRequest request) {
         var session = request.getSession();
-        // TODO
+        var common = Extractor.extract(request);
+        authService.logout(common);
         session.invalidate();
         return Responses.ok();
     }

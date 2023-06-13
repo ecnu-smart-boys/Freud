@@ -60,8 +60,6 @@ public class MessageServiceImpl implements MessageService {
     @Resource
     CosConfig cosConfig;
 
-
-
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -133,7 +131,7 @@ public class MessageServiceImpl implements MessageService {
         }
 
         // 获得咨询记录
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent(), req.getConsultationSize());
+        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent() - 1, req.getConsultationSize());
         List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
 
         // 获得求助记录
@@ -228,7 +226,7 @@ public class MessageServiceImpl implements MessageService {
 
     private AllMsgListResponse consultationToResponse(AllMessageRequest req, Conversation consultation) {
         // 获得咨询记录
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent(), req.getConsultationSize());
+        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent() - 1, req.getConsultationSize());
         List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
 
         // 没有求助督导
@@ -238,7 +236,7 @@ public class MessageServiceImpl implements MessageService {
 
         // 求助了督导
         var help = conversationRepository.retrieveById(consultation.getHelper().getHelpId());
-        var helpResult =  messageRepository.retrieveByConversationId(help.getId(), req.getHelpCurrent(), req.getHelpSize());
+        var helpResult =  messageRepository.retrieveByConversationId(help.getId(), req.getHelpCurrent() - 1, req.getHelpSize());
         List<MessageInfo> helps = convertToInfoList(helpResult.getData());
 
         return new AllMsgListResponse(consultations, consultationResult.getTotal(), helps, helpResult.getTotal());
@@ -250,12 +248,14 @@ public class MessageServiceImpl implements MessageService {
         messages.forEach(message -> {
             MessageInfo messageInfo = new MessageInfo();
             messageInfo.setToId(message.getToId());
-            messageInfo.setFromId(messageInfo.getFromId());
-            messageInfo.setRevoked(messageInfo.isRevoked());
+            messageInfo.setFromId(message.getFromId());
+            messageInfo.setRevoked(message.isRevoked());
+            messageInfo.setTime(message.getTime());
 
             if(!message.isRevoked()) {
                 messageInfo.setMsgBody(message.getMsgBody());
             }
+            messageInfos.add(messageInfo);
         });
         return messageInfos;
     }

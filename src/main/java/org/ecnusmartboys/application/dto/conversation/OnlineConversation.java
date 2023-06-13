@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("展示在在线会话列表中")
+@ApiModel("会话列表")
 public class OnlineConversation {
 
     @ApiModelProperty("会话id")
@@ -18,6 +18,12 @@ public class OnlineConversation {
     @ApiModelProperty("咨询人id")
     private String userId;
 
+    @ApiModelProperty("咨询人名字")
+    private String name;
+
     @ApiModelProperty("咨询人头像")
     private String avatar;
+
+    @ApiModelProperty("是否已经结束")
+    private boolean isEnd;
 }

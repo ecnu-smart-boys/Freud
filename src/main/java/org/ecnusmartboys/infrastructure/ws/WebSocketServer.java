@@ -3,6 +3,7 @@ package org.ecnusmartboys.infrastructure.ws;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
+import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.OnlineStateService;
 import org.ecnusmartboys.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,4 +90,15 @@ public class WebSocketServer extends TextWebSocketHandler {
         userService.offline(userId);
     }
 
+
+    public void notifyUser(Long userId, String content) {
+        WebSocketSession session = sessionMap.get(userId);
+        if (session != null && session.isOpen()) {
+            try {
+                send(userId, content);
+            } catch (Exception e) {
+                log.error("Failed to close session for userId {}", userId, e);
+            }
+        }
+    }
 }

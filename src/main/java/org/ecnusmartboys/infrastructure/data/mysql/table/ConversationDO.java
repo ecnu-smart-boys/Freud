@@ -38,4 +38,8 @@ public class ConversationDO extends BaseDO {
     public static final String CONSULTATION = "is_consultation";
     @TableField(CONSULTATION)
     private Boolean isConsultation;
+
+    public static final String SHOWN = "is_shown";
+    @TableField(SHOWN)
+    private Boolean isShown;
 }

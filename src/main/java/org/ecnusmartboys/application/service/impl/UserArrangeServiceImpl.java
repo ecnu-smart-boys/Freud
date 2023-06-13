@@ -15,10 +15,7 @@ import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.arrangement.Arrangement;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.user.*;
-import org.ecnusmartboys.domain.repository.ArrangementRepository;
-import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
-import org.ecnusmartboys.domain.repository.ConversationRepository;
-import org.ecnusmartboys.domain.repository.UserRepository;
+import org.ecnusmartboys.domain.repository.*;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
 import org.springframework.stereotype.Service;
@@ -36,6 +33,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
     private final UserRepository userRepository;
     private final ConsulvisorRepository consulvisorRepository;
     private final ConversationRepository conversationRepository;
+    private final OnlineUserRepository onlineUserRepository;
 
 
     private final ConsultantInfoConvertor consultantInfoConvertor;
@@ -152,7 +150,8 @@ public class UserArrangeServiceImpl implements UserArrangeService {
 
         user.setDisabled(true);
         userRepository.update(user);
-        // TODO 强制下线
+        onlineUserRepository.logout(user.getId());
+        // 发送websocket TODO
         return Responses.ok("禁用用户成功");
     }
 

@@ -17,4 +17,5 @@ public class Conversation extends BaseEntity {
     private Long endTime;
     private Help helper;
     private boolean isConsultation;
+    private boolean isShown;
 }

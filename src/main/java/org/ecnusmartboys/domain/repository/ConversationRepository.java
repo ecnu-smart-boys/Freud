@@ -43,7 +43,7 @@ public interface ConversationRepository {
      * @param fromId 请求者id
      * @param toId 被请求者id
      */
-    String startConsultation(String fromId, String toId);
+    Conversation startConsultation(String fromId, String toId);
 
     String bindHelp(String conversationId, String supervisorId);
 
@@ -53,9 +53,9 @@ public interface ConversationRepository {
     List<Conversation> retrieveConsultationByToId(String toId);
 
     /**
-     * 根据督导/咨询师id，获得所有在线的咨询会话
+     * 根据督导/咨询师id，获得所有未被展示的咨询会话
      */
-    List<Conversation> retrieveOnlineConversationsByToId(String toId);
+    List<Conversation> retrieveConversationListByToId(String toId);
 
     /**
      * 根据督导id，获得所有已完结的求助会话
@@ -93,4 +93,9 @@ public interface ConversationRepository {
      * 通过fromId和toId来确定一个在线的会话
      */
     Conversation retrieveByFromIdAndToId(String fromId, String toId);
+
+    /**
+     * 将会话设置为用户已经从列表中移除
+     */
+    void remove(String conversationId);
 }
