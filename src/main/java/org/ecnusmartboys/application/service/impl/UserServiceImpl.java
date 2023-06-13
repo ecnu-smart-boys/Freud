@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService{
     public Responses<Object> updateVisitorInfo(UpdateVisitorRequest req, Common common) {
         var visitor = updateVisitorReqConvertor.toEntity(req);
         visitor.setId(common.getUserId());
-        userRepository.save(visitor);
-        return null;
+        userRepository.update(visitor);
+        return Responses.ok();
     }
 
     @Override
