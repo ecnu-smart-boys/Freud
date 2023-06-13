@@ -39,4 +39,7 @@ public class ConsultationInfo {
     @ApiModelProperty("持续时间")
     private long lastTime;
 
+    @ApiModelProperty("会话是否已结束")
+    private boolean isEnd;
+
 }

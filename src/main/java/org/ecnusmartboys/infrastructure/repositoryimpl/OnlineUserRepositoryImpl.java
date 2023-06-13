@@ -260,7 +260,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         List<Long> temp = new ArrayList<>(onlineConsultants);
         int total = temp.size();
 
-        for(long i = (current - 1) * size; i < current * size; i++) {
+        for(long i = current * size; i < (current + 1) * size; i++) {
             if(i >= total) {
                 break;
             }
@@ -268,7 +268,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
-            if(consultant.getVisitors().size() != 0) {
+            if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }
@@ -284,7 +284,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         List<Long> temp = new ArrayList<>(onlineSupervisors);
         int total = temp.size();
 
-        for(long i = (current - 1) * size; i < current * size; i++) {
+        for(long i = current * size; i < (current + 1) * size; i++) {
             if(i >= total) {
                 break;
             }
@@ -292,7 +292,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineSupervisor supervisor = fetchSupervisor(temp.get((int) i));
-            if(supervisor.getConsultants().size() != 0) {
+            if(supervisor.getConsultants().size() == supervisor.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += supervisor.getConsultants().size();
             }
@@ -321,7 +321,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
-            if(consultant.getVisitors().size() != 0) {
+            if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }

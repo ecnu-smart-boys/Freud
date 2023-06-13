@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @ApiModel("查询一次会话咨询+求助记录请求封装类")
 public class AllMessageRequest {
 
-    @NotBlank(message = "会话记录不能为空")
+    @NotBlank(message = "会话id不能为空")
     private String conversationId;
 
     @ApiModelProperty(value = "聊天记录页码")

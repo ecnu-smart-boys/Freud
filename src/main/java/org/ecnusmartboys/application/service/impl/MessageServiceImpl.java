@@ -106,7 +106,6 @@ public class MessageServiceImpl implements MessageService {
                     }
                     message.setRevoked(true);
                     messageRepository.update(message);
-
                     break;
                 }
             }

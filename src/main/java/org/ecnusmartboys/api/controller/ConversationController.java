@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
-import org.ecnusmartboys.application.dto.conversation.OnlineConversation;
+import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
@@ -115,6 +115,14 @@ public class ConversationController {
         return conversationService.getTodayOwnConsultations(common);
     }
 
+    @AuthRoles(Consultant.ROLE)
+    @ApiOperation("获得综合评价")
+    @GetMapping("avgComment")
+    public Responses<Integer> getAvgComment(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getAvgComment(common);
+    }
+
     @AuthRoles(Supervisor.ROLE)
     @ApiOperation("督导获得今日的求助信息")
     @GetMapping("/supervisor/todayHelps")
@@ -183,9 +191,9 @@ public class ConversationController {
     @PostMapping("/consult")
     @ApiOperation("访客发起咨询会话")
     public Responses<Object> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
-        var common = Extractor.extract(request);
-//        Common common = new Common();
-//        common.setUserId(req.getMyId());
+//        var common = Extractor.extract(request);
+        Common common = new Common();
+        common.setUserId("3");
         return conversationService.startConversation(req, common);
     }
 
@@ -194,9 +202,9 @@ public class ConversationController {
     @PostMapping("/endConsultation")
     @ApiOperation("结束咨询会话")
     public Responses<EndConsultResponse> endConsultation(@RequestBody @Validated EndConsultRequest req, HttpServletRequest request){
-//        var common = Extractor.extract(request);
-        Common common = new Common();
-        common.setUserId(req.getMyId());
+        var common = Extractor.extract(request);
+//        Common common = new Common();
+//        common.setUserId(req.getMyId());
         return conversationService.endConsultation(req, common);
     }
 
@@ -284,7 +292,7 @@ public class ConversationController {
     }
 
     @AuthRoles(Admin.ROLE)
-    @ApiOperation(value = "管理员查看咨询记录消息列表")
+    @ApiOperation(value = "管理员查看咨询记录信息")
     @GetMapping("/details/adminConsultationInfo")
     public Responses<WebConversationInfoResponse> getAdminConsultationInfo(@RequestParam String conversationId, HttpServletRequest request) {
         var common = Extractor.extract(request);
@@ -294,27 +302,27 @@ public class ConversationController {
     /************************* 查看正在进行的会话详情 *************************/
 
     @AuthRoles({Consultant.ROLE, Supervisor.ROLE})
-    @ApiOperation(value = "咨询师/督导获得在线会话列表")
+    @ApiOperation(value = "咨询师/督导获得会话列表")
     @GetMapping("conversationsList")
-    public Responses<List<OnlineConversation>> getOnlineConversationsList(HttpServletRequest request) {
+    public Responses<List<LeftConversation>> getOnlineConversationsList(HttpServletRequest request) {
         var common = Extractor.extract(request);
-        return conversationService.getOnlineConversationsList(common);
+        return conversationService.getConversationsList(common);
     }
 
     @AuthRoles(Consultant.ROLE)
-    @ApiOperation("咨询师获得在线会话的基本信息")
-    @GetMapping("onlineConsultationInfo")
-    public Responses<WebConversationInfoResponse> getOnlineConsultationInfo(@RequestParam String conversationId, HttpServletRequest request) {
+    @ApiOperation("咨询师获得会话的基本信息")
+    @GetMapping("consultationInfo")
+    public Responses<WebConversationInfoResponse> getConsultationInfo(@RequestParam String conversationId, HttpServletRequest request) {
         var common = Extractor.extract(request);
-        return conversationService.getOnlineConsultationInfo(conversationId, common);
+        return conversationService.getConsultationInfo(conversationId, common);
     }
 
     @AuthRoles(Supervisor.ROLE)
-    @ApiOperation("督导获得在线会话的基本信息")
-    @GetMapping("onlineHelpInfo")
-    public Responses<WebConversationInfoResponse> getOnlineHelpInfo(@RequestParam String conversationId, HttpServletRequest request) {
+    @ApiOperation("督导获得会话的基本信息")
+    @GetMapping("helpInfo")
+    public Responses<WebConversationInfoResponse> getHelpInfo(@RequestParam String conversationId, HttpServletRequest request) {
         var common = Extractor.extract(request);
-        return conversationService.getOnlineHelpInfo(conversationId, common);
+        return conversationService.getHelpInfo(conversationId, common);
     }
 
     @AuthRoles({Supervisor.ROLE, Consultant.ROLE})

@@ -12,5 +12,5 @@ public class EndConsultRequest {
     @ApiModelProperty("会话id")
     private String conversationId;
 
-    private String myId;
+//    private String myId;
 }

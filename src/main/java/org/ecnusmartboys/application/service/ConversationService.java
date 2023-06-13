@@ -1,6 +1,6 @@
 package org.ecnusmartboys.application.service;
 
-import org.ecnusmartboys.application.dto.conversation.OnlineConversation;
+import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
@@ -22,6 +22,8 @@ public interface ConversationService {
     Responses<List<WxConsultRecordInfo>> getVisitorConsultations(Common common);
 
     Responses<List<ConversationInfo>> getTodayConsultations();
+
+    Responses<Integer> getAvgComment(Common common);
 
     Responses<List<DayConsultInfo>> getRecentWeek();
 
@@ -73,13 +75,14 @@ public interface ConversationService {
 
     Responses<WebConversationInfoResponse> getAdminConsultationInfo(String conversationId, Common common);
 
-    Responses<List<OnlineConversation>> getOnlineConversationsList(Common common);
+    Responses<List<LeftConversation>> getConversationsList(Common common);
 
-    Responses<WebConversationInfoResponse> getOnlineConsultationInfo(String conversationId, Common common);
+    Responses<WebConversationInfoResponse> getConsultationInfo(String conversationId, Common common);
 
-    Responses<WebConversationInfoResponse> getOnlineHelpInfo(String conversationId, Common common);
+    Responses<WebConversationInfoResponse> getHelpInfo(String conversationId, Common common);
 
     Responses<Object> removeConversation(RemoveConversationRequest req, Common common);
+
 
 
 }

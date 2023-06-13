@@ -152,7 +152,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
         conversationDO.setIsConsultation(true);
 
         conversationMapper.insert(conversationDO);
-        return convert(conversationDO);
+        return convert(conversationMapper.selectById(conversationDO.getConversationId()));
     }
 
     @Override

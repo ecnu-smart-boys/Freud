@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("会话列表")
-public class OnlineConversation {
+@ApiModel("显示在左下角信息")
+public class LeftConversation {
 
     @ApiModelProperty("会话id")
     private String conversationId;
@@ -24,6 +24,6 @@ public class OnlineConversation {
     @ApiModelProperty("咨询人头像")
     private String avatar;
 
-    @ApiModelProperty("是否已经结束")
+    @ApiModelProperty("会话是否已经结束")
     private boolean isEnd;
 }

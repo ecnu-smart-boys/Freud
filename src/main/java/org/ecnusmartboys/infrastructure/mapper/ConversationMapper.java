@@ -13,7 +13,7 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
 
     @Select("SELECT a.* FROM " +
             "(SELECT * FROM conversation " +
-            "WHERE end_time IS NOT NULL and (#{date} = '1970-01-01' or DATE(start_time) = #{date}) and is_consultation = 0) AS a, " +
+            "WHERE end_time IS NOT NULL and (#{date} = '1970-01-01' or DATE(start_time) = #{date}) and is_consultation = 1) AS a, " +
             "(SELECT * FROM sys_user WHERE (#{name} = '' or name LIKE CONCAT('%', #{name}, '%'))) AS b " +
             "WHERE from_id = id;")
     List<ConversationDO> selectAllConsultation(String name, String date);
@@ -40,7 +40,7 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
     List<ConversationDO> selectConsultationByVisitorId(String visitorId);
 
     @Select("SELECT * FROM conversation " +
-            "where end_time IS NOT NULL and DATE(start_time) = #{date} and is_consultation = 0")
+            "where end_time IS NOT NULL and DATE(start_time) = #{date} and is_consultation = 1")
     List<ConversationDO> selectConsultByDate(String date);
 
     @Select("SELECT * FROM conversation " +
@@ -66,15 +66,15 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
     List<ConversationDO> selectConsultationByFromId(String fromId);
 
 
-    @Select("SELECT to_id AS user_id, COUNT(*) AS COUNT FROM conversation " +
+    @Select("SELECT to_id AS user_id, COUNT(*) AS total FROM conversation " +
             "WHERE MONTH(start_time) = #{month} AND end_time IS NOT NULL AND is_consultation = TRUE " +
-            "GROUP BY to_id ORDER BY COUNT DESC limit 4;")
+            "GROUP BY to_id ORDER BY total DESC limit 4;")
     List<RankDO> selectMonthConsultantsInOrder(int month);
 
-    @Select("SELECT to_id, COUNT(*) AS COUNT FROM " +
-            "(SELECT * FROM conversation WHERE MONTH(start_time) = 6 AND end_time IS NOT NULL AND is_consultation = TRUE) AS C \n" +
-            " ,COMMENT WHERE C.conversation_id = comment.`conversation_id` AND score = 5 AND from_id = user_id " +
-            "GROUP BY to_id ORDER BY COUNT DESC LIMIT 4;")
+    @Select("SELECT to_id as user_id, COUNT(*) AS total FROM " +
+            "(SELECT * FROM conversation WHERE MONTH(start_time) = 6 AND end_time IS NOT NULL AND is_consultation = 1) AS C " +
+            " ,comment WHERE C.conversation_id = comment.conversation_id AND score = 5 AND from_id = user_id " +
+            "GROUP BY to_id ORDER BY total DESC LIMIT 4;")
     List<RankDO> selectMonthGoodCommentInOrder(int month);
 
 

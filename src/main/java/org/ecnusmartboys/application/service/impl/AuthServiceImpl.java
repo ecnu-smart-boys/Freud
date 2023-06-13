@@ -78,10 +78,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Responses<UserInfo> staffLogin(StaffLoginRequest req) {
         // 验证登录
-        var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
-        if (!validCaptcha) {
-            throw new UnauthorizedException("验证码错误");
-        }
+//        var validCaptcha = captchaUtil.verifyCaptcha(req.getCaptchaId(), req.getCaptcha());
+//        if (!validCaptcha) {
+//            throw new UnauthorizedException("验证码错误");
+//        }
 
         var user = userRepository.retrieveByUsername(req.getUsername());
         if (user == null) {

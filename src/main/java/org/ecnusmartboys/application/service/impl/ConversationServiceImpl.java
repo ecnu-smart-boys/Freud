@@ -10,7 +10,7 @@ import org.ecnusmartboys.application.dto.HelpRecordInfo;
 import org.ecnusmartboys.application.dto.RankUserInfo;
 import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.conversation.HelpInfo;
-import org.ecnusmartboys.application.dto.conversation.OnlineConversation;
+import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
@@ -98,6 +98,20 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
+    public Responses<Integer> getAvgComment(Common common) {
+        var conversations = conversationRepository.retrieveHelpByToId(common.getUserId());
+        int totalScore = 0;
+        for(Conversation conversation : conversations) {
+            totalScore += conversation.getFromUserComment().getScore();
+        }
+
+        if(totalScore == 0) {
+            return Responses.ok(0);
+        }
+        return Responses.ok(totalScore / conversations.size());
+    }
+
+    @Override
     public Responses<List<DayConsultInfo>> getRecentWeek() {
         long currentDay = (new Date().getTime()) - 6 * ONE_DAY;
         List<DayConsultInfo> dayConsultInfos = new ArrayList<>();
@@ -166,7 +180,7 @@ public class ConversationServiceImpl implements ConversationService {
         onlineUserRepository.resetConversation(conversation.getId());
 
         // ws通知咨询师
-        OnlineConversation notifyConsultant = new OnlineConversation(conversation.getId(), conversation.getFromUser().getId(),
+        LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
                 conversation.getFromUser().getName(), conversation.getFromUser().getAvatar(), false);
         var notify = new Notify("start", notifyConsultant);
         try {
@@ -175,7 +189,7 @@ public class ConversationServiceImpl implements ConversationService {
             throw new RuntimeException(e);
         }
 
-        OnlineConversation notifyVisitor = new OnlineConversation(conversation.getId(), conversation.getToUser().getId(),
+        LeftConversation notifyVisitor = new LeftConversation(conversation.getId(), conversation.getToUser().getId(),
                 conversation.getToUser().getName(), conversation.getToUser().getAvatar(), false);
 
         return Responses.ok(notifyVisitor);
@@ -434,7 +448,7 @@ public class ConversationServiceImpl implements ConversationService {
         if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在这条会话记录");
         }
-        if(consultation.getEndTime() != null) {
+        if(consultation.getEndTime() == null) {
             throw new BadRequestException("该会话尚未结束");
         }
 
@@ -492,11 +506,11 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public Responses<List<OnlineConversation>> getOnlineConversationsList(Common common) {
-        List<OnlineConversation> result = new ArrayList<>();
+    public Responses<List<LeftConversation>> getConversationsList(Common common) {
+        List<LeftConversation> result = new ArrayList<>();
         var conversations = conversationRepository.retrieveConversationListByToId(common.getUserId());
         conversations.forEach(conversation -> {
-            var info = new OnlineConversation(conversation.getId(), conversation.getFromUser().getId(),
+            var info = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
                     conversation.getFromUser().getName(),conversation.getFromUser().getAvatar(), false);
             if(conversation.getEndTime() != null) {
                 info.setEnd(true);
@@ -507,25 +521,21 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public Responses<WebConversationInfoResponse> getOnlineConsultationInfo(String conversationId, Common common) {
+    public Responses<WebConversationInfoResponse> getConsultationInfo(String conversationId, Common common) {
         var consultation = conversationRepository.retrieveById(conversationId);
         if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("该咨询师不存在该在线会话");
 
-        } else if(consultation.getEndTime() != null) {
-            throw new BadRequestException("该会话已经结束，它不是在线会话");
         }
         return Responses.ok(convertToWebConversationInfo(consultation));
     }
 
     @Override
-    public Responses<WebConversationInfoResponse> getOnlineHelpInfo(String helpId, Common common) {
+    public Responses<WebConversationInfoResponse> getHelpInfo(String helpId, Common common) {
         var consultation = conversationRepository.retrieveByHelperId(helpId);
         if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在该在线会话");
 
-        } else if(consultation.getEndTime() != null) {
-            throw new BadRequestException("该会话已经结束，它不是在线会话");
         }
 
         return Responses.ok(convertToWebConversationInfo(consultation));
@@ -536,13 +546,13 @@ public class ConversationServiceImpl implements ConversationService {
         var conversation = conversationRepository.retrieveById(req.getConversationId());
         if(conversation == null || !Objects.equals(conversation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不存在该会话");
-        } else if(conversation.getEndTime() != null) {
+        } else if(conversation.getEndTime() == null) {
             throw new BadRequestException("会话尚未结束，不能移除");
         }
 
         conversation.setShown(true);
         conversationRepository.remove(conversation.getId());
-        return null;
+        return Responses.ok("移除成功");
     }
 
     @NotNull
@@ -597,7 +607,7 @@ public class ConversationServiceImpl implements ConversationService {
         var fromUser = consultation.getFromUser();
         ConsultationInfo consultationInfo =
                 new ConsultationInfo(toUser.getId(), fromUser.getId(), toUser.getName(), toUser.getAvatar(), fromUser.getPhone(),
-                        fromUser.getName(), fromUser.getAvatar(), consultation.getStartTime(), System.currentTimeMillis());
+                        fromUser.getName(), fromUser.getAvatar(), consultation.getStartTime(), System.currentTimeMillis(), false);
 
         // 会话未结束
         if(consultation.getEndTime() != null) {
@@ -607,6 +617,8 @@ public class ConversationServiceImpl implements ConversationService {
             conversationInfoResponse.setVisitorText(consultation.getFromUserComment().getText()); // 访客评价
             conversationInfoResponse.setTag(consultation.getToUserComment().getTag()); // 咨询师评价标签
             conversationInfoResponse.setConsultantText(consultation.getToUserComment().getText()); // 咨询师评价内容
+
+            consultationInfo.setEnd(true);
         }
         conversationInfoResponse.setConsultationInfo(consultationInfo);
 
@@ -655,9 +667,9 @@ public class ConversationServiceImpl implements ConversationService {
             onlineUserRepository.resetConversation(conversation.getId());
 
             // ws通知双方会话开始
-            OnlineConversation notifyConsultant = new OnlineConversation(conversation.getId(), conversation.getFromUser().getId(),
+            LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
                     conversation.getFromUser().getName(), conversation.getFromUser().getAvatar(), false);
-            OnlineConversation notifyVisitor = new OnlineConversation(conversation.getId(), conversation.getToUser().getId(),
+            LeftConversation notifyVisitor = new LeftConversation(conversation.getId(), conversation.getToUser().getId(),
                     conversation.getToUser().getName(), conversation.getToUser().getAvatar(), false);
             try {
                 // 发送给咨询师
