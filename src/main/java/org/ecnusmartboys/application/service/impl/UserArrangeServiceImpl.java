@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.doocs.im.ImClient;
+import io.github.doocs.im.model.request.AccountImportRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.convertor.*;
@@ -218,6 +219,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         var supervisor = addSupReqConvertor.toEntity(req);
         supervisor.setRole(Supervisor.ROLE);
         userRepository.save(supervisor);
+        importImUser(supervisor);
         return Responses.ok("成功添加督导");
     }
 
@@ -230,7 +232,21 @@ public class UserArrangeServiceImpl implements UserArrangeService {
 
         var supervisor =  updateSupReqConvertor.toEntity(req);
         userRepository.update(supervisor);
+        importImUser(supervisor);
         return Responses.ok("成功更新督导");
+    }
+
+    private void importImUser(User user){
+        var req = AccountImportRequest.builder()
+            .userId(user.getId())
+            .faceUrl(user.getAvatar())
+            .nick(user.getName())
+            .build();
+        try {
+            var resp = adminClient.account.accountImport(req);
+        } catch (IOException e) {
+            log.error("IM导入用户失败", e);
+        }
     }
 
     @Transactional
