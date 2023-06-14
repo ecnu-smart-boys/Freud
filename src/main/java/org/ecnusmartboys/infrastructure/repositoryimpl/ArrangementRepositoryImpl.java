@@ -1,5 +1,6 @@
 package org.ecnusmartboys.infrastructure.repositoryimpl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.arrangement.Arrangement;
@@ -10,6 +11,7 @@ import org.ecnusmartboys.infrastructure.data.mysql.table.ArrangementDO;
 import org.ecnusmartboys.infrastructure.mapper.ArrangementMapper;
 import org.springframework.stereotype.Repository;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.Date;
@@ -24,6 +26,8 @@ public class ArrangementRepositoryImpl implements ArrangementRepository {
 
     private final ArrangementConvertor arrangementConvertor;
 
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
     public void save(String userId, Date date) {
         ArrangementDO arrangementDO = new ArrangementDO(date, Long.valueOf(userId));
@@ -32,14 +36,13 @@ public class ArrangementRepositoryImpl implements ArrangementRepository {
 
     @Override
     public List<Arrangement> retrieveByDate(Date date) {
-        var arrangementDOS = arrangementMapper.selectByDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
+        var arrangementDOS = arrangementMapper.selectByDate(dateFormat.format(date));
         return arrangementConvertor.toArrangements(arrangementDOS);
     }
 
     @Override
     public void remove(String userId, Date date) {
-        ArrangementDO arrangementDO = new ArrangementDO(date, Long.valueOf(userId));
-        arrangementMapper.deleteById(arrangementDO);
+        arrangementMapper.deleteByDateAndUserId(dateFormat.format(date), userId);
     }
 
     @Override

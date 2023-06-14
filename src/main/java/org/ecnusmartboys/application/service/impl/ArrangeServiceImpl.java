@@ -17,8 +17,10 @@ import org.ecnusmartboys.domain.model.user.User;
 import org.ecnusmartboys.domain.repository.ArrangementRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -56,7 +58,11 @@ public class ArrangeServiceImpl implements ArrangeService {
             throw new BadRequestException("只能给以后的日期进行排班");
         }
 
-        arrangementRepository.save(req.getUserId(), date);
+        try {
+            arrangementRepository.save(req.getUserId(), date);
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException("用户已被排班");
+        }
         return Responses.ok("成功添加排班");
     }
 
