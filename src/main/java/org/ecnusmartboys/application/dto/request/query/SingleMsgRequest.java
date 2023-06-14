@@ -18,11 +18,11 @@ public class SingleMsgRequest {
     @NotBlank(message = "会话记录不能为空")
     private String conversationId;
 
-    @ApiModelProperty(value = "聊天记录页码")
-    @Min(value = 0, message = "聊天记录页码不合法")
-    private long current = 0;
+    @ApiModelProperty("消息迭代器")
+    @NotBlank(message = "消息迭代器不能为空")
+    private int iterator;
 
-    @ApiModelProperty("聊天记录页大小")
-    @Min(value = 1, message = "聊天记录页大小不合法")
+    @NotBlank(message = "获取消息的条数不能为0")
+    @Min(value = 1, message = "每次获取消息的条数必须是一个正整数")
     private long size;
 }

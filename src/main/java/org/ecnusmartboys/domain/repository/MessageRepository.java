@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface MessageRepository {
 
-
-    PageResult<Message> retrieveByConversationId(String id, long consultationCurrent, long consultationSize);
-
     void save(Message message);
 
     void update(Message message);

@@ -96,9 +96,7 @@ public class MessageServiceImpl implements MessageService {
                     // 重置超时计时
                     onlineUserRepository.resetConversation(tracker.getConversationId());
 
-                    // websocket，提醒用户同步消息 TODO
-//                    MessageInfo info = new MessageInfo()
-
+                    // websocket，通知督导同步消息 TODO
                     break;
                 }
                 case AFTER_MSG_WITHDRAW: {
@@ -196,26 +194,8 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getCurrent(), req.getSize());
-        List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
-
-        return Responses.ok(new MsgListResponse(consultations, consultationResult.getTotal()));
-    }
-
-    @Override
-    public Responses<MsgListResponse> getHelpMsg(SingleMsgRequest req, Common common) {
-        Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
-            throw new BadRequestException("你不存在这条会话记录");
-
-        } else if(consultation.getHelper() == null) {
-            // 没有求助督导，total返回 -1
-            return Responses.ok(new MsgListResponse(null, -1L));
-        }
-
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getHelper().getHelpId(), req.getCurrent(), req.getSize());
-        List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
-        return Responses.ok(new MsgListResponse(consultations, consultationResult.getTotal()));
+        List<MessageInfo> infos = retrieveMsg(consultation.getId(), req.getIterator(), req.getSize());
+        return Responses.ok(new MsgListResponse(infos));
     }
 
     @Override
@@ -225,20 +205,8 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该督导不存在此次会话");
         }
 
-        long offset = Long.parseLong(consultation.getId()) << 32;
-        long end = req.getIterator();
-
-        if(req.getIterator() == -1) {
-            var total = messageRepository.retrieveTotalByConversationId(req.getConversationId());
-            if(total < end) {
-                end = total;
-            }
-        }
-
-        long begin = Math.max(end - req.getSize(), 0L);
-        List<Message> messages = messageRepository.retrieveMsgList(offset + begin, offset + end);
-
-        return null;
+        List<MessageInfo> infos = retrieveMsg(consultation.getId(), req.getIterator(), req.getSize());
+        return Responses.ok(new MsgListResponse(infos));
     }
 
     private AllMsgListResponse consultationToResponse(AllMessageRequest req, Conversation consultation) {

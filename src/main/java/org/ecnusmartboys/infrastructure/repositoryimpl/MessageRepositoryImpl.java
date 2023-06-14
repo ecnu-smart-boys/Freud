@@ -23,13 +23,6 @@ public class MessageRepositoryImpl implements MessageRepository {
     private final MessageMapper messageMapper;
 
     @Override
-    public PageResult<Message> retrieveByConversationId(String conversationId, long consultationCurrent, long consultationSize) {
-        var total = messageMapper.selectCount(new LambdaQueryWrapper<MessageDO>().eq(MessageDO::getConversationId, conversationId));
-        List<MessageDO> DOs = messageMapper.selectMessageByPage(conversationId, consultationCurrent, consultationSize);
-        return new PageResult<>(messageConvertor.toMessages(DOs), total);
-    }
-
-    @Override
     public void save(Message message) {
         MessageDO messageDO = messageConvertor.toMessageDO(message);
         messageMapper.insert(messageDO);

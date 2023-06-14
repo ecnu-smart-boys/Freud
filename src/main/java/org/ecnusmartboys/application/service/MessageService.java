@@ -44,11 +44,6 @@ public interface MessageService {
     Responses<MsgListResponse> getVisitorConsultationMsg(SingleMsgRequest req, Common common);
 
     /**
-     * 咨询师单独查询一次会话的求助记录
-     */
-    Responses<MsgListResponse> getHelpMsg(SingleMsgRequest req, Common common);
-
-    /**
      * 督导同步咨询师和访客的聊天记录
      */
     Responses<MsgListResponse> synchronizeConsultationMsg(SynchronizeMsgRequest req, Common common);

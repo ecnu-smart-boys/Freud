@@ -17,7 +17,4 @@ public class MsgListResponse {
 
     @ApiModelProperty("咨询记录列表")
     private List<MessageInfo> consultation;
-
-    @ApiModelProperty("咨询消息记录总条数")
-    private long consultationTotal;
 }

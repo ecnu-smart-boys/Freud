@@ -26,19 +26,4 @@ public class AllMessageRequest {
     @ApiModelProperty
     private long size;
 
-//    @ApiModelProperty(value = "聊天记录页码")
-//    @Min(value = 0, message = "聊天记录页码不合法")
-//    private long consultationCurrent = 0;
-//
-//    @ApiModelProperty("聊天记录页大小")
-//    @Min(value = 1, message = "聊天记录页大小不合法")
-//    private long consultationSize;
-//
-//    @ApiModelProperty(value = "求助记录页码")
-//    @Min(value = 0, message = "求助记录页码不合法")
-//    private long helpCurrent;
-//
-//    @ApiModelProperty("求助记录页大小")
-//    @Min(value = 1, message = "求助记录页大小不合法")
-//    private long helpSize;
 }
