@@ -12,5 +12,6 @@ import org.mapstruct.ReportingPolicy;
 public interface UpdateVisitorReqConvertor extends BaseConvertor<UpdateVisitorRequest, Visitor> {
     @Override
     @Mapping(source = "nickName", target = "name")
+    @Mapping(target = "role", constant = Visitor.ROLE)
     Visitor toEntity(UpdateVisitorRequest req);
 }

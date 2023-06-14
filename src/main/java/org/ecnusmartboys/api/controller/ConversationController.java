@@ -155,7 +155,7 @@ public class ConversationController {
         return conversationService.getMaxConversations(common);
     }
 
-    @AuthRoles(Admin.ROLE)
+    @AuthRoles({Admin.ROLE, Visitor.ROLE})
     @GetMapping("/onlineConsultantInfo")
     @ApiOperation("管理员获得当前在线咨询师和咨询数量")
     public Responses<OnlineInfoResponse> getOnlineConsultantInfo(@Validated OnlineStaffListRequest req) {
