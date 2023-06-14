@@ -8,6 +8,7 @@ import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
+import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
@@ -95,7 +96,13 @@ public class IMController {
 //    }
 
 
-
+    @AuthRoles(Supervisor.ROLE)
+    @ApiOperation("督导同步访客和咨询师的聊天")
+    @GetMapping("synchronizeMsg")
+    public Responses<MsgListResponse> synchronizeMsg(@Validated SynchronizeMsgRequest req, HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return messageService.synchronizeConsultationMsg(req, common);
+    }
 }
 
 

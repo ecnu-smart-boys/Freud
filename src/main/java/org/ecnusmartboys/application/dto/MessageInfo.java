@@ -13,6 +13,8 @@ public class MessageInfo {
 
     private String toId;
 
+    private long iterator;
+
     private String msgBody;
 
     private long time;

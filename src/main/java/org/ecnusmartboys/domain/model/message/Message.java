@@ -15,6 +15,8 @@ public class Message {
 
     private String msgKey;
 
+    private long iterator;
+
     private String conversationId;
 
     private String fromId;

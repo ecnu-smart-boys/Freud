@@ -24,6 +24,8 @@ public class MessageDO extends BaseDO {
 
     private String msgKey;
 
+    private long iterator;
+
     private String conversationId;
 
     private String fromId;

@@ -10,18 +10,18 @@ public class ConversationMsgTracker {
 
     private Lock lock;
 
-    private int messageCount;
+    private long messageCount;
 
     private String conversationId;
 
     public ConversationMsgTracker(String conversationId) {
-        messageCount = 0;
+        messageCount = Long.parseLong(conversationId) << 32;
         lock = new ReentrantLock();
         this.conversationId = conversationId;
     }
 
-    public int increment() {
-        int temp = 0;
+    public long increment() {
+        long temp = 0;
         lock.lock();
         try {
             temp = messageCount;

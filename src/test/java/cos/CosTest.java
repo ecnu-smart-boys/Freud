@@ -56,5 +56,7 @@ public class CosTest {
             // 上传失败
             System.out.println("Failed to upload image.");
         }
+
     }
+
 }

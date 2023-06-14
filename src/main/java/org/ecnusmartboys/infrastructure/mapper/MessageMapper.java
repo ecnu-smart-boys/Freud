@@ -13,4 +13,6 @@ public interface MessageMapper extends BaseMapper<MessageDO> {
     @Select("SELECT * FROM message WHERE conversation_id = #{conversationId} ORDER BY TIME DESC LIMIT #{current}, #{size}")
     List<MessageDO> selectMessageByPage(String conversationId, long current, long size);
 
+    @Select("SELECT * FROM message where iterator >= #{begin} and iterator < #{end}")
+    List<MessageDO> selectByRange(long begin, long end);
 }

@@ -14,6 +14,7 @@ import org.ecnusmartboys.application.dto.MessageInfo;
 import org.ecnusmartboys.application.dto.message.*;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
+import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
@@ -30,7 +31,6 @@ import org.ecnusmartboys.infrastructure.config.CosConfig;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -41,7 +41,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_MSG_WITHDRAW;
 import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_SEND_MSG;
 
@@ -56,6 +55,8 @@ public class MessageServiceImpl implements MessageService {
     private final OnlineUserRepository onlineUserRepository;
 
     private static final String BASE_URL = "https://freud-1311238733.cos.ap-shanghai.myqcloud.com/";
+
+    private static final long OFFSET = 1L << 32;
 
     @Resource
     CosConfig cosConfig;
@@ -75,14 +76,15 @@ public class MessageServiceImpl implements MessageService {
                         return Responses.ok();
                     }
 
-                    int new_key = tracker.increment();
+                    long iterator = tracker.increment();
 
                     String msgBody = mapper.writeValueAsString(cb.getMsgBody());
-                    String newBody = parseMsgBody(tracker.getConversationId() + "_" + new_key, msgBody);
+                    String newBody = parseMsgBody(String.valueOf(iterator) , msgBody);
 
                     // 保存消息
                     Message message = new Message();
-                    message.setMsgKey(String.valueOf(new_key)); // 消息标识
+                    message.setMsgKey(cb.getMsgKey()); // 消息标识
+                    message.setIterator(iterator);
                     message.setConversationId(tracker.getConversationId());
                     message.setFromId(cb.getFromAccount());
                     message.setToId(cb.getToAccount());
@@ -95,6 +97,7 @@ public class MessageServiceImpl implements MessageService {
                     onlineUserRepository.resetConversation(tracker.getConversationId());
 
                     // websocket，提醒用户同步消息 TODO
+//                    MessageInfo info = new MessageInfo()
 
                     break;
                 }
@@ -130,15 +133,7 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
-        // 获得咨询记录
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent() - 1, req.getConsultationSize());
-        List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
-
-        // 获得求助记录
-        var helpResult =  messageRepository.retrieveByConversationId(help.getId(), req.getHelpCurrent(), req.getHelpSize());
-        List<MessageInfo> helps = convertToInfoList(helpResult.getData());
-
-        return Responses.ok(new AllMsgListResponse(consultations, consultationResult.getTotal(), helps, helpResult.getTotal()));
+        return Responses.ok(consultationToResponse(req, consultation));
     }
 
     @Override
@@ -152,13 +147,12 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
-        var toId = consultation.getToUser().getId();
         List<Consulvisor> consulvisors = consulvisorRepository.retrieveBySupId(common.getUserId());
         List<String> consultantIds = new ArrayList<>();
         consulvisors.forEach(consulvisor -> {
             consultantIds.add(consulvisor.getConsultantId());
         });
-        if(!consultantIds.contains(toId)) {
+        if(!consultantIds.contains(consultation.getToUser().getId())) {
             throw new BadRequestException("该咨询师未绑定，不可查看其咨询详情");
         }
 
@@ -224,22 +218,68 @@ public class MessageServiceImpl implements MessageService {
         return Responses.ok(new MsgListResponse(consultations, consultationResult.getTotal()));
     }
 
-    private AllMsgListResponse consultationToResponse(AllMessageRequest req, Conversation consultation) {
-        // 获得咨询记录
-        var consultationResult =  messageRepository.retrieveByConversationId(consultation.getId(), req.getConsultationCurrent() - 1, req.getConsultationSize());
-        List<MessageInfo> consultations = convertToInfoList(consultationResult.getData());
-
-        // 没有求助督导
-        if(consultation.getHelper() == null) {
-            return new AllMsgListResponse(consultations, consultationResult.getTotal(), new ArrayList<>(), 0L);
+    @Override
+    public Responses<MsgListResponse> synchronizeConsultationMsg(SynchronizeMsgRequest req, Common common) {
+        Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
+        if(consultation == null || consultation.getHelper() == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+            throw new BadRequestException("该督导不存在此次会话");
         }
 
-        // 求助了督导
-        var help = conversationRepository.retrieveById(consultation.getHelper().getHelpId());
-        var helpResult =  messageRepository.retrieveByConversationId(help.getId(), req.getHelpCurrent() - 1, req.getHelpSize());
-        List<MessageInfo> helps = convertToInfoList(helpResult.getData());
+        long offset = Long.parseLong(consultation.getId()) << 32;
+        long end = req.getIterator();
 
-        return new AllMsgListResponse(consultations, consultationResult.getTotal(), helps, helpResult.getTotal());
+        if(req.getIterator() == -1) {
+            var total = messageRepository.retrieveTotalByConversationId(req.getConversationId());
+            if(total < end) {
+                end = total;
+            }
+        }
+
+        long begin = Math.max(end - req.getSize(), 0L);
+        List<Message> messages = messageRepository.retrieveMsgList(offset + begin, offset + end);
+
+        return null;
+    }
+
+    private AllMsgListResponse consultationToResponse(AllMessageRequest req, Conversation consultation) {
+        AllMsgListResponse response = new AllMsgListResponse();
+        List<MessageInfo> consultationMsg = new ArrayList<>();
+        List<MessageInfo> helpMsg = new ArrayList<>();
+
+        if(req.getConsultationIterator() != 0) {
+            // 需要获得咨询消息
+            consultationMsg = retrieveMsg(consultation.getId(), req.getConsultationIterator(), req.getSize());
+        }
+
+        if(consultation.getHelper() != null) {
+            response.setCallHelp(true);
+            if(req.getHelpIterator() != 0) {
+                // 需要获得求助消息
+                helpMsg = retrieveMsg(consultation.getHelper().getHelpId(), req.getHelpIterator(), req.getSize());
+            }
+        } else {
+            response.setCallHelp(false);
+        }
+
+        response.setConsultation(consultationMsg);
+        response.setHelp(helpMsg);
+        return response;
+    }
+
+    private List<MessageInfo> retrieveMsg(String conversationId, int consultationIterator, long size) {
+        long offset = Long.parseLong(conversationId) << 32;
+        long end = consultationIterator;
+
+        if(end == -1) {
+            var total = messageRepository.retrieveTotalByConversationId(conversationId);
+            if(total < end) {
+                end = total;
+            }
+        }
+
+        long begin = Math.max(end - size, 0L);
+        List<Message> messages = messageRepository.retrieveMsgList(offset + begin, offset + end);
+        return convertToInfoList(messages);
     }
 
 
@@ -251,6 +291,8 @@ public class MessageServiceImpl implements MessageService {
             messageInfo.setFromId(message.getFromId());
             messageInfo.setRevoked(message.isRevoked());
             messageInfo.setTime(message.getTime());
+            messageInfo.setMsgBody(message.getMsgBody());
+            messageInfo.setIterator(Long.parseLong(message.getMsgKey()) % OFFSET);
 
             if(!message.isRevoked()) {
                 messageInfo.setMsgBody(message.getMsgBody());
@@ -311,7 +353,7 @@ public class MessageServiceImpl implements MessageService {
             if (lastDotIndex == -1) { // 不合法url
                 throw new IllegalArgumentException("Invalid file URL");
             }
-            extension = soundElem.getUrl().substring(lastDotIndex + 1);
+            extension = soundElem.getUrl().substring(lastDotIndex + 1); // 获得后缀名
 
             // 下载语音文件到本地
             URL url = new URL(soundElem.getUrl());
@@ -365,7 +407,7 @@ public class MessageServiceImpl implements MessageService {
                 if (lastDotIndex == -1) { // 不合法url
                     throw new IllegalArgumentException("Invalid file URL");
                 }
-                extension = imageInfo.getURL().substring(lastDotIndex + 1);
+                extension = imageInfo.getURL().substring(lastDotIndex + 1); // 获得后缀名
 
                 // 下载图片文件到本地
                 URL url = new URL(imageInfo.getURL());

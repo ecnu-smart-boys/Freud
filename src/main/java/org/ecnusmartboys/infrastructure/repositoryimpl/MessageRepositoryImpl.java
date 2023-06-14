@@ -3,6 +3,7 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.application.dto.MessageInfo;
 import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.message.Message;
 import org.ecnusmartboys.domain.repository.MessageRepository;
@@ -47,6 +48,17 @@ public class MessageRepositoryImpl implements MessageRepository {
             return null;
         }
         return messageConvertor.toMessage(messageDO);
+    }
+
+    @Override
+    public long retrieveTotalByConversationId(String conversationId) {
+        return messageMapper.selectCount(new LambdaQueryWrapper<MessageDO>().eq(MessageDO::getConversationId, conversationId));
+    }
+
+    @Override
+    public List<Message> retrieveMsgList(long begin, long end) {
+        List<MessageDO> DOs = messageMapper.selectByRange(begin, end);
+        return messageConvertor.toMessages(DOs);
     }
 
 

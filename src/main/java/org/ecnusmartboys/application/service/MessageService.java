@@ -2,6 +2,7 @@ package org.ecnusmartboys.application.service;
 
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
+import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
@@ -47,5 +48,8 @@ public interface MessageService {
      */
     Responses<MsgListResponse> getHelpMsg(SingleMsgRequest req, Common common);
 
-
+    /**
+     * 督导同步咨询师和访客的聊天记录
+     */
+    Responses<MsgListResponse> synchronizeConsultationMsg(SynchronizeMsgRequest req, Common common);
 }

@@ -345,11 +345,13 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         if(Objects.equals(role, Consultant.ROLE)) {
             onlineConsultants.add(Long.valueOf(userId)); // 服务器重启后，redis不一致
             OnlineConsultant consultant = fetchConsultant(Long.parseLong(userId));
+            consultant.setMaxConcurrent(5); // TODO
             return consultant.getVisitors().size();
         }
 
         onlineSupervisors.add(Long.valueOf(userId));
         OnlineSupervisor supervisor = fetchSupervisor(Long.parseLong(userId));
+        supervisor.setMaxConcurrent(5); // TODO
         return supervisor.getConsultants().size();
     }
 
