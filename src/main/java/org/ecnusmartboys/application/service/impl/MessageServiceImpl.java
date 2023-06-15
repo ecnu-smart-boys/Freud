@@ -164,9 +164,6 @@ public class MessageServiceImpl implements MessageService {
         }
 
         Conversation consultation = conversationRepository.retrieveByHelperId(help.getId());
-        if(consultation.getEndTime() == null) {
-            throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
-        }
 
         return Responses.ok(consultationToResponse(req, consultation));
     }
@@ -185,6 +182,10 @@ public class MessageServiceImpl implements MessageService {
         });
         if(!consultantIds.contains(consultation.getToUser().getId())) {
             throw new BadRequestException("该咨询师未绑定，不可查看其咨询详情");
+        }
+
+        if(consultation.getEndTime() == null) {
+            throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
         return Responses.ok(consultationToResponse(req, consultation));

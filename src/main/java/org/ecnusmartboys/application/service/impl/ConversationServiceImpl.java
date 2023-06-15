@@ -344,7 +344,7 @@ public class ConversationServiceImpl implements ConversationService {
         if(comment == null) {
             throw new BadRequestException("会话不存在，无法评论");
 
-        } else if(!Objects.equals(comment.getUserId(), comment.getId())) {
+        } else if(!Objects.equals(comment.getUserId(), common.getUserId())) {
             throw new BadRequestException("你没有资格评论");
 
         } else if(comment.getCommented()) {
@@ -368,7 +368,7 @@ public class ConversationServiceImpl implements ConversationService {
         if(comment == null) {
             throw new BadRequestException("会话不存在，无法评论");
 
-        } else if(!Objects.equals(comment.getUserId(), comment.getId())) {
+        } else if(!Objects.equals(comment.getUserId(), common.getUserId())) {
             throw new BadRequestException("你没有资格评论");
 
         } else if(comment.getCommented()) {
@@ -675,7 +675,7 @@ public class ConversationServiceImpl implements ConversationService {
         var toUser = consultation.getToUser();
         var fromUser = consultation.getFromUser();
         ConsultationInfo consultationInfo =
-                new ConsultationInfo(toUser.getId(), fromUser.getId(), toUser.getName(), toUser.getAvatar(), fromUser.getPhone(),
+                new ConsultationInfo(consultation.getId(), toUser.getId(), fromUser.getId(), toUser.getName(), toUser.getAvatar(), fromUser.getPhone(),
                         fromUser.getName(), fromUser.getAvatar(), consultation.getStartTime(), System.currentTimeMillis(), false);
 
         // 会话未结束
