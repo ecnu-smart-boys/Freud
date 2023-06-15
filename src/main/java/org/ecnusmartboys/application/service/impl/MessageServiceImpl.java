@@ -28,6 +28,7 @@ import org.ecnusmartboys.domain.repository.ConversationRepository;
 import org.ecnusmartboys.domain.repository.MessageRepository;
 import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.infrastructure.config.CosConfig;
+import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Resource
     CosConfig cosConfig;
+
+    @Resource
+    IMConfig imConfig;
 
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -117,7 +121,10 @@ public class MessageServiceImpl implements MessageService {
         return Responses.ok();
     }
 
-
+    @Override
+    public Responses<String> generateUserSig(Common common) {
+        return Responses.ok(imConfig.getUserSig(common.getUserId()));
+    }
 
     @Override
     public Responses<AllMsgListResponse> getSupervisorOwnHelpMsg(AllMessageRequest req, Common common) {

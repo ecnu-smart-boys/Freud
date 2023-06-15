@@ -19,6 +19,11 @@ public interface MessageService {
     Responses<?> callback(IMCallbackParam param, String body, HttpServletRequest request);
 
     /**
+     * 生成签名
+     */
+    Responses<String> generateUserSig(Common common);
+
+    /**
      * 督导查看自己的求助记录消息列表
      */
     Responses<AllMsgListResponse> getSupervisorOwnHelpMsg(AllMessageRequest req, Common common);

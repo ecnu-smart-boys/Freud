@@ -45,6 +45,14 @@ public class IMController {
         return messageService.callback(param, body, request);
     }
 
+    @AuthRoles({Supervisor.ROLE,Visitor.ROLE,Consultant.ROLE})
+    @ApiOperation(value = "获取微信IM签名")
+    @GetMapping("/generateUserSig")
+    public Responses<String> generateUserSig(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return messageService.generateUserSig(common);
+    }
+
     @AuthRoles(Supervisor.ROLE)
     @ApiOperation(value = "督导查看自己的求助记录消息列表")
     @GetMapping("/details/supervisorOwnHelpMsg")
