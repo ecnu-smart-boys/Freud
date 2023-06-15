@@ -406,11 +406,23 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
 
-    public void addConversation(String conversationId, String fromId, String toId) {
+    public void addConsultation(String conversationId, String fromId, String toId) {
         long cId = Long.parseLong(fromId);
         long sId = Long.parseLong(toId);
         long identifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
         tracker.put(identifier, new ConversationMsgTracker(conversationId));
+    }
+
+    @Override
+    public void addHelp(String conversationId, String consultantId, String supervisorId, String visitorId) {
+        long cId = Long.parseLong(consultantId);
+        long sId = Long.parseLong(supervisorId);
+        long helpIdentifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
+        tracker.put(helpIdentifier, new ConversationMsgTracker(conversationId));
+
+        var tracker = fetchTracker(visitorId, consultantId);
+        tracker.setSupervisorId(sId);
+        tracker.setHelpId(conversationId);
     }
 
     private void removeConversation(String fromId, String toId) {

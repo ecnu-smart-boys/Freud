@@ -108,8 +108,11 @@ public interface OnlineUserRepository {
      */
     Set<String> retrieveAvailableSupervisors(String consultantId);
 
-    void addConversation(String conversationId, String fromId, String toId);
+    void addConsultation(String conversationId, String fromId, String toId);
+
+    void addHelp(String conversationId, String consultantId, String supervisorId, String visitorId);
 
     ConversationMsgTracker fetchTracker(String fromAccount, String toAccount);
+
 
 }

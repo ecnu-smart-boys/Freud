@@ -20,9 +20,12 @@ import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
 import org.ecnusmartboys.application.dto.response.SigResponse;
+import org.ecnusmartboys.application.dto.ws.MsgNotification;
+import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.message.Message;
+import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.domain.repository.ConversationRepository;
@@ -32,6 +35,7 @@ import org.ecnusmartboys.infrastructure.config.CosConfig;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -55,10 +59,11 @@ public class MessageServiceImpl implements MessageService {
     private final ConsulvisorRepository consulvisorRepository;
     private final MessageRepository messageRepository;
     private final OnlineUserRepository onlineUserRepository;
+    private final WebSocketServer webSocketServer;
 
     private static final String BASE_URL = "https://freud-1311238733.cos.ap-shanghai.myqcloud.com/";
-
     private static final long OFFSET = 1L << 32;
+
 
     @Resource
     CosConfig cosConfig;
@@ -101,11 +106,22 @@ public class MessageServiceImpl implements MessageService {
                     // 重置超时计时
                     onlineUserRepository.resetConversation(tracker.getConversationId());
 
-                    // websocket，通知督导同步消息 TODO
+                    // websocket，通知督导同步消息
+                    if(tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
+                        MsgNotification msgNotification = new MsgNotification(tracker.getHelpId(), tracker.getConversationId(), convertToInfo(message));
+                        Notify notify = new Notify("newMsg", msgNotification);
+                        webSocketServer.notifyUser(tracker.getSupervisorId(), mapper.writeValueAsString(notify));
+                    }
                     break;
                 }
                 case AFTER_MSG_WITHDRAW: {
-                    var cb = mapper.readValue(body, AfterMsgWithdrawCallback.class);
+                    var cb = mapper.readValue(body, AfterSendMsgCallback.class);
+                    var tracker = onlineUserRepository.fetchTracker(cb.getFromAccount(), cb.getToAccount());
+                    if(tracker == null) {
+                        // 没有这个在线会话，这是个野消息
+                        return Responses.ok();
+                    }
+
                     var key = cb.getMsgKey(); // 消息的唯一表示
                     Message message = messageRepository.retrieveByKey(key);
                     if(message == null) {
@@ -113,6 +129,13 @@ public class MessageServiceImpl implements MessageService {
                     }
                     message.setRevoked(true);
                     messageRepository.update(message);
+
+                    // websocket，通知督导同步消息
+                    if(tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
+                        MsgNotification msgNotification = new MsgNotification(tracker.getHelpId(), tracker.getConversationId(), convertToInfo(message));
+                        Notify notify = new Notify("revoke", msgNotification);
+                        webSocketServer.notifyUser(tracker.getSupervisorId(), mapper.writeValueAsString(notify));
+                    }
                     break;
                 }
             }
@@ -155,10 +178,6 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该咨询记录不存在");
         }
 
-        if(consultation.getEndTime() == null) {
-            throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
-        }
-
         List<Consulvisor> consulvisors = consulvisorRepository.retrieveBySupId(common.getUserId());
         List<String> consultantIds = new ArrayList<>();
         consulvisors.forEach(consulvisor -> {
@@ -176,10 +195,6 @@ public class MessageServiceImpl implements MessageService {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
         if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("咨询师不存在该咨询记录");
-        }
-
-        if(consultation.getEndTime() == null) {
-            throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
         return Responses.ok(consultationToResponse(req, consultation));
@@ -267,20 +282,23 @@ public class MessageServiceImpl implements MessageService {
     private List<MessageInfo> convertToInfoList(List<Message> messages) {
         List<MessageInfo> messageInfos = new ArrayList<>();
         messages.forEach(message -> {
-            MessageInfo messageInfo = new MessageInfo();
-            messageInfo.setToId(message.getToId());
-            messageInfo.setFromId(message.getFromId());
-            messageInfo.setRevoked(message.isRevoked());
-            messageInfo.setMsgKey(message.getMsgKey());
-            messageInfo.setTime(message.getTime());
-            messageInfo.setIterator(message.getIterator() % OFFSET);
-
-            if(!message.isRevoked()) {
-                messageInfo.setMsgBody(message.getMsgBody());
-            }
-            messageInfos.add(messageInfo);
+            messageInfos.add(convertToInfo(message));
         });
         return messageInfos;
+    }
+
+    private MessageInfo convertToInfo(Message message) {
+        MessageInfo messageInfo = new MessageInfo(); messageInfo.setToId(message.getToId());
+        messageInfo.setFromId(message.getFromId());
+        messageInfo.setRevoked(message.isRevoked());
+        messageInfo.setMsgKey(message.getMsgKey());
+        messageInfo.setTime(message.getTime());
+        messageInfo.setIterator(message.getIterator() % OFFSET);
+
+        if(!message.isRevoked()) {
+            messageInfo.setMsgBody(message.getMsgBody());
+        }
+        return messageInfo;
     }
 
     private String parseMsgBody(String msgKey, String msgBody) throws Exception {

@@ -191,7 +191,7 @@ public class ConversationServiceImpl implements ConversationService {
         // 初始化该会话的计时
         onlineUserRepository.resetConversation(conversation.getId());
         // 开始跟踪该会话的消息记录
-        onlineUserRepository.addConversation(conversation.getId(), common.getUserId(), req.getToId());
+        onlineUserRepository.addConsultation(conversation.getId(), common.getUserId(), req.getToId());
 
         // ws通知咨询师
         LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -292,7 +292,7 @@ public class ConversationServiceImpl implements ConversationService {
         // 初始化该会话的计时
         onlineUserRepository.resetConversation(help.getId());
         // 开始跟踪该会话的消息记录
-        onlineUserRepository.addConversation(help.getId(), common.getUserId(), req.getToId());
+        onlineUserRepository.addHelp(help.getId(), common.getUserId(), req.getToId(), conversation.getFromUser().getId());
 
         // ws发消息给督导
         LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
@@ -357,6 +357,8 @@ public class ConversationServiceImpl implements ConversationService {
         comment.setScore(req.getScore());
 
         conversationRepository.saveComment(comment);
+        // ws同步评价内容
+        notifyComment(req.getConversationId(), common.getUserId());
         return Responses.ok("评价成功");
     }
 
@@ -379,6 +381,8 @@ public class ConversationServiceImpl implements ConversationService {
         comment.setTag(req.getTag());
 
         conversationRepository.saveComment(comment);
+        // ws同步评价内容
+        notifyComment(req.getConversationId(), common.getUserId());
         return Responses.ok("评价成功");
     }
 
@@ -731,7 +735,7 @@ public class ConversationServiceImpl implements ConversationService {
             // 初始化该会话的计时
             onlineUserRepository.resetConversation(conversation.getId());
             // 开始跟踪该会话的消息记录
-            onlineUserRepository.addConversation(conversation.getId(), visitorId, consultantId);
+            onlineUserRepository.addConsultation(conversation.getId(), visitorId, consultantId);
 
             // ws通知双方会话开始
             LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -874,6 +878,31 @@ public class ConversationServiceImpl implements ConversationService {
             // 发送给访客
             var notifyVisitor = new Notify("endConsultation", conversation.getId());
             webSocketServer.notifyUser(Long.valueOf(conversation.getFromUser().getId()), mapper.writeValueAsString(notifyVisitor));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void notifyComment(String conversationId, String userId) {
+        var conversation = conversationRepository.retrieveById(conversationId);
+        var notify = new Notify("comment", conversation.getId());
+
+        try {
+
+            if(Objects.equals(conversation.getFromUser().getId(), userId)) {
+                // 发送给咨询师
+                webSocketServer.notifyUser(Long.valueOf(conversation.getToUser().getId()), mapper.writeValueAsString(notify));
+            } else {
+                // 发送给访客
+                webSocketServer.notifyUser(Long.valueOf(conversation.getFromUser().getId()), mapper.writeValueAsString(notify));
+            }
+
+
+            if(conversation.getHelper() != null) {
+                // 同步给督导
+                webSocketServer.notifyUser(Long.valueOf(conversation.getHelper().getSupervisor().getId()),
+                        mapper.writeValueAsString(notify));
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
