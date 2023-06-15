@@ -123,7 +123,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Responses<String> generateUserSig(Common common) {
-        return Responses.ok(imConfig.getUserSig(common.getUserId()));
+        String sig;
+        try {
+            sig = imConfig.getUserSig(common.getUserId());
+        } catch (Exception e) {
+            throw new BadRequestException("生成错误");
+        }
+        return Responses.ok(sig);
     }
 
     @Override
