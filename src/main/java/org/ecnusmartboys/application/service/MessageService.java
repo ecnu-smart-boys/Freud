@@ -7,6 +7,7 @@ import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
+import org.ecnusmartboys.application.dto.response.SigResponse;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public interface MessageService {
     /**
      * 生成签名
      */
-    Responses<String> generateUserSig(Common common);
+    Responses<SigResponse> generateUserSig(Common common);
 
     /**
      * 督导查看自己的求助记录消息列表

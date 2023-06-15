@@ -13,6 +13,7 @@ import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
+import org.ecnusmartboys.application.dto.response.SigResponse;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.ecnusmartboys.domain.model.user.Consultant;
@@ -48,7 +49,7 @@ public class IMController {
     @AuthRoles({Supervisor.ROLE,Visitor.ROLE,Consultant.ROLE})
     @ApiOperation(value = "获取微信IM签名")
     @GetMapping("/generateUserSig")
-    public Responses<String> generateUserSig(HttpServletRequest request) {
+    public Responses<SigResponse> generateUserSig(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return messageService.generateUserSig(common);
     }

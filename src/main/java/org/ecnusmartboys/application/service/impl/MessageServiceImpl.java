@@ -19,6 +19,7 @@ import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
+import org.ecnusmartboys.application.dto.response.SigResponse;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.message.Message;
@@ -122,14 +123,14 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Responses<String> generateUserSig(Common common) {
+    public Responses<SigResponse> generateUserSig(Common common) {
         String sig;
         try {
             sig = imConfig.getUserSig(common.getUserId());
         } catch (Exception e) {
             throw new BadRequestException("生成错误");
         }
-        return Responses.ok(sig);
+        return Responses.ok(new SigResponse(sig));
     }
 
     @Override
