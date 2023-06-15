@@ -113,14 +113,17 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             var visitorInfoDO = userConvertor.toVisitorInfoDO((Visitor) user);
             visitorInfoDO.setVisitorId(userDO.getId());
             visitorInfoMapper.insert(visitorInfoDO);
+            user.setId(String.valueOf(visitorInfoDO.getVisitorId()));
         } else if (user instanceof Consultant) {
             var staffInfoDO = userConvertor.toStaffInfoDO((Consultant) user);
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.insert(staffInfoDO);
+            user.setId(String.valueOf(staffInfoDO.getStaffId()));
         } else if(user instanceof Supervisor) {
             var staffInfoDO = userConvertor.toStaffInfoDO((Supervisor) user);
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.insert(staffInfoDO);
+            user.setId(String.valueOf(staffInfoDO.getStaffId()));
         }
     }
 
