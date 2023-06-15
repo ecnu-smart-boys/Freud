@@ -1,5 +1,6 @@
 package org.ecnusmartboys.application.service;
 
+import org.ecnusmartboys.application.dto.AvailableConsultant;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
@@ -67,6 +68,8 @@ public interface ConversationService {
     Responses<OnlineInfoResponse> getOnlineBoundConsultantInfo(OnlineStaffListRequest req, Common common);
 
     Responses<Integer> getOnlineConversationNumber(Common common);
+
+    Responses<List<AvailableConsultant>> getAvailableConsultants(Common common);
 
     Responses<WebConversationInfoResponse> getSupervisorOwnHelpInfo(String helpId, Common common);
 

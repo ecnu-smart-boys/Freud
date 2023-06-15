@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -19,10 +20,10 @@ public class SingleMsgRequest {
     private String conversationId;
 
     @ApiModelProperty("消息迭代器")
-    @NotBlank(message = "消息迭代器不能为空")
+    @NotNull(message = "消息迭代器不能为空")
     private int iterator;
 
-    @NotBlank(message = "获取消息的条数不能为0")
+    @NotNull(message = "获取消息的条数不能为0")
     @Min(value = 1, message = "每次获取消息的条数必须是一个正整数")
     private long size;
 }

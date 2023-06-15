@@ -14,11 +14,11 @@ public class AllMessageRequest {
     @NotBlank(message = "会话id不能为空")
     private String conversationId;
 
-    @NotBlank(message = "咨询会话消息的迭代器不能为空")
+    @NotNull(message = "咨询会话消息的迭代器不能为空")
     @ApiModelProperty("咨询会话消息的迭代器，-1表示首页，0表示不用传")
     private int consultationIterator;
 
-    @NotBlank(message = "求助消息的迭代器不能为空")
+    @NotNull(message = "求助消息的迭代器不能为空")
     @ApiModelProperty("求助消息的迭代器，-1表示首页，0表示不用传")
     private int helpIterator;
 

@@ -10,10 +10,7 @@ import io.github.doocs.im.model.request.SendMsgRequest;
 import io.github.doocs.im.model.response.SendMsgResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.application.dto.ConsultRecordInfo;
-import org.ecnusmartboys.application.dto.HelpRecordInfo;
-import org.ecnusmartboys.application.dto.RankUserInfo;
-import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.conversation.HelpInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
@@ -475,6 +472,39 @@ public class ConversationServiceImpl implements ConversationService {
         User user = userRepository.retrieveById(common.getUserId());
         var result = onlineUserRepository.getOnlineConversationNumber(common.getUserId(), user.getRole());
         return Responses.ok(result);
+    }
+
+    @Override
+    public Responses<List<AvailableConsultant>> getAvailableConsultants(Common common) {
+        List<AvailableConsultant> availableConsultants = new ArrayList<>();
+        var response = onlineUserRepository.getOnlineConsultantsInfo(0, 100);
+        var consultants = response.getStaffs();
+        consultants.forEach(consultant -> {
+            AvailableConsultant availableConsultant = new AvailableConsultant();
+            availableConsultant.setState(consultant.getState());
+            availableConsultant.setConsultantId(consultant.getUserId());
+
+            var user = userRepository.retrieveById(consultant.getUserId());
+            availableConsultant.setName(user.getName());
+            availableConsultant.setAvatar(user.getAvatar());
+            availableConsultant.setHasConsulted(false);
+
+            var consultations = conversationRepository.retrieveConsultationByToId(user.getId());
+            if(consultations.size() == 0) {
+                availableConsultant.setAvgComment(0);
+            } else {
+                int score = 0;
+                for(var consultation : consultations) {
+                    score += consultation.getFromUserComment().getScore();
+                    if(Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
+                        availableConsultant.setHasConsulted(true);
+                    }
+                }
+            }
+
+            availableConsultants.add(availableConsultant);
+        });
+        return Responses.ok(availableConsultants);
     }
 
     @Override

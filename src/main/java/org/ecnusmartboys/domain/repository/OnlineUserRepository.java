@@ -111,4 +111,5 @@ public interface OnlineUserRepository {
     void addConversation(String conversationId, String fromId, String toId);
 
     ConversationMsgTracker fetchTracker(String fromAccount, String toAccount);
+
 }

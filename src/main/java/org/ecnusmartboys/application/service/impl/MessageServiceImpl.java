@@ -231,6 +231,8 @@ public class MessageServiceImpl implements MessageService {
 
         response.setConsultation(consultationMsg);
         response.setHelp(helpMsg);
+
+
         return response;
     }
 
@@ -239,10 +241,7 @@ public class MessageServiceImpl implements MessageService {
         long end = consultationIterator;
 
         if(end == -1) {
-            var total = messageRepository.retrieveTotalByConversationId(conversationId);
-            if(total < end) {
-                end = total;
-            }
+            end = messageRepository.retrieveTotalByConversationId(conversationId);
         }
 
         long begin = Math.max(end - size, 0L);
@@ -258,9 +257,9 @@ public class MessageServiceImpl implements MessageService {
             messageInfo.setToId(message.getToId());
             messageInfo.setFromId(message.getFromId());
             messageInfo.setRevoked(message.isRevoked());
+            messageInfo.setMsgKey(message.getMsgKey());
             messageInfo.setTime(message.getTime());
-            messageInfo.setMsgBody(message.getMsgBody());
-            messageInfo.setIterator(Long.parseLong(message.getMsgKey()) % OFFSET);
+            messageInfo.setIterator(message.getIterator() % OFFSET);
 
             if(!message.isRevoked()) {
                 messageInfo.setMsgBody(message.getMsgBody());

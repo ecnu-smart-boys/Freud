@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.api.Extractor;
 import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.application.dto.AvailableConsultant;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
@@ -187,6 +188,14 @@ public class ConversationController {
 
     /************************* 进行在线咨询会话 *************************/
 
+    @AuthRoles(Visitor.ROLE)
+    @GetMapping("availableConsultants")
+    @ApiOperation("访客获得在线咨询师列表")
+    public Responses<List<AvailableConsultant>> getAvailableConsultants(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getAvailableConsultants(common);
+    }
+
 //    @AuthRoles(Visitor.ROLE)
     @AnonymousAccess
     @PostMapping("/consult")
@@ -321,6 +330,4 @@ public class ConversationController {
         var common = Extractor.extract(request);
         return conversationService.removeConversation(req, common);
     }
-
-
 }

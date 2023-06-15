@@ -17,6 +17,8 @@ public class MessageInfo {
 
     private String msgBody;
 
+    private String msgKey;
+
     private long time;
 
     private boolean revoked;
