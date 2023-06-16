@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Visitor extends User {
     public static final String ROLE = "visitor";
+    private String role = ROLE;
     private String emergencyContact;
     private String emergencyPhone;
 
