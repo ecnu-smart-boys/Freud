@@ -1,4 +1,4 @@
-package org.ecnusmartboys.api.interceptor;
+package org.ecnusmartboys.adaptor.interceptor;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

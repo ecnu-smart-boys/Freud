@@ -1,7 +1,7 @@
 package org.ecnusmartboys.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
-import org.ecnusmartboys.api.interceptor.WebSocketInterceptor;
+import org.ecnusmartboys.adaptor.interceptor.WebSocketInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

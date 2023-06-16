@@ -1,7 +1,7 @@
 package wx;
 
 import org.ecnusmartboys.FreudApp;
-import org.ecnusmartboys.api.controller.AuthController;
+import org.ecnusmartboys.adaptor.controller.AuthController;
 import org.ecnusmartboys.infrastructure.mapper.VisitorInfoMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

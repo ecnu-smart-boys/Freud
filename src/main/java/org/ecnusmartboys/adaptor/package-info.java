@@ -11,4 +11,4 @@
  * 表面,门面(Facade): Facade的用意在于为远程客户端提供粗粒度的调用接口。
  * 它的主要工作就是将一个用户请求委派给一个或多个Service进行处理,也就是我们常说的Controller。<p>
  */
-package org.ecnusmartboys.api;
+package org.ecnusmartboys.adaptor;

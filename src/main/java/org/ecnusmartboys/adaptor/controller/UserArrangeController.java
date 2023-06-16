@@ -1,11 +1,11 @@
-package org.ecnusmartboys.api.controller;
+package org.ecnusmartboys.adaptor.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.api.Extractor;
-import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.adaptor.Extractor;
+import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.UserListReq;
@@ -15,7 +15,6 @@ import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.user.Admin;
-import org.ecnusmartboys.domain.model.user.Visitor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;

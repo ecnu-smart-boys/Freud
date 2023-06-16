@@ -1,12 +1,12 @@
-package org.ecnusmartboys.api.controller;
+package org.ecnusmartboys.adaptor.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.api.Extractor;
-import org.ecnusmartboys.api.annotation.AnonymousAccess;
-import org.ecnusmartboys.api.constance.SessionKey;
+import org.ecnusmartboys.adaptor.Extractor;
+import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
+import org.ecnusmartboys.adaptor.constance.SessionKey;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.StaffLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;

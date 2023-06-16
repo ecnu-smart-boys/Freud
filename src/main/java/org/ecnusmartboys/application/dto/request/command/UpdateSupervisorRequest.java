@@ -4,10 +4,9 @@ import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ecnusmartboys.api.annotation.IdNumber;
+import org.ecnusmartboys.adaptor.annotation.IdNumber;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;

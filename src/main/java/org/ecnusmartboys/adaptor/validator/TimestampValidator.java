@@ -1,7 +1,7 @@
-package org.ecnusmartboys.api.validator;
+package org.ecnusmartboys.adaptor.validator;
 
 
-import org.ecnusmartboys.api.annotation.Timestamp;
+import org.ecnusmartboys.adaptor.annotation.Timestamp;
 import org.ecnusmartboys.infrastructure.utils.Validator;
 
 import javax.validation.ConstraintValidator;

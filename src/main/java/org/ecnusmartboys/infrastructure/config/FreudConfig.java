@@ -1,7 +1,7 @@
 package org.ecnusmartboys.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
-import org.ecnusmartboys.api.interceptor.AuthenticationInterceptor;
+import org.ecnusmartboys.adaptor.interceptor.AuthenticationInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

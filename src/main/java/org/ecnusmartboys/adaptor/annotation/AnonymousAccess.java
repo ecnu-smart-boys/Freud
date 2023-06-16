@@ -1,4 +1,4 @@
-package org.ecnusmartboys.api.annotation;
+package org.ecnusmartboys.adaptor.annotation;
 
 import java.lang.annotation.*;
 

@@ -1,8 +1,8 @@
-package org.ecnusmartboys.api.interceptor;
+package org.ecnusmartboys.adaptor.interceptor;
 
 import lombok.RequiredArgsConstructor;
-import org.ecnusmartboys.api.Extractor;
-import org.ecnusmartboys.api.annotation.AuthRoles;
+import org.ecnusmartboys.adaptor.Extractor;
+import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;

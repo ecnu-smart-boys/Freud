@@ -1,6 +1,6 @@
-package org.ecnusmartboys.api;
+package org.ecnusmartboys.adaptor;
 
-import org.ecnusmartboys.api.constance.SessionKey;
+import org.ecnusmartboys.adaptor.constance.SessionKey;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.Extra;
 import org.ecnusmartboys.infrastructure.utils.RequestUtil;

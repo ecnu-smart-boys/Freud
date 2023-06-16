@@ -1,4 +1,4 @@
-package org.ecnusmartboys.api.filter;
+package org.ecnusmartboys.adaptor.filter;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;

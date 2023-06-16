@@ -1,6 +1,6 @@
-package org.ecnusmartboys.api.annotation;
+package org.ecnusmartboys.adaptor.annotation;
 
-import org.ecnusmartboys.api.validator.TimestampValidator;
+import org.ecnusmartboys.adaptor.validator.PhoneValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -9,12 +9,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD, ElementType.PARAMETER})
+@Target({ ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = TimestampValidator.class)
-public @interface Timestamp {
+@Constraint(validatedBy = PhoneValidator.class)
+public @interface Phone {
 
-    String message() default "时间戳范围在2023年1月1日到2024年12月31日";
+    String message() default "手机号格式不正确";
 
     Class<?>[] groups() default { };
 

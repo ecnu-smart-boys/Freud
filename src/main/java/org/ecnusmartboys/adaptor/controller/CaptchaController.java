@@ -1,9 +1,9 @@
-package org.ecnusmartboys.api.controller;
+package org.ecnusmartboys.adaptor.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.ecnusmartboys.api.annotation.AnonymousAccess;
+import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.Captcha;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;

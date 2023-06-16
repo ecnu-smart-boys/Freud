@@ -3,12 +3,10 @@ package org.ecnusmartboys.application.dto.request.query;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ecnusmartboys.api.annotation.Timestamp;
+import org.ecnusmartboys.adaptor.annotation.Timestamp;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package org.ecnusmartboys.application.dto.request.command;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.ecnusmartboys.api.annotation.Phone;
+import org.ecnusmartboys.adaptor.annotation.Phone;
 
 @Data
 @ApiModel("发送短信验证码请求")
