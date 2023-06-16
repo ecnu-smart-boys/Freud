@@ -12,8 +12,4 @@ public class StartConsultRequest {
     @NotNull(message = "咨询师id不能为空")
     @ApiModelProperty("咨询师id")
     private String toId;
-
-    @NotNull
-    @ApiModelProperty("我的id")
-    private String myId;
 }

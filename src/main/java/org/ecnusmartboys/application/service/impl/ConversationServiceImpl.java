@@ -170,7 +170,7 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     @Transactional
-    public Responses<Object> startConversation(StartConsultRequest req, Common common) {
+    public Responses<LeftConversation> startConversation(StartConsultRequest req, Common common) {
         // 该咨询师是否在线
         var result = onlineUserRepository.isConsultantOnline(req.getToId());
         if(!result) {

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @ApiModel("微信访客咨询记录列表信息")
 public class WxConsultRecordInfo {
 
+
+
     @ApiModelProperty("咨询师姓名")
     private String consultantName;
 

@@ -15,6 +15,7 @@ import org.ecnusmartboys.application.dto.response.SupervisorsResponse;
 import org.ecnusmartboys.application.dto.response.VisitorsResponse;
 import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.user.Admin;
+import org.ecnusmartboys.domain.model.user.Visitor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;

@@ -39,7 +39,7 @@ public interface ConversationService {
 
     Responses<List<ConversationInfo>> getTodayHelps(Common common);
 
-    Responses<Object> startConversation(StartConsultRequest req, Common common);
+    Responses<LeftConversation> startConversation(StartConsultRequest req, Common common);
 
     Responses<EndConsultResponse> endConsultation(EndConsultRequest req, Common common);
 

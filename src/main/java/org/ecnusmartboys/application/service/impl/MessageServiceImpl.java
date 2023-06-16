@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import io.github.doocs.im.model.callback.AfterMsgWithdrawCallback;
+import io.github.doocs.im.constant.MsgType;
 import io.github.doocs.im.model.callback.AfterSendMsgCallback;
+import io.github.doocs.im.model.message.TIMImageMsgElement;
+import io.github.doocs.im.model.message.TIMMsgElement;
+import io.github.doocs.im.model.message.TIMSoundMsgElement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.MessageInfo;
-import org.ecnusmartboys.application.dto.message.*;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
@@ -87,9 +89,8 @@ public class MessageServiceImpl implements MessageService {
                     }
 
                     long iterator = tracker.increment();
-
-                    String msgBody = mapper.writeValueAsString(cb.getMsgBody());
-                    String newBody = parseMsgBody(String.valueOf(iterator) , msgBody);
+                    parseMsgBody(String.valueOf(iterator), cb.getMsgBody());
+                    var msgBody = mapper.writeValueAsString(cb.getMsgBody());
 
                     // 保存消息
                     Message message = new Message();
@@ -98,7 +99,7 @@ public class MessageServiceImpl implements MessageService {
                     message.setConversationId(tracker.getConversationId());
                     message.setFromId(cb.getFromAccount());
                     message.setToId(cb.getToAccount());
-                    message.setMsgBody(newBody); // 消息体
+                    message.setMsgBody(msgBody); // 消息体
                     message.setRevoked(false);
                     message.setTime(cb.getMsgTime());
                     messageRepository.save(message);
@@ -262,7 +263,6 @@ public class MessageServiceImpl implements MessageService {
         response.setConsultation(consultationMsg);
         response.setHelp(helpMsg);
 
-
         return response;
     }
 
@@ -302,61 +302,49 @@ public class MessageServiceImpl implements MessageService {
         return messageInfo;
     }
 
-    private String parseMsgBody(String msgKey, String msgBody) throws Exception {
-        MessageBody[] messageBodies = null;
+    private void parseMsgBody(String msgKey, List<TIMMsgElement> elements) throws Exception {
         try {
-            messageBodies = mapper.readValue(msgBody, MessageBody[].class);
-
-            for(int index = 0; index < messageBodies.length; index++) {
-                if(Objects.equals(messageBodies[index].getMsgType(), TextElem.TYPE)) {
+            for(int index = 0; index < elements.size(); index++) {
+                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_TEXT_ELEM)) {
                     // 文本类型
                     continue;
                 }
 
-                if(Objects.equals(messageBodies[index].getMsgType(), SoundElem.TYPE)) {
+                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_SOUND_ELEM)) {
                     // 语音类型，解析为sound类型
-                    parseSoundContent(msgKey, index, (SoundElem) messageBodies[index].getMsgContent());
+                    parseSoundContent(msgKey, index, ((TIMSoundMsgElement) elements.get(index)).getMsgContent());
                     continue;
                 }
 
-                if(Objects.equals(messageBodies[index].getMsgType(), ImageElem.TYPE)) {
+                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_IMAGE_ELEM)) {
                     // 图片类型，解析为image类型
-                    parseImageContent(msgKey, index, (ImageElem) messageBodies[index].getMsgContent());
+                    parseImageContent(msgKey, index, ((TIMImageMsgElement) elements.get(index)).getMsgContent());
                     continue;
                 }
-
-                if(Objects.equals(messageBodies[index].getMsgType(), EmojiElem.TYPE)) {
-                    // 表情类型
-                    continue;
-                }
-
                 // 非法消息类型
                 throw new RuntimeException("非法消息类型");
             }
-
-            // 重新序列化为json
-            return mapper.writeValueAsString(messageBodies);
         } catch (Exception e) {
             throw new Exception(e);
         }
     }
 
-    private void parseSoundContent(String msgKey, int index, SoundElem soundElem) {
+    private void parseSoundContent(String msgKey, int index, TIMSoundMsgElement.SoundMsgContent msgContent) {
         String fileName = msgKey + "_" + index;
         String extension = "";
         try {
-            if(Objects.equals(soundElem.getUrl(), "")) {
+            if(Objects.equals(msgContent.getUrl(), "")) {
                 return;
             }
 
-            int lastDotIndex = soundElem.getUrl().lastIndexOf('.');
+            int lastDotIndex = msgContent.getUrl() .lastIndexOf('.');
             if (lastDotIndex == -1) { // 不合法url
                 throw new IllegalArgumentException("Invalid file URL");
             }
-            extension = soundElem.getUrl().substring(lastDotIndex + 1); // 获得后缀名
+            extension = msgContent.getUrl().substring(lastDotIndex + 1); // 获得后缀名
 
             // 下载语音文件到本地
-            URL url = new URL(soundElem.getUrl());
+            URL url = new URL(msgContent.getUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             // 获取输入流
             InputStream inputStream = connection.getInputStream();
@@ -364,7 +352,7 @@ public class MessageServiceImpl implements MessageService {
             // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(inputStream.available());
-            PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), "sound/" + fileName + extension, inputStream, metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), "sound/" + fileName + '.' + extension, inputStream, metadata);
 
             // 执行文件上传
             PutObjectResult putObjectResult = cosConfig.cosClient().putObject(putObjectRequest);
@@ -374,11 +362,11 @@ public class MessageServiceImpl implements MessageService {
             // 处理上传结果
             if (putObjectResult != null) {
                 // 上传成功，修改消息的url
-                soundElem.setUrl(BASE_URL + "sound/" + fileName + extension);
+                msgContent.setUrl(BASE_URL + "sound/" + fileName + '.' + extension);
 
             } else {
                 // 上传失败，消息url设置为空
-                soundElem.setUrl("");
+                msgContent.setUrl("");
 
             }
         } catch (JsonProcessingException e) {
@@ -386,37 +374,38 @@ public class MessageServiceImpl implements MessageService {
             throw new RuntimeException(e);
         } catch (MalformedURLException e) {
             // URL 非法，进行异常处理
-            throw new IllegalArgumentException("Invalid URL: " + soundElem.getUrl());
+            throw new IllegalArgumentException("Invalid URL" + msgContent.getUrl());
         } catch (IOException e) {
             // 其他 IO 异常，进行异常处理
             throw new RuntimeException("Failed to download sound file: " + e.getMessage());
         }
     }
 
-    private void parseImageContent(String msgKey, int index, ImageElem imageElem) {
+        private void parseImageContent(String msgKey, int index, TIMImageMsgElement.ImageMsgContent msgContent) {
         String fileName = msgKey + "_" + index;
         String extension = "";
         try {
-            for(int i = 0; i < imageElem.getImageInfoArray().size(); i++) {
-                var imageInfo = imageElem.getImageInfoArray().get(i);
-                if(Objects.equals(imageInfo.getURL(), "")) {
+            for(int i = 0; i < msgContent.getImageInfoArray().size(); i++) {
+                var imageInfo = msgContent.getImageInfoArray().get(i);
+                if(Objects.equals(imageInfo.getUrl(), "")) {
                     continue;
                 }
 
-                int lastDotIndex = imageInfo.getURL().lastIndexOf('.');
-                if (lastDotIndex == -1) { // 不合法url
+                int lastDotIndex = imageInfo.getUrl().lastIndexOf('.');
+                int lastQuestionIndex = imageInfo.getUrl().lastIndexOf('?');
+                if (lastDotIndex == -1 || lastQuestionIndex == -1) { // 不合法url
                     throw new IllegalArgumentException("Invalid file URL");
                 }
-                extension = imageInfo.getURL().substring(lastDotIndex + 1); // 获得后缀名
+                extension = imageInfo.getUrl().substring(lastDotIndex + 1, lastQuestionIndex); // 获得后缀名
 
                 // 下载图片文件到本地
-                URL url = new URL(imageInfo.getURL());
+                URL url = new URL(imageInfo.getUrl());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 // 获取输入流
                 InputStream inputStream = connection.getInputStream();
 
                 // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
-                String path = "image/" + fileName +"_" + index + extension;
+                String path = "image/" + fileName +"_" + i + '.' + extension;
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(inputStream.available());
                 PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), path, inputStream, metadata);
@@ -429,11 +418,11 @@ public class MessageServiceImpl implements MessageService {
                 // 处理上传结果
                 if (putObjectResult != null) {
                     // 上传成功，修改消息的url
-                    imageInfo.setURL(BASE_URL + path);
+                    imageInfo.setUrl(BASE_URL + path);
 
                 } else {
                     // 上传失败，消息url设置为空
-                    imageInfo.setURL("");
+                    imageInfo.setUrl("");
                 }
             }
         } catch (MalformedURLException e) {

@@ -28,9 +28,9 @@ public class MessageDO extends BaseDO {
 
     private String conversationId;
 
-    private String fromId;
+    private Long fromId;
 
-    private String toId;
+    private Long toId;
 
     /**
      * JSON格式

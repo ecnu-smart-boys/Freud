@@ -86,7 +86,7 @@ public class ConversationController {
     }
 
     @AuthRoles(Visitor.ROLE)
-    @ApiOperation("咨询师获得咨询记录列表")
+    @ApiOperation("访客获得咨询记录列表")
     @GetMapping("/visitor/consultations")
     public Responses<List<WxConsultRecordInfo>> getVisitorConsultations(HttpServletRequest request) {
         var common = Extractor.extract(request);
@@ -196,14 +196,11 @@ public class ConversationController {
         return conversationService.getAvailableConsultants(common);
     }
 
-//    @AuthRoles(Visitor.ROLE)
-    @AnonymousAccess
+    @AuthRoles(Visitor.ROLE)
     @PostMapping("/consult")
     @ApiOperation("访客发起咨询会话")
-    public Responses<Object> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
-//        var common = Extractor.extract(request);
-        Common common = new Common();
-        common.setUserId("3");
+    public Responses<LeftConversation> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
+        var common = Extractor.extract(request);
         return conversationService.startConversation(req, common);
     }
 
