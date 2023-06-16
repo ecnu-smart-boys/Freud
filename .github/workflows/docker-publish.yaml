@@ -12,7 +12,7 @@ env:
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: foliet/freud
-  
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest

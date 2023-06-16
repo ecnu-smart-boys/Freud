@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class WxConsultRecordInfo {
 
 
-
     @ApiModelProperty("咨询师姓名")
     private String consultantName;
 

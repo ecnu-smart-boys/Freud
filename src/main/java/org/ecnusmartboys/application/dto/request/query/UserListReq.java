@@ -14,7 +14,7 @@ public class UserListReq {
 
     @ApiModelProperty(value = "页码")
     @Min(value = 1, message = "页码不合法")
-    private Long current ;
+    private Long current;
 
     @ApiModelProperty(value = "页大小")
     @Min(value = 1, message = "页大小不合法")

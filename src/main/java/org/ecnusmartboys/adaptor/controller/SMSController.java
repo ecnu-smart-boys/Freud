@@ -5,11 +5,14 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.adaptor.Extractor;
 import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
-import org.ecnusmartboys.application.service.SMSService;
 import org.ecnusmartboys.application.dto.request.command.SendSMSRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
+import org.ecnusmartboys.application.service.SMSService;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 

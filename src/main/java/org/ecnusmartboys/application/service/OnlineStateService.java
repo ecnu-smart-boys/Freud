@@ -12,6 +12,7 @@ public interface OnlineStateService {
 
     /**
      * 获取用户在线状态
+     *
      * @param userId
      * @return
      */
@@ -19,6 +20,7 @@ public interface OnlineStateService {
 
     /**
      * 设置用户在线状态
+     *
      * @param userId
      * @param state
      */
@@ -26,6 +28,7 @@ public interface OnlineStateService {
 
     /**
      * 用户长时间无心跳会踢下线，刷新用户踢下线时间
+     *
      * @param userId
      * @param timeout
      * @param unit
@@ -34,6 +37,7 @@ public interface OnlineStateService {
 
     /**
      * 将所有超时无心跳用户设置为离线，并返回对应的用户ID列表
+     *
      * @return 被踢下线的用户id
      */
     List<Long> timeoutKick();

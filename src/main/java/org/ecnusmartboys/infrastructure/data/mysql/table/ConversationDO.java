@@ -21,25 +21,17 @@ import java.util.Date;
 @TableName(value = ConversationDO.TABLE_NAME, autoResultMap = true)
 public class ConversationDO extends BaseDO {
     public static final String TABLE_NAME = "conversation";
-
+    public static final String CONSULTATION = "is_consultation";
+    public static final String SHOWN = "is_shown";
     @TableId(value = "conversation_id", type = IdType.AUTO)
     protected Long conversationId;
-
     private Long fromId;
-
     private Long toId;
-
     private Date startTime;
-
     private Date endTime;
-
     private Long helperId;
-
-    public static final String CONSULTATION = "is_consultation";
     @TableField(CONSULTATION)
     private Boolean isConsultation;
-
-    public static final String SHOWN = "is_shown";
     @TableField(SHOWN)
     private Boolean isShown;
 }

@@ -19,8 +19,8 @@ import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
-import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SigResponse;
 import org.ecnusmartboys.application.dto.ws.MsgNotification;
 import org.ecnusmartboys.application.dto.ws.Notify;
@@ -39,6 +39,7 @@ import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_MSG_WITHDRAW;
 import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_SEND_MSG;
 
@@ -57,24 +59,19 @@ import static org.ecnusmartboys.infrastructure.data.im.CallbackCommand.AFTER_SEN
 @Service
 public class MessageServiceImpl implements MessageService {
 
+    private static final String BASE_URL = "https://freud-1311238733.cos.ap-shanghai.myqcloud.com/";
+    private static final long OFFSET = 1L << 32;
     private final ConversationRepository conversationRepository;
     private final ConsulvisorRepository consulvisorRepository;
     private final MessageRepository messageRepository;
     private final OnlineUserRepository onlineUserRepository;
     private final WebSocketServer webSocketServer;
-
-    private static final String BASE_URL = "https://freud-1311238733.cos.ap-shanghai.myqcloud.com/";
-    private static final long OFFSET = 1L << 32;
-
-
-    @Resource
-    CosConfig cosConfig;
-
-    @Resource
-    IMConfig imConfig;
-
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    @Resource
+    CosConfig cosConfig;
+    @Resource
+    IMConfig imConfig;
 
     @Override
     public Responses<?> callback(IMCallbackParam param, String body, HttpServletRequest request) {
@@ -83,7 +80,7 @@ public class MessageServiceImpl implements MessageService {
                 case AFTER_SEND_MSG: {
                     var cb = mapper.readValue(body, AfterSendMsgCallback.class);
                     var tracker = onlineUserRepository.fetchTracker(cb.getFromAccount(), cb.getToAccount());
-                    if(tracker == null) {
+                    if (tracker == null) {
                         // 没有这个在线会话，这是个野消息
                         return Responses.ok();
                     }
@@ -108,7 +105,7 @@ public class MessageServiceImpl implements MessageService {
                     onlineUserRepository.resetConversation(tracker.getConversationId());
 
                     // websocket，通知督导同步消息
-                    if(tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
+                    if (tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
                         MsgNotification msgNotification = new MsgNotification(tracker.getHelpId(), tracker.getConversationId(), convertToInfo(message));
                         Notify notify = new Notify("newMsg", msgNotification);
                         webSocketServer.notifyUser(tracker.getSupervisorId(), mapper.writeValueAsString(notify));
@@ -118,21 +115,21 @@ public class MessageServiceImpl implements MessageService {
                 case AFTER_MSG_WITHDRAW: {
                     var cb = mapper.readValue(body, AfterSendMsgCallback.class);
                     var tracker = onlineUserRepository.fetchTracker(cb.getFromAccount(), cb.getToAccount());
-                    if(tracker == null) {
+                    if (tracker == null) {
                         // 没有这个在线会话，这是个野消息
                         return Responses.ok();
                     }
 
                     var key = cb.getMsgKey(); // 消息的唯一表示
                     Message message = messageRepository.retrieveByKey(key);
-                    if(message == null) {
+                    if (message == null) {
                         break;
                     }
                     message.setRevoked(true);
                     messageRepository.update(message);
 
                     // websocket，通知督导同步消息
-                    if(tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
+                    if (tracker.getSupervisorId() != ConversationMsgTracker.NULL_HELP) {
                         MsgNotification msgNotification = new MsgNotification(tracker.getHelpId(), tracker.getConversationId(), convertToInfo(message));
                         Notify notify = new Notify("revoke", msgNotification);
                         webSocketServer.notifyUser(tracker.getSupervisorId(), mapper.writeValueAsString(notify));
@@ -160,7 +157,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<AllMsgListResponse> getSupervisorOwnHelpMsg(AllMessageRequest req, Common common) {
         Conversation help = conversationRepository.retrieveById(req.getConversationId());
-        if(help == null || !Objects.equals(help.getToUser().getId(), common.getUserId())) {
+        if (help == null || !Objects.equals(help.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("督导不存在该求助记录");
         }
 
@@ -172,7 +169,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<AllMsgListResponse> getBoundConsultantsMsg(AllMessageRequest req, Common common) {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || !consultation.isConsultation()) {
+        if (consultation == null || !consultation.isConsultation()) {
             throw new BadRequestException("该咨询记录不存在");
         }
 
@@ -181,11 +178,11 @@ public class MessageServiceImpl implements MessageService {
         consulvisors.forEach(consulvisor -> {
             consultantIds.add(consulvisor.getConsultantId());
         });
-        if(!consultantIds.contains(consultation.getToUser().getId())) {
+        if (!consultantIds.contains(consultation.getToUser().getId())) {
             throw new BadRequestException("该咨询师未绑定，不可查看其咨询详情");
         }
 
-        if(consultation.getEndTime() == null) {
+        if (consultation.getEndTime() == null) {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
@@ -195,7 +192,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<AllMsgListResponse> getConsultantOwnConsultationMsg(AllMessageRequest req, Common common) {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("咨询师不存在该咨询记录");
         }
 
@@ -205,10 +202,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<AllMsgListResponse> getAdminConsultationMsg(AllMessageRequest req, Common common) {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || !consultation.isConsultation()) {
+        if (consultation == null || !consultation.isConsultation()) {
             throw new BadRequestException("咨询记录不存在，或者还未结束");
 
-        } else if(consultation.getEndTime() == null) {
+        } else if (consultation.getEndTime() == null) {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
@@ -218,10 +215,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<MsgListResponse> getVisitorConsultationMsg(SingleMsgRequest req, Common common) {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || !Objects.equals(consultation.getFromUser().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getFromUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不存在这条会话记录");
 
-        } else if(consultation.getEndTime() == null) {
+        } else if (consultation.getEndTime() == null) {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
@@ -232,7 +229,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Responses<MsgListResponse> synchronizeConsultationMsg(SynchronizeMsgRequest req, Common common) {
         Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
-        if(consultation == null || consultation.getHelper() == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+        if (consultation == null || consultation.getHelper() == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在此次会话");
         }
 
@@ -245,14 +242,14 @@ public class MessageServiceImpl implements MessageService {
         List<MessageInfo> consultationMsg = new ArrayList<>();
         List<MessageInfo> helpMsg = new ArrayList<>();
 
-        if(req.getConsultationIterator() != 0) {
+        if (req.getConsultationIterator() != 0) {
             // 需要获得咨询消息
             consultationMsg = retrieveMsg(consultation.getId(), req.getConsultationIterator(), req.getSize());
         }
 
-        if(consultation.getHelper() != null) {
+        if (consultation.getHelper() != null) {
             response.setCallHelp(true);
-            if(req.getHelpIterator() != 0) {
+            if (req.getHelpIterator() != 0) {
                 // 需要获得求助消息
                 helpMsg = retrieveMsg(consultation.getHelper().getHelpId(), req.getHelpIterator(), req.getSize());
             }
@@ -270,7 +267,7 @@ public class MessageServiceImpl implements MessageService {
         long offset = Long.parseLong(conversationId) << 32;
         long end = consultationIterator;
 
-        if(end == -1) {
+        if (end == -1) {
             end = messageRepository.retrieveTotalByConversationId(conversationId);
         }
 
@@ -289,14 +286,15 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private MessageInfo convertToInfo(Message message) {
-        MessageInfo messageInfo = new MessageInfo(); messageInfo.setToId(message.getToId());
+        MessageInfo messageInfo = new MessageInfo();
+        messageInfo.setToId(message.getToId());
         messageInfo.setFromId(message.getFromId());
         messageInfo.setRevoked(message.isRevoked());
         messageInfo.setMsgKey(message.getMsgKey());
         messageInfo.setTime(message.getTime());
         messageInfo.setIterator(message.getIterator() % OFFSET);
 
-        if(!message.isRevoked()) {
+        if (!message.isRevoked()) {
             messageInfo.setMsgBody(message.getMsgBody());
         }
         return messageInfo;
@@ -304,19 +302,19 @@ public class MessageServiceImpl implements MessageService {
 
     private void parseMsgBody(String msgKey, List<TIMMsgElement> elements) throws Exception {
         try {
-            for(int index = 0; index < elements.size(); index++) {
-                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_TEXT_ELEM)) {
+            for (int index = 0; index < elements.size(); index++) {
+                if (Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_TEXT_ELEM)) {
                     // 文本类型
                     continue;
                 }
 
-                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_SOUND_ELEM)) {
+                if (Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_SOUND_ELEM)) {
                     // 语音类型，解析为sound类型
                     parseSoundContent(msgKey, index, ((TIMSoundMsgElement) elements.get(index)).getMsgContent());
                     continue;
                 }
 
-                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_IMAGE_ELEM)) {
+                if (Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_IMAGE_ELEM)) {
                     // 图片类型，解析为image类型
                     parseImageContent(msgKey, index, ((TIMImageMsgElement) elements.get(index)).getMsgContent());
                     continue;
@@ -333,11 +331,11 @@ public class MessageServiceImpl implements MessageService {
         String fileName = msgKey + "_" + index;
         String extension = "";
         try {
-            if(Objects.equals(msgContent.getUrl(), "")) {
+            if (Objects.equals(msgContent.getUrl(), "")) {
                 return;
             }
 
-            int lastDotIndex = msgContent.getUrl() .lastIndexOf('.');
+            int lastDotIndex = msgContent.getUrl().lastIndexOf('.');
             if (lastDotIndex == -1) { // 不合法url
                 throw new IllegalArgumentException("Invalid file URL");
             }
@@ -381,13 +379,13 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-        private void parseImageContent(String msgKey, int index, TIMImageMsgElement.ImageMsgContent msgContent) {
+    private void parseImageContent(String msgKey, int index, TIMImageMsgElement.ImageMsgContent msgContent) {
         String fileName = msgKey + "_" + index;
         String extension = "";
         try {
-            for(int i = 0; i < msgContent.getImageInfoArray().size(); i++) {
+            for (int i = 0; i < msgContent.getImageInfoArray().size(); i++) {
                 var imageInfo = msgContent.getImageInfoArray().get(i);
-                if(Objects.equals(imageInfo.getUrl(), "")) {
+                if (Objects.equals(imageInfo.getUrl(), "")) {
                     continue;
                 }
 
@@ -405,7 +403,7 @@ public class MessageServiceImpl implements MessageService {
                 InputStream inputStream = connection.getInputStream();
 
                 // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
-                String path = "image/" + fileName +"_" + i + '.' + extension;
+                String path = "image/" + fileName + "_" + i + '.' + extension;
                 ObjectMetadata metadata = new ObjectMetadata();
                 metadata.setContentLength(inputStream.available());
                 PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), path, inputStream, metadata);

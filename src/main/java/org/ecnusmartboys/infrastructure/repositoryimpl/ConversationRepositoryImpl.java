@@ -1,14 +1,12 @@
 package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.conversation.*;
 import org.ecnusmartboys.domain.repository.ConversationRepository;
 import org.ecnusmartboys.infrastructure.convertor.CommentConvertor;
-import org.ecnusmartboys.infrastructure.convertor.ConversationConvertor;
 import org.ecnusmartboys.infrastructure.convertor.UserConvertor;
 import org.ecnusmartboys.infrastructure.data.mysql.intermidium.RankDO;
 import org.ecnusmartboys.infrastructure.data.mysql.table.CommentDO;
@@ -16,7 +14,6 @@ import org.ecnusmartboys.infrastructure.data.mysql.table.ConversationDO;
 import org.ecnusmartboys.infrastructure.mapper.CommentMapper;
 import org.ecnusmartboys.infrastructure.mapper.ConversationMapper;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +67,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public List<ConversationInfo> retrieveByDate(Date date) {
-        List<ConversationDO> conversationDOS =conversationMapper.selectConsultByDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
+        List<ConversationDO> conversationDOS = conversationMapper.selectConsultByDate(new SimpleDateFormat("yyyy-MM-dd").format(date));
 
         List<ConversationInfo> infos = new ArrayList<>();
         conversationDOS.forEach(conversationDO -> {
@@ -81,7 +78,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public List<ConversationInfo> retrieveByDateAndToId(Date date, String toId) {
-        List<ConversationDO> conversationDOS =conversationMapper.selectConsultByDateAndToId(new SimpleDateFormat("yyyy-MM-dd").format(date), toId);
+        List<ConversationDO> conversationDOS = conversationMapper.selectConsultByDateAndToId(new SimpleDateFormat("yyyy-MM-dd").format(date), toId);
 
         List<ConversationInfo> infos = new ArrayList<>();
         conversationDOS.forEach(conversationDO -> {
@@ -99,7 +96,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public Conversation retrieveById(String conversationId) {
         ConversationDO conversationDO = conversationMapper.selectById(conversationId);
-        if(conversationDO == null) {
+        if (conversationDO == null) {
             return null;
         }
         return convert(conversationDO);
@@ -112,7 +109,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
         conversationDO.setEndTime(new Date());
         conversationMapper.updateById(conversationDO);
 
-        if(conversationDO.getIsConsultation()) {
+        if (conversationDO.getIsConsultation()) {
             // 是一次咨询，创建两个空评论
             // 访客评论
             CommentDO commentDO1 = new CommentDO();
@@ -132,7 +129,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     public Comment retrieveComment(String conversationId, String userId) {
         var comment = commentMapper.selectOne(new LambdaQueryWrapper<CommentDO>().eq(CommentDO::getConversationId, conversationId)
                 .eq(CommentDO::getUserId, userId).eq(CommentDO::getCommented, 0));
-        if(comment == null) {
+        if (comment == null) {
             return null;
         }
         return commentConvertor.toComment(comment);
@@ -221,7 +218,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public Conversation retrieveByHelperId(String helperId) {
         ConversationDO conversationDO = conversationMapper.selectByHelperId(helperId);
-        if(conversationDO == null) {
+        if (conversationDO == null) {
             return null;
         }
         return convert(conversationDO);
@@ -230,12 +227,12 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public Conversation retrieveByFromIdAndToId(String fromId, String toId) {
         ConversationDO conversationDO = conversationMapper.selectByFromIdAndToId(fromId, toId);
-        if(conversationDO != null) {
+        if (conversationDO != null) {
             return convert(conversationDO);
         }
 
         conversationDO = conversationMapper.selectByFromIdAndToId(toId, fromId);
-        if(conversationDO != null) {
+        if (conversationDO != null) {
             return convert(conversationDO);
         }
         return null;
@@ -251,8 +248,8 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     private List<Conversation> convert2List(List<ConversationDO> conversationDOS, Long current, Long size) {
         List<Conversation> conversations = new ArrayList<>();
         int total = conversationDOS.size();
-        for(long i = current * size; i < (current + 1) * size; i++) {
-            if(i >= total) {
+        for (long i = current * size; i < (current + 1) * size; i++) {
+            if (i >= total) {
                 break;
             }
             var DO = conversationDOS.get((int) i);
@@ -268,24 +265,24 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
         conversation.setId(DO.getConversationId().toString());
         conversation.setStartTime(DO.getStartTime().getTime());
-        if(DO.getEndTime() != null) {
+        if (DO.getEndTime() != null) {
             conversation.setEndTime(DO.getEndTime().getTime());
         }
         conversation.setConsultation(DO.getIsConsultation());
 
         conversation.setFromUser(userConvertor.toUser(userMapper.selectById(DO.getFromId())));
         conversation.setToUser(userConvertor.toUser(userMapper.selectById(DO.getToId())));
-        if(DO.getEndTime() != null) {
+        if (DO.getEndTime() != null) {
             conversation.setFromUserComment(commentConvertor.toComment(commentMapper.selectByUserAndConId(DO.getFromId(), DO.getConversationId())));
             conversation.setToUserComment(commentConvertor.toComment(commentMapper.selectByUserAndConId(DO.getToId(), DO.getConversationId())));
         }
 
-        if(!Objects.equals(DO.getHelperId(), NULL_HELPER)) {
+        if (!Objects.equals(DO.getHelperId(), NULL_HELPER)) {
             var help = conversationMapper.selectById(DO.getHelperId());
             Help helper = new Help();
             helper.setHelpId(help.getConversationId().toString());
             helper.setStartTime(help.getStartTime().getTime());
-            if(help.getEndTime() != null) {
+            if (help.getEndTime() != null) {
                 helper.setEndTime(help.getEndTime().getTime());
             }
             helper.setSupervisor(userConvertor.toUser(userMapper.selectById(help.getToId())));

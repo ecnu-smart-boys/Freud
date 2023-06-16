@@ -3,8 +3,6 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.application.dto.MessageInfo;
-import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.message.Message;
 import org.ecnusmartboys.domain.repository.MessageRepository;
 import org.ecnusmartboys.infrastructure.convertor.MessageConvertor;
@@ -36,8 +34,8 @@ public class MessageRepositoryImpl implements MessageRepository {
 
     @Override
     public Message retrieveByKey(String key) {
-        var messageDO =  messageMapper.selectOne(new LambdaQueryWrapper<MessageDO>().eq(MessageDO::getMsgKey, key));
-        if(messageDO == null) {
+        var messageDO = messageMapper.selectOne(new LambdaQueryWrapper<MessageDO>().eq(MessageDO::getMsgKey, key));
+        if (messageDO == null) {
             return null;
         }
         return messageConvertor.toMessage(messageDO);

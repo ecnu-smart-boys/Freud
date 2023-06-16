@@ -89,7 +89,7 @@ public class RedisUtil {
     public Map<Object, Double> zRangeWithScores(String key, long start, long end) {
         try {
             Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
-                redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+                    redisTemplate.opsForZSet().rangeWithScores(key, start, end);
             Map<Object, Double> result = new HashMap<>();
             for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
                 result.put(tuple.getValue(), tuple.getScore());
@@ -313,7 +313,7 @@ public class RedisUtil {
     public Map<Object, Double> zRangeByScoreWithScores(String key, double min, double max, long limit) {
         try {
             Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
-                redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, 0, limit);
+                    redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, 0, limit);
             Map<Object, Double> result = new HashMap<>();
             for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
                 result.put(tuple.getValue(), tuple.getScore());
@@ -338,7 +338,7 @@ public class RedisUtil {
     public Map<Object, Double> zRangeByScoreWithScores(String key, double min, double max, long limit, long skip) {
         try {
             Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> tuples =
-                redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, skip, limit);
+                    redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, skip, limit);
             Map<Object, Double> result = new HashMap<>();
             for (org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object> tuple : tuples) {
                 result.put(tuple.getValue(), tuple.getScore());
@@ -635,18 +635,18 @@ public class RedisUtil {
             return null;
         }
     }
-    
+
     public String getKey(Object table, Object key, Object field) {
         return table.toString() + ":" + key.toString() + ":" + field.toString();
     }
 
-    public String getKey(Object ...parts) {
+    public String getKey(Object... parts) {
         String key = "";
-        for (int i=0; i<parts.length; ++i) {
+        for (int i = 0; i < parts.length; ++i) {
             if (i != parts.length - 1) {
                 key += (parts[i].toString() + ":");
             } else {
-                key += parts[parts.length-1];
+                key += parts[parts.length - 1];
             }
         }
         return key;
@@ -760,7 +760,7 @@ public class RedisUtil {
         return result;
     }
 
-    public Set<String> keys(String pattern){
+    public Set<String> keys(String pattern) {
         return redisTemplate.keys(pattern);
     }
 
@@ -823,7 +823,7 @@ public class RedisUtil {
     public List<Object> multiGet(List<String> keys) {
         List list = redisTemplate.opsForValue().multiGet(Sets.newHashSet(keys));
         List resultList = Lists.newArrayList();
-        Optional.ofNullable(list).ifPresent(e-> list.forEach(ele-> Optional.ofNullable(ele).ifPresent(resultList::add)));
+        Optional.ofNullable(list).ifPresent(e -> list.forEach(ele -> Optional.ofNullable(ele).ifPresent(resultList::add)));
         return resultList;
     }
 
@@ -1312,24 +1312,24 @@ public class RedisUtil {
         long count = redisTemplate.delete(keys);
     }
 
-    public long incr(String key){
+    public long incr(String key) {
         return redisTemplate.opsForValue().increment(key);
     }
 
-    public long incr(String key, long increment){
+    public long incr(String key, long increment) {
         return redisTemplate.opsForValue().increment(key, increment);
     }
 
-    public double incr(String key, double increment){
+    public double incr(String key, double increment) {
         return redisTemplate.opsForValue().increment(key, increment);
     }
 
-    public long pfAdd(String key, Object value){
+    public long pfAdd(String key, Object value) {
 
         return redisTemplate.opsForHyperLogLog().add(key, value);
     }
 
-    public long pfCount(String ...key){
+    public long pfCount(String... key) {
         return redisTemplate.opsForHyperLogLog().size(key);
     }
 }

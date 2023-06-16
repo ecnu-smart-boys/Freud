@@ -25,6 +25,7 @@ import org.ecnusmartboys.application.dto.ws.EndHelpNotification;
 import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.ConversationService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
+import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.ecnusmartboys.domain.model.conversation.Help;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
@@ -32,7 +33,6 @@ import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.User;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.domain.repository.ConversationRepository;
-import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
@@ -53,29 +53,26 @@ import java.util.*;
 public class ConversationServiceImpl implements ConversationService {
 
     private final static long ONE_DAY = 24 * 60 * 60 * 1000L;
-
-    @Resource
-    IMConfig imConfig;
-
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final ConsulvisorRepository consulvisorRepository;
     private final OnlineUserRepository onlineUserRepository;
     private final WebSocketServer webSocketServer;
-
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    @Resource
+    IMConfig imConfig;
 
     @Override
     public Responses<ConsultRecordsResponse> getAllConsultations(ConsultRecordListReq req) {
-        var pageResult =  conversationRepository.retrieveAllConsultations(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp());
+        var pageResult = conversationRepository.retrieveAllConsultations(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp());
         var records = convertToConsultationList(pageResult.getData());
         return Responses.ok(new ConsultRecordsResponse(records, pageResult.getTotal()));
     }
 
     @Override
     public Responses<ConsultRecordsResponse> getConsultConsultations(ConsultRecordListReq req, Common common) {
-        var pageResult =  conversationRepository.retrieveConsultationsByToUser(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
+        var pageResult = conversationRepository.retrieveConsultationsByToUser(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
         var records = convertToConsultationList(pageResult.getData());
         return Responses.ok(new ConsultRecordsResponse(records, pageResult.getTotal()));
     }
@@ -113,11 +110,11 @@ public class ConversationServiceImpl implements ConversationService {
     public Responses<Integer> getAvgComment(Common common) {
         var conversations = conversationRepository.retrieveHelpByToId(common.getUserId());
         int totalScore = 0;
-        for(Conversation conversation : conversations) {
+        for (Conversation conversation : conversations) {
             totalScore += conversation.getFromUserComment().getScore();
         }
 
-        if(totalScore == 0) {
+        if (totalScore == 0) {
             return Responses.ok(0);
         }
         return Responses.ok(totalScore / conversations.size());
@@ -128,7 +125,7 @@ public class ConversationServiceImpl implements ConversationService {
         long currentDay = (new Date().getTime()) - 6 * ONE_DAY;
         List<DayConsultInfo> dayConsultInfos = new ArrayList<>();
 
-        for(int i = 0; i < 7; i++, currentDay += ONE_DAY) {
+        for (int i = 0; i < 7; i++, currentDay += ONE_DAY) {
             List<ConversationInfo> result = conversationRepository.retrieveByDate(new Date(currentDay));
             dayConsultInfos.add(new DayConsultInfo(currentDay, result.size()));
         }
@@ -150,7 +147,7 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Responses<ConsultRecordsResponse> getBoundConsultations(ConsultRecordListReq req, Common common) {
-        var pageResult =  conversationRepository.retrieveBoundConsultations(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
+        var pageResult = conversationRepository.retrieveBoundConsultations(req.getCurrent() - 1, req.getSize(), req.getName(), req.getTimestamp(), common.getUserId());
         var records = convertToConsultationList(pageResult.getData());
         return Responses.ok(new ConsultRecordsResponse(records, pageResult.getTotal()));
     }
@@ -173,17 +170,17 @@ public class ConversationServiceImpl implements ConversationService {
     public Responses<LeftConversation> startConversation(StartConsultRequest req, Common common) {
         // 该咨询师是否在线
         var result = onlineUserRepository.isConsultantOnline(req.getToId());
-        if(!result) {
+        if (!result) {
             throw new BadRequestException("该咨询师不在线");
         }
 
         // 是否已经有一个对话或在排队中
-        if(onlineUserRepository.isVisitorBusy(common.getUserId())) {
+        if (onlineUserRepository.isVisitorBusy(common.getUserId())) {
             throw new BadRequestException("你已经在进行一个会话，或正处于排队等待中");
         }
 
         // 将该访客插入该咨询师当前咨询队列或等待队列
-        if(onlineUserRepository.consultRequest(common.getUserId(), req.getToId())) {
+        if (onlineUserRepository.consultRequest(common.getUserId(), req.getToId())) {
             return Responses.ok("请排队等待");
         }
         // 创建新咨询会话
@@ -214,13 +211,13 @@ public class ConversationServiceImpl implements ConversationService {
     public Responses<EndConsultResponse> endConsultation(EndConsultRequest req, Common common) {
         var conversation = conversationRepository.retrieveById(req.getConversationId());
 
-        if(conversation == null || !conversation.isConsultation()) {
+        if (conversation == null || !conversation.isConsultation()) {
             throw new BadRequestException("你要结束的咨询不存在");
 
-        } else if(conversation.getEndTime() != null) {
+        } else if (conversation.getEndTime() != null) {
             throw new BadRequestException("该会话已经结束");
 
-        } else if(!Objects.equals(conversation.getToUser().getId(), common.getUserId())
+        } else if (!Objects.equals(conversation.getToUser().getId(), common.getUserId())
                 && !Objects.equals(conversation.getFromUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不能结束一个未参与的会话");
         }
@@ -238,7 +235,7 @@ public class ConversationServiceImpl implements ConversationService {
 
         Set<String> ids = onlineUserRepository.retrieveAvailableSupervisors(common.getUserId());
         consulvisors.forEach(consulvisor -> {
-            if(ids.contains(consulvisor.getSupervisorId())) {
+            if (ids.contains(consulvisor.getSupervisorId())) {
                 User user = userRepository.retrieveById(consulvisor.getSupervisorId());
                 infos.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
@@ -250,40 +247,40 @@ public class ConversationServiceImpl implements ConversationService {
     @Transactional
     public Responses<Object> callHelp(CallHelpRequest req, Common common) {
         // 首先查看该督导是否在线
-        if(!onlineUserRepository.isSupervisorOnline(req.getToId())) {
+        if (!onlineUserRepository.isSupervisorOnline(req.getToId())) {
             throw new BadRequestException("你所要求助的督导不在线");
         }
 
         // 该督导是否是该咨询师绑定的督导
         boolean bound = false;
         var consulvisors = consulvisorRepository.retrieveBySupId(req.getToId());
-        for(var consulvisor : consulvisors) {
-            if(Objects.equals(consulvisor.getConsultantId(), common.getUserId())) {
+        for (var consulvisor : consulvisors) {
+            if (Objects.equals(consulvisor.getConsultantId(), common.getUserId())) {
                 bound = true;
                 break;
             }
         }
-        if(!bound) {
+        if (!bound) {
             throw new BadRequestException("你未绑定该督导");
         }
 
         var conversation = conversationRepository.retrieveById(req.getConversationId());
-        if(conversation == null || !conversation.isConsultation()) {
+        if (conversation == null || !conversation.isConsultation()) {
             throw new BadRequestException("该咨询记录不存在");
 
-        } else if(!Objects.equals(common.getUserId(), conversation.getToUser().getId())) {
+        } else if (!Objects.equals(common.getUserId(), conversation.getToUser().getId())) {
             throw new BadRequestException("你不能给一个未参与的咨询求助督导");
 
-        } else if(conversation.getEndTime() != null) {
+        } else if (conversation.getEndTime() != null) {
             throw new BadRequestException("该会话已经结束");
         }
 
-        if(conversationRepository.retrieveByFromIdAndToId(common.getUserId(), req.getToId()) != null) {
+        if (conversationRepository.retrieveByFromIdAndToId(common.getUserId(), req.getToId()) != null) {
             throw new RuntimeException("你在某个会话中正在求助这个督导，请换一个督导");
         }
 
         // 将该咨询师插入该督导当前咨询队列或等待队列
-        if(onlineUserRepository.callHelpRequest(common.getUserId(), req.getToId(), req.getConversationId())) {
+        if (onlineUserRepository.callHelpRequest(common.getUserId(), req.getToId(), req.getConversationId())) {
             throw new BadRequestException("该督导忙碌，请换一个督导");
         }
 
@@ -313,13 +310,13 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<Object> endHelp(EndHelpRequest req, Common common) {
         var help = conversationRepository.retrieveById(req.getConversationId());
-        if(help == null || help.isConsultation()) {
+        if (help == null || help.isConsultation()) {
             throw new BadRequestException("该求助会话不存在");
 
-        } else if(help.getEndTime() != null) {
+        } else if (help.getEndTime() != null) {
             throw new BadRequestException("你不能关闭一个已经结束的求助会话");
 
-        } else if(!Objects.equals(help.getToUser().getId(), common.getUserId())
+        } else if (!Objects.equals(help.getToUser().getId(), common.getUserId())
                 && !Objects.equals(help.getFromUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不能关闭一个没有参与的求助会话");
         }
@@ -331,7 +328,7 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Responses<Object> cancelWaiting(String userId) {
-        if(!onlineUserRepository.cancelWaiting(userId)) {
+        if (!onlineUserRepository.cancelWaiting(userId)) {
             throw new RuntimeException("你未处于排队状态");
         }
         return Responses.ok("取消排队成功");
@@ -341,13 +338,13 @@ public class ConversationServiceImpl implements ConversationService {
     public Responses<EndConsultResponse> visitorComment(VisitorCommentRequest req, Common common) {
         var comment = conversationRepository.retrieveComment(req.getConversationId(), common.getUserId());
         // 评论不存在
-        if(comment == null) {
+        if (comment == null) {
             throw new BadRequestException("会话不存在，无法评论");
 
-        } else if(!Objects.equals(comment.getUserId(), common.getUserId())) {
+        } else if (!Objects.equals(comment.getUserId(), common.getUserId())) {
             throw new BadRequestException("你没有资格评论");
 
-        } else if(comment.getCommented()) {
+        } else if (comment.getCommented()) {
             throw new BadRequestException("该会话你已经评论过了");
         }
 
@@ -365,13 +362,13 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<EndConsultResponse> consultantComment(ConsultantCommentRequest req, Common common) {
         var comment = conversationRepository.retrieveComment(req.getConversationId(), common.getUserId());
-        if(comment == null) {
+        if (comment == null) {
             throw new BadRequestException("会话不存在，无法评论");
 
-        } else if(!Objects.equals(comment.getUserId(), common.getUserId())) {
+        } else if (!Objects.equals(comment.getUserId(), common.getUserId())) {
             throw new BadRequestException("你没有资格评论");
 
-        } else if(comment.getCommented()) {
+        } else if (comment.getCommented()) {
             throw new BadRequestException("该会话你已经评论过了");
         }
 
@@ -388,7 +385,7 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Responses<Object> setting(SettingRequest req, Common common) {
-        if(onlineUserRepository.isStaffInConversation(common.getUserId())) {
+        if (onlineUserRepository.isStaffInConversation(common.getUserId())) {
             throw new BadRequestException("有会话正在进行中，不可更改咨询设置");
         }
 
@@ -494,13 +491,13 @@ public class ConversationServiceImpl implements ConversationService {
             availableConsultant.setHasConsulted(false);
 
             var consultations = conversationRepository.retrieveConsultationByToId(user.getId());
-            if(consultations.size() == 0) {
+            if (consultations.size() == 0) {
                 availableConsultant.setAvgComment(0);
             } else {
                 int score = 0;
-                for(var consultation : consultations) {
+                for (var consultation : consultations) {
                     score += consultation.getFromUserComment().getScore();
-                    if(Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
+                    if (Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
                         availableConsultant.setHasConsulted(true);
                     }
                 }
@@ -514,10 +511,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getSupervisorOwnHelpInfo(String helpId, Common common) {
         Conversation consultation = conversationRepository.retrieveByHelperId(helpId);
-        if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在这条会话记录");
         }
-        if(consultation.getEndTime() == null) {
+        if (consultation.getEndTime() == null) {
             throw new BadRequestException("该会话尚未结束");
         }
 
@@ -528,10 +525,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getBoundConsultantsInfo(String conversationId, Common common) {
         Conversation consultation = conversationRepository.retrieveById(conversationId);
-        if(consultation == null || !consultation.isConsultation()) {
+        if (consultation == null || !consultation.isConsultation()) {
             throw new BadRequestException("该咨询记录不存在");
 
-        } else if(consultation.getEndTime() == null) {
+        } else if (consultation.getEndTime() == null) {
             throw new BadRequestException("该会话正在进行中，不可访问");
         }
 
@@ -541,7 +538,7 @@ public class ConversationServiceImpl implements ConversationService {
         consulvisors.forEach(consulvisor -> {
             consultantIds.add(consulvisor.getConsultantId());
         });
-        if(!consultantIds.contains(toId)) {
+        if (!consultantIds.contains(toId)) {
             throw new BadRequestException("该咨询师未绑定，不可查看其咨询详情");
         }
 
@@ -551,10 +548,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getConsultantOwnConsultationInfo(String conversationId, Common common) {
         Conversation consultation = conversationRepository.retrieveById(conversationId);
-        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("该咨询师不存在该会话消息");
 
-        } else if(consultation.getEndTime() == null) {
+        } else if (consultation.getEndTime() == null) {
             throw new BadRequestException("该会话正在进行中，不可查看其咨询详情");
         }
 
@@ -564,10 +561,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getAdminConsultationInfo(String conversationId, Common common) {
         Conversation consultation = conversationRepository.retrieveById(conversationId);
-        if(consultation == null || !consultation.isConsultation()) {
+        if (consultation == null || !consultation.isConsultation()) {
             throw new BadRequestException("该咨询记录不存在");
 
-        }  else if(consultation.getEndTime() == null) {
+        } else if (consultation.getEndTime() == null) {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
@@ -580,8 +577,8 @@ public class ConversationServiceImpl implements ConversationService {
         var conversations = conversationRepository.retrieveConversationListByToId(common.getUserId());
         conversations.forEach(conversation -> {
             var info = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
-                    conversation.getFromUser().getName(),conversation.getFromUser().getAvatar(), false);
-            if(conversation.getEndTime() != null) {
+                    conversation.getFromUser().getName(), conversation.getFromUser().getAvatar(), false);
+            if (conversation.getEndTime() != null) {
                 info.setEnd(true);
             }
             result.add(info);
@@ -592,7 +589,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getConsultationInfo(String conversationId, Common common) {
         var consultation = conversationRepository.retrieveById(conversationId);
-        if(consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("该咨询师不存在该在线会话");
 
         }
@@ -602,7 +599,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<WebConversationInfoResponse> getHelpInfo(String helpId, Common common) {
         var consultation = conversationRepository.retrieveByHelperId(helpId);
-        if(consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
+        if (consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在该在线会话");
 
         }
@@ -613,9 +610,9 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<Object> removeConversation(RemoveConversationRequest req, Common common) {
         var conversation = conversationRepository.retrieveById(req.getConversationId());
-        if(conversation == null || !Objects.equals(conversation.getToUser().getId(), common.getUserId())) {
+        if (conversation == null || !Objects.equals(conversation.getToUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不存在该会话");
-        } else if(conversation.getEndTime() == null) {
+        } else if (conversation.getEndTime() == null) {
             throw new BadRequestException("会话尚未结束，不能移除");
         }
 
@@ -639,7 +636,7 @@ public class ConversationServiceImpl implements ConversationService {
             recordInfo.setStartTime(conversation.getStartTime());
             recordInfo.setEndTime(conversation.getEndTime());
 
-            if(conversation.getHelper() != null) {
+            if (conversation.getHelper() != null) {
                 recordInfo.setHelper(conversation.getHelper().getSupervisor().getName());
             }
 
@@ -679,7 +676,7 @@ public class ConversationServiceImpl implements ConversationService {
                         fromUser.getName(), fromUser.getAvatar(), consultation.getStartTime(), System.currentTimeMillis(), false);
 
         // 会话未结束
-        if(consultation.getEndTime() != null) {
+        if (consultation.getEndTime() != null) {
             consultationInfo.setLastTime(consultation.getEndTime());
             // 评论
             conversationInfoResponse.setVisitorScore(consultation.getFromUserComment().getScore()); // 评分
@@ -692,7 +689,7 @@ public class ConversationServiceImpl implements ConversationService {
         conversationInfoResponse.setConsultationInfo(consultationInfo);
 
         // 求助了督导
-        if(consultation.getHelper() != null) {
+        if (consultation.getHelper() != null) {
             conversationInfoResponse.setHelpInfo(convertToHelpInfo(consultation.getHelper()));
         }
 
@@ -701,9 +698,9 @@ public class ConversationServiceImpl implements ConversationService {
 
     private HelpInfo convertToHelpInfo(Help help) {
         HelpInfo helpInfo = new HelpInfo(help.getHelpId(), help.getSupervisor().getId(), help.getSupervisor().getAvatar(), help.getSupervisor().getName(),
-                                    help.getStartTime(), System.currentTimeMillis(), false);
+                help.getStartTime(), System.currentTimeMillis(), false);
         // 求助已经结束
-        if(help.getEndTime() != null) {
+        if (help.getEndTime() != null) {
             helpInfo.setEndTime(help.getEndTime());
             helpInfo.setEnd(true);
         }
@@ -711,23 +708,23 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private void updateConsultationQueue(String consultantId) {
-        while(true) {
+        while (true) {
             var visitorId = onlineUserRepository.popFrontConsultation(consultantId);
-            if(visitorId == null) {
+            if (visitorId == null) {
                 // 排队队列为空
                 break;
             }
 
             // 排队期间，咨询师已经下线
-            if(!onlineUserRepository.isConsultantOnline(consultantId)) {
+            if (!onlineUserRepository.isConsultantOnline(consultantId)) {
                 continue;
             }
             // 排队期间，访客等不及了，干脆下线了
-            if(!onlineUserRepository.isVisitorOnline(visitorId)) {
+            if (!onlineUserRepository.isVisitorOnline(visitorId)) {
                 continue;
             }
             // 就是你了
-            if(onlineUserRepository.consultRequest(visitorId, consultantId)) {
+            if (onlineUserRepository.consultRequest(visitorId, consultantId)) {
                 // 又要排队了，并发问题，基本不可能
                 break;
             }
@@ -764,9 +761,9 @@ public class ConversationServiceImpl implements ConversationService {
         var timeoutConversations = onlineUserRepository.kickOutTimeoutConversations();
 
         // 结束
-        for(String timeoutConversation : timeoutConversations) {
+        for (String timeoutConversation : timeoutConversations) {
             var conversation = conversationRepository.retrieveById(timeoutConversation);
-            if(conversation == null) {
+            if (conversation == null) {
                 // error
                 continue;
             }
@@ -812,7 +809,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private void endConversation(Conversation conversation) {
-        if(!conversation.isConsultation()) {
+        if (!conversation.isConsultation()) {
             // 求助会话
             // 结束求助会话
             conversationRepository.endConversation(conversation.getId());
@@ -826,7 +823,7 @@ public class ConversationServiceImpl implements ConversationService {
             // 结束会话，默认添加两个空的评论
             conversationRepository.endConversation(conversation.getId());
             // 求助级联结束
-            if(conversation.getHelper() != null) {
+            if (conversation.getHelper() != null) {
                 var help = conversationRepository.retrieveById(conversation.getHelper().getHelpId());
                 // 结束求助会话
                 conversationRepository.endConversation(help.getId());
@@ -843,7 +840,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private void notifyEndToUsers(Conversation conversation) {
-        if(!conversation.isConsultation()) {
+        if (!conversation.isConsultation()) {
             // 求助
             try {
                 var consultation = conversationRepository.retrieveByHelperId(conversation.getId());
@@ -865,7 +862,7 @@ public class ConversationServiceImpl implements ConversationService {
             EndConsultationNotification end = new EndConsultationNotification(conversation.getId(), "",
                     conversation.getFromUser().getName(), conversation.getToUser().getName(), "");
             var notify = new Notify("endConsultation", end);
-            if(conversation.getHelper() != null) {
+            if (conversation.getHelper() != null) {
                 // 求助了督导
                 end.setSupervisorName(conversation.getHelper().getSupervisor().getName());
                 end.setHelpId(conversation.getHelper().getHelpId());
@@ -889,7 +886,7 @@ public class ConversationServiceImpl implements ConversationService {
 
         try {
 
-            if(Objects.equals(conversation.getFromUser().getId(), userId)) {
+            if (Objects.equals(conversation.getFromUser().getId(), userId)) {
                 // 发送给咨询师
                 webSocketServer.notifyUser(Long.valueOf(conversation.getToUser().getId()), mapper.writeValueAsString(notify));
             } else {
@@ -898,7 +895,7 @@ public class ConversationServiceImpl implements ConversationService {
             }
 
 
-            if(conversation.getHelper() != null) {
+            if (conversation.getHelper() != null) {
                 // 同步给督导
                 webSocketServer.notifyUser(Long.valueOf(conversation.getHelper().getSupervisor().getId()),
                         mapper.writeValueAsString(notify));

@@ -9,7 +9,6 @@ import org.ecnusmartboys.application.dto.request.query.GetMonthArrangementReques
 import org.ecnusmartboys.application.dto.request.query.NoArrangedRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
 
-import java.util.Date;
 import java.util.List;
 
 public interface ArrangeService {

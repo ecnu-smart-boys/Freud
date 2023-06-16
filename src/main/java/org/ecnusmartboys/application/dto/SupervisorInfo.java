@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class SupervisorInfo extends UserInfo{
+public class SupervisorInfo extends UserInfo {
 
     private String idNumber;
 

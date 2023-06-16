@@ -2,7 +2,6 @@ package org.ecnusmartboys.application.dto.conversation;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,8 @@ public class HelpInfo {
     private String supervisorId;
 
     @ApiModelProperty("督导头像")
-    private String avatar;;
+    private String avatar;
+    ;
 
     @ApiModelProperty("督导姓名")
     private String supervisorName;

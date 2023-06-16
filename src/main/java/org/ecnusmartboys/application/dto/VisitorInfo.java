@@ -3,7 +3,7 @@ package org.ecnusmartboys.application.dto;
 import lombok.Data;
 
 @Data
-public class VisitorInfo extends UserInfo{
+public class VisitorInfo extends UserInfo {
 
     private String emergencyContact;
 

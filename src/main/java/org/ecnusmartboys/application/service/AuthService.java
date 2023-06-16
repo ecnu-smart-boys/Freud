@@ -9,7 +9,9 @@ import org.ecnusmartboys.application.dto.response.Responses;
 
 public interface AuthService {
     Responses<UserInfo> loginWx(WxLoginRequest req);
+
     Responses<UserInfo> register(WxRegisterRequest req);
+
     Responses<UserInfo> staffLogin(StaffLoginRequest req);
 
     void logout(Common common);

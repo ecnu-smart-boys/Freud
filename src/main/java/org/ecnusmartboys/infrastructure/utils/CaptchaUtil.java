@@ -4,8 +4,8 @@ import com.wf.captcha.ArithmeticCaptcha;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.application.dto.Captcha;
+import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

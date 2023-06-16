@@ -1,9 +1,6 @@
 package org.ecnusmartboys.application.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class UserInfo {

@@ -8,7 +8,7 @@ import org.ecnusmartboys.infrastructure.utils.RequestUtil;
 import javax.servlet.http.HttpServletRequest;
 
 public class Extractor {
-    public static Common extract(HttpServletRequest request){
+    public static Common extract(HttpServletRequest request) {
         var session = request.getSession();
         Common common = new Common();
         common.setUserId((String) session.getAttribute(SessionKey.UserID));

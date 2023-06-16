@@ -1,7 +1,5 @@
 package org.ecnusmartboys.domain.repository;
 
-import org.ecnusmartboys.application.dto.MessageInfo;
-import org.ecnusmartboys.domain.model.PageResult;
 import org.ecnusmartboys.domain.model.message.Message;
 
 import java.util.List;

@@ -33,7 +33,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             // 不加AnonymousAccess注解表示登录才可以访问
             var common = Extractor.extract(request);
             String userId = common.getUserId();
-            if(userId == null) {
+            if (userId == null) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }

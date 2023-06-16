@@ -3,7 +3,6 @@ package cos;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import io.github.doocs.im.ImClient;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.FreudApp;
 import org.ecnusmartboys.infrastructure.config.CosConfig;

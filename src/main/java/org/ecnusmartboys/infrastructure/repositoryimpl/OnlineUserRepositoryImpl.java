@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.OnlineStaffInfo;
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
-import org.ecnusmartboys.domain.model.online.*;
+import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
+import org.ecnusmartboys.domain.model.online.OnlineConsultant;
+import org.ecnusmartboys.domain.model.online.OnlineSupervisor;
+import org.ecnusmartboys.domain.model.online.OnlineVisitor;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.User;
@@ -20,21 +23,14 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
-    private final Set<Long> onlineSupervisors;
-
-    private final Set<Long> onlineConsultants;
-
-    private final Set<Long> onlineVisitors;
-
-    private final Map<Long, OnlineConsultant> consultantConversations;
-
-    private final Map<Long, OnlineSupervisor> supervisorConversations;
-
-    private final Map<Long, OnlineVisitor> visitorConversations;
-
     private static final int SEND_NULL_MSG = 2; // TODO
     private static final int END_CONVERSATION = 1; // TODO
-
+    private final Set<Long> onlineSupervisors;
+    private final Set<Long> onlineConsultants;
+    private final Set<Long> onlineVisitors;
+    private final Map<Long, OnlineConsultant> consultantConversations;
+    private final Map<Long, OnlineSupervisor> supervisorConversations;
+    private final Map<Long, OnlineVisitor> visitorConversations;
     private final Map<Long, ConversationMsgTracker> tracker; // 用于追踪每个在线会话的消息数
 
 
@@ -57,20 +53,20 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
     @Override
     public void join(User user) {
-        if(Objects.equals(user.getRole(), Consultant.ROLE)) {
+        if (Objects.equals(user.getRole(), Consultant.ROLE)) {
             onlineConsultants.add(Long.valueOf(user.getId()));
-            fetchConsultant(Long.parseLong(user.getId())).setMaxConcurrent(((Consultant)user).getMaxConversations());
+            fetchConsultant(Long.parseLong(user.getId())).setMaxConcurrent(((Consultant) user).getMaxConversations());
 
-        } else if(Objects.equals(user.getRole(), Supervisor.ROLE)) {
+        } else if (Objects.equals(user.getRole(), Supervisor.ROLE)) {
             onlineSupervisors.add(Long.valueOf(user.getId()));
-            fetchSupervisor(Long.parseLong(user.getId())).setMaxConcurrent(((Supervisor)user).getMaxConversations());;
+            fetchSupervisor(Long.parseLong(user.getId())).setMaxConcurrent(((Supervisor) user).getMaxConversations());
+            ;
 
-        }  else if(Objects.equals(user.getRole(), Visitor.ROLE)) {
+        } else if (Objects.equals(user.getRole(), Visitor.ROLE)) {
             onlineVisitors.add(Long.valueOf(user.getId()));
             fetchVisitor(Long.parseLong(user.getId()));
         }
     }
-
 
 
     @Override
@@ -110,15 +106,15 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         var consultant = fetchConsultant(Long.parseLong(consultantId));
         var visitor = fetchVisitor(Long.parseLong(visitorId));
         // 直接咨询
-        if(consultant.getVisitors().size() < consultant.getMaxConcurrent()) {
+        if (consultant.getVisitors().size() < consultant.getMaxConcurrent()) {
             consultant.getVisitors().add(Long.valueOf(visitorId)); // +
             visitor.startConsultation(Long.parseLong(consultantId)); // +
             return false;
         }
 
         // 排队
-        for(var waitingId : consultant.getWaitingList()) {
-            if(Objects.equals(waitingId, visitorId)) {
+        for (var waitingId : consultant.getWaitingList()) {
+            if (Objects.equals(waitingId, visitorId)) {
                 // 避免重复排队
                 return true;
             }
@@ -135,7 +131,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         var consultant = fetchConsultant(Long.parseLong(consultantId));
 
         // 直接开始求助
-        if(supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
+        if (supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
             supervisor.getConsultants().add(Long.valueOf(consultantId));
             consultant.getSupervisors().add(Long.valueOf(supervisorId));
             return false;
@@ -173,7 +169,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     @Override
     public String popFrontConsultation(String consultantId) {
         var consultant = fetchConsultant(Long.parseLong(consultantId));
-        if(consultant.getWaitingList().size() == 0) {
+        if (consultant.getWaitingList().size() == 0) {
             return null;
         }
 
@@ -201,7 +197,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         Iterator<Map.Entry<String, Long>> iterator = conversations.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
-            if(entry.getValue() < System.currentTimeMillis()) {
+            if (entry.getValue() < System.currentTimeMillis()) {
                 result.add(entry.getKey());
                 iterator.remove();
             }
@@ -216,7 +212,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         Iterator<Map.Entry<String, Long>> iterator = secondChances.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
-            if(entry.getValue() < System.currentTimeMillis()) {
+            if (entry.getValue() < System.currentTimeMillis()) {
                 result.add(entry.getKey());
                 iterator.remove();
             }
@@ -226,11 +222,11 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
     @Override
     public boolean isStaffInConversation(String userId) {
-        if(consultantConversations.containsKey(Long.valueOf(userId))) {
+        if (consultantConversations.containsKey(Long.valueOf(userId))) {
             var consultant = fetchConsultant(Long.parseLong(userId));
             return consultant.getVisitors().size() != 0;
 
-        } else if(supervisorConversations.containsKey(Long.valueOf(userId))) {
+        } else if (supervisorConversations.containsKey(Long.valueOf(userId))) {
             var supervisor = fetchSupervisor(Long.parseLong(userId));
             return supervisor.getConsultants().size() != 0;
         }
@@ -240,11 +236,11 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
     @Override
     public void updateSetting(String userId, Integer maxConversations) {
-        if(consultantConversations.containsKey(Long.valueOf(userId))) {
+        if (consultantConversations.containsKey(Long.valueOf(userId))) {
             var consultant = fetchConsultant(Long.parseLong(userId));
             consultant.setMaxConcurrent(maxConversations);
 
-        } else if(supervisorConversations.containsKey(Long.valueOf(userId))) {
+        } else if (supervisorConversations.containsKey(Long.valueOf(userId))) {
             var supervisor = fetchSupervisor(Long.parseLong(userId));
             supervisor.setMaxConcurrent(maxConversations);
         }
@@ -257,15 +253,15 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         List<Long> temp = new ArrayList<>(onlineConsultants);
         int total = temp.size();
 
-        for(long i = current * size; i < (current + 1) * size; i++) {
-            if(i >= total) {
+        for (long i = current * size; i < (current + 1) * size; i++) {
+            if (i >= total) {
                 break;
             }
             var onlineStaffInfo = new OnlineStaffInfo();
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
-            if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
+            if (consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }
@@ -281,15 +277,15 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         List<Long> temp = new ArrayList<>(onlineSupervisors);
         int total = temp.size();
 
-        for(long i = current * size; i < (current + 1) * size; i++) {
-            if(i >= total) {
+        for (long i = current * size; i < (current + 1) * size; i++) {
+            if (i >= total) {
                 break;
             }
             var onlineStaffInfo = new OnlineStaffInfo();
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineSupervisor supervisor = fetchSupervisor(temp.get((int) i));
-            if(supervisor.getConsultants().size() == supervisor.getMaxConcurrent()) {
+            if (supervisor.getConsultants().size() == supervisor.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += supervisor.getConsultants().size();
             }
@@ -301,8 +297,8 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     @Override
     public OnlineInfoResponse getOnlineBoundConsultantInfo(long current, long size, Set<String> consultantIds) {
         List<Long> temp = new ArrayList<>();
-        for(var consultantId : onlineConsultants) {
-            if(consultantIds.contains(consultantId.toString())) {
+        for (var consultantId : onlineConsultants) {
+            if (consultantIds.contains(consultantId.toString())) {
                 temp.add(consultantId);
             }
         }
@@ -310,15 +306,15 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         List<OnlineStaffInfo> consultants = new ArrayList<>();
         int liveConversations = 0;
 
-        for(long i = current * size; i < (current + 1) * size; i++) {
-            if(i >= temp.size()) {
+        for (long i = current * size; i < (current + 1) * size; i++) {
+            if (i >= temp.size()) {
                 break;
             }
             var onlineStaffInfo = new OnlineStaffInfo();
             onlineStaffInfo.setUserId(temp.get((int) i).toString());
 
             OnlineConsultant consultant = fetchConsultant(temp.get((int) i));
-            if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
+            if (consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
                 onlineStaffInfo.setState(2);
                 liveConversations += consultant.getVisitors().size();
             }
@@ -329,12 +325,12 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
     @Override
     public int getConsultantState(String id) {
-        if(!onlineConsultants.contains(Long.valueOf(id))) {
+        if (!onlineConsultants.contains(Long.valueOf(id))) {
             return 0;
         }
 
         OnlineConsultant consultant = fetchConsultant(Long.parseLong(id));
-        if(consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
+        if (consultant.getVisitors().size() == consultant.getMaxConcurrent()) {
             return 2;
         }
         return 1;
@@ -342,7 +338,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
     @Override
     public int getOnlineConversationNumber(String userId, String role) {
-        if(Objects.equals(role, Consultant.ROLE)) {
+        if (Objects.equals(role, Consultant.ROLE)) {
             onlineConsultants.add(Long.valueOf(userId)); // 服务器重启后，redis不一致
             OnlineConsultant consultant = fetchConsultant(Long.parseLong(userId));
             consultant.setMaxConcurrent(5); // TODO
@@ -359,14 +355,14 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     public boolean cancelWaiting(String visitorId) {
         var visitor = fetchVisitor(Long.parseLong(visitorId));
         long consultantId = visitor.endWaiting();
-        if(consultantId == OnlineVisitor.NULL_CONSULTANT) {
+        if (consultantId == OnlineVisitor.NULL_CONSULTANT) {
             return false;
         }
 
         OnlineConsultant consultant = fetchConsultant(consultantId);
         int index = 0;
-        for(; index < consultant.getWaitingList().size(); index++) {
-            if(Objects.equals(consultant.getWaitingList().get(index), visitorId)) {
+        for (; index < consultant.getWaitingList().size(); index++) {
+            if (Objects.equals(consultant.getWaitingList().get(index), visitorId)) {
                 break;
             }
         }
@@ -383,7 +379,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         Set<String> result = new HashSet<>();
         onlineSupervisors.forEach(id -> {
             OnlineSupervisor supervisor = fetchSupervisor(id);
-            if(supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
+            if (supervisor.getConsultants().size() < supervisor.getMaxConcurrent()) {
                 result.add(id.toString());
             }
         });
@@ -399,7 +395,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         long cId = Long.parseLong(fromId);
         long sId = Long.parseLong(toId);
         long identifier = ((long) Math.max(cId, sId) << 32) + Math.min(cId, sId);
-        if(!tracker.containsKey(identifier)) {
+        if (!tracker.containsKey(identifier)) {
             return null;
         }
         return tracker.get(identifier);
@@ -434,7 +430,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
 
     private OnlineConsultant fetchConsultant(long userId) {
-        if(!consultantConversations.containsKey(userId)) {
+        if (!consultantConversations.containsKey(userId)) {
             OnlineConsultant consultant = new OnlineConsultant();
             consultantConversations.put(userId, consultant);
         }
@@ -443,7 +439,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     private OnlineSupervisor fetchSupervisor(long userId) {
-        if(!supervisorConversations.containsKey(userId)) {
+        if (!supervisorConversations.containsKey(userId)) {
             OnlineSupervisor supervisor = new OnlineSupervisor();
             supervisorConversations.put(userId, supervisor);
         }
@@ -452,12 +448,11 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     private OnlineVisitor fetchVisitor(long userId) {
-        if(!visitorConversations.containsKey(userId)) {
+        if (!visitorConversations.containsKey(userId)) {
             visitorConversations.put(userId, new OnlineVisitor());
         }
         return visitorConversations.get(userId);
     }
-
 
 
 }

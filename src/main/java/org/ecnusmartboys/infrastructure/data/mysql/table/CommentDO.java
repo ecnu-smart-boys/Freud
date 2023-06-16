@@ -20,20 +20,14 @@ import lombok.NoArgsConstructor;
 @TableName(value = CommentDO.TABLE_NAME, autoResultMap = true)
 public class CommentDO extends BaseDO {
     public static final String TABLE_NAME = "comment";
+    public static final String COMMENTED = "is_commented";
     @TableId(value = "id", type = IdType.AUTO)
     protected Long id;
-
     private Long conversationId;
-
     private Long userId;
-
     private Integer score;
-
     private String text;
-
     private String tag;
-
-    public static final String COMMENTED = "is_commented";
     @TableField(COMMENTED)
     private Boolean commented;
 }

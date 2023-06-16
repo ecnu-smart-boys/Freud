@@ -40,8 +40,9 @@ public interface ConversationRepository {
 
     /**
      * 开启一个会话
+     *
      * @param fromId 请求者id
-     * @param toId 被请求者id
+     * @param toId   被请求者id
      */
     Conversation startConsultation(String fromId, String toId);
 
@@ -84,6 +85,7 @@ public interface ConversationRepository {
 
     /**
      * 通过求助督导id获得会话记录
+     *
      * @param helperId 求助督导id
      * @return 会话
      */

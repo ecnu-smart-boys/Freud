@@ -7,9 +7,9 @@ import com.tencentcloudapi.sms.v20210111.models.SendStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.ecnusmartboys.application.dto.SMSCode;
 import org.ecnusmartboys.infrastructure.config.SmsConfig;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
-import org.ecnusmartboys.application.dto.SMSCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -25,11 +25,10 @@ public class SmsUtil {
 
     private static final String CODE_PREFIX = "smscode:";
     private static final int CODE_EXPIRE_MINUTES = 10;
-
+    private static final int CODE_LENGTH = 6;
+    private static final int CODE_RANGE = 1000000;
     private final RedisUtil redisUtil;
-
     private final SmsClient smsClient;
-
     private final SmsConfig smsConfig;
 
     public SMSCode sendSMSCode(String phone) {
@@ -51,7 +50,7 @@ public class SmsUtil {
         return code;
     }
 
-    private void sendSms(String code, String phone){
+    private void sendSms(String code, String phone) {
         SendSmsRequest req = new SendSmsRequest();
         req.setSmsSdkAppId(smsConfig.getSdkAppId());
         req.setSignName(smsConfig.getSignName());
@@ -95,10 +94,6 @@ public class SmsUtil {
     public void invalidateCode(String phone, String codeId) {
         redisUtil.del(getRedisCodeKey(phone, codeId));
     }
-
-    private static final int CODE_LENGTH = 6;
-
-    private static final int CODE_RANGE = 1000000;
 
     private SMSCode generateCode() {
         String verCode = StringUtils.leftPad(String.valueOf(new Random().nextInt(CODE_RANGE)), CODE_LENGTH, "0");

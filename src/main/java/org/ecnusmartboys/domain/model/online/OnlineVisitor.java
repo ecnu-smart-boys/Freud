@@ -28,7 +28,7 @@ public class OnlineVisitor {
     }
 
     public boolean startWaiting(long consultant) {
-        if(isBusy()) {
+        if (isBusy()) {
             return false;
         }
 

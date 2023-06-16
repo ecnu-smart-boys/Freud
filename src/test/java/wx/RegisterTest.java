@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 
 
@@ -22,7 +23,7 @@ public class RegisterTest {
     VisitorInfoMapper visitorInfoMapper;
 
     @Test
-    public void testRegister(){
+    public void testRegister() {
 //        var mock = new MockHttpServletRequest();
 //        var req = new WxRegisterRequest();
 //        req.setAge(18);

@@ -1,9 +1,7 @@
 package org.ecnusmartboys.domain.repository;
 
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
-import org.ecnusmartboys.domain.model.online.ConsultationInfo;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
-import org.ecnusmartboys.domain.model.online.HelpInfo;
 import org.ecnusmartboys.domain.model.user.User;
 
 import java.util.List;
@@ -67,27 +65,31 @@ public interface OnlineUserRepository {
 
     /**
      * 分页查询当前在线的咨询师状态和总咨询数
+     *
      * @param current 页码
-     * @param size 页码大小
+     * @param size    页码大小
      */
     OnlineInfoResponse getOnlineConsultantsInfo(long current, long size);
 
     /**
      * 分页查询当前在线的督导状态和总咨询数
+     *
      * @param current 页码
-     * @param size 页码大小
+     * @param size    页码大小
      */
     OnlineInfoResponse getOnlineSupervisorsInfo(long current, long size);
 
     /**
      * 分页查询当前在线且与某督导绑定的咨询师状态和总咨询数
+     *
      * @param current 页码
-     * @param size 页码大小
+     * @param size    页码大小
      */
     OnlineInfoResponse getOnlineBoundConsultantInfo(long current, long size, Set<String> consultantIds);
 
     /**
      * 获得咨询师状态
+     *
      * @param id 咨询师id
      * @return 0：不在线，1 在线，2 忙碌
      */

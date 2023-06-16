@@ -1,8 +1,8 @@
 package org.ecnusmartboys.adaptor.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.infrastructure.exception.*;
 import org.ecnusmartboys.application.dto.response.Responses;
+import org.ecnusmartboys.infrastructure.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -24,7 +24,7 @@ public class ControllerExceptionHandlerAdvice {
      */
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(BusinessException.class)
-    public Responses<?> businessExceptionHandler(BusinessException exception){
+    public Responses<?> businessExceptionHandler(BusinessException exception) {
         return Responses.error(exception.getStatus(), exception.getMessage());
     }
 

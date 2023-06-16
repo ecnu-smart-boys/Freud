@@ -1,7 +1,7 @@
 package org.ecnusmartboys.application.service.impl;
 
-import cn.hutool.crypto.digest.BCrypt;
 import lombok.RequiredArgsConstructor;
+import org.ecnusmartboys.application.convertor.UserInfoConvertor;
 import org.ecnusmartboys.application.convertor.WxRegisterReqConvertor;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -10,14 +10,11 @@ import org.ecnusmartboys.application.dto.request.command.WxLoginRequest;
 import org.ecnusmartboys.application.dto.request.command.WxRegisterRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.AuthService;
-import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Visitor;
 import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
-import org.ecnusmartboys.infrastructure.exception.BusinessException;
 import org.ecnusmartboys.infrastructure.exception.ForbiddenException;
-import org.ecnusmartboys.application.convertor.UserInfoConvertor;
 import org.ecnusmartboys.infrastructure.exception.UnauthorizedException;
 import org.ecnusmartboys.infrastructure.utils.CaptchaUtil;
 import org.ecnusmartboys.infrastructure.utils.SmsUtil;
@@ -47,13 +44,13 @@ public class AuthServiceImpl implements AuthService {
         var code2Session = wxUtil.code2Session(req.getCode());
         Assert.isTrue(code2Session != null && StringUtils.hasText(code2Session.getOpenid()), "获取openid失败");
         Visitor user;
-        if(userRepository.retrieveByOpenId(code2Session.getOpenid()) instanceof Visitor tmp){
-            if(tmp.isDisabled()){
+        if (userRepository.retrieveByOpenId(code2Session.getOpenid()) instanceof Visitor tmp) {
+            if (tmp.isDisabled()) {
                 throw ForbiddenException.DISABLED;
             }
             user = tmp;
             onlineUserRepository.join(user);
-        }else{
+        } else {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
         return Responses.ok(userInfoConvertor.fromEntity(user));

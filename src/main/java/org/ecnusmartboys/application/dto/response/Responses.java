@@ -13,22 +13,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Responses<T> {
+    private static final int DEFAULT_ERROR_STATUS = -1;
     /**
      * 业务状态码，与http状态码不相同。
      */
     private Integer status;
-
     /**
      * 返回信息，抛出异常时会附带异常信息，正常返回任意值（"ok", null）皆可。
      */
     private String message;
-
     /**
      * 返回数据，正常返回时返回的数据，异常时返回null。
      */
     private T data;
 
-    private static final int DEFAULT_ERROR_STATUS = -1;
     /**
      * 返回成功，不带数据。
      *

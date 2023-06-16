@@ -5,6 +5,7 @@ import lombok.Data;
 import org.ecnusmartboys.application.dto.RankUserInfo;
 
 import java.util.List;
+
 @AllArgsConstructor
 @Data
 public class RankResponse {

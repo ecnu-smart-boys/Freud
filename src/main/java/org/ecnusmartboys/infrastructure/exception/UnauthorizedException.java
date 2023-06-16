@@ -6,6 +6,7 @@ package org.ecnusmartboys.infrastructure.exception;
 public class UnauthorizedException extends RuntimeException {
     public static UnauthorizedException AUTHENTICATION_FAIL = new UnauthorizedException("认证失败");
     public static UnauthorizedException ANONYMOUS_NOT_ALLOWED = new UnauthorizedException("禁止匿名访问");
+
     public UnauthorizedException(String message) {
         super(message);
     }

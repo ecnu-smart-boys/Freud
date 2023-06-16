@@ -8,8 +8,6 @@ import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ public class TimeoutKickScheduler {
     private final WebSocketServer webSocketServer;
 
     @Scheduled(cron = "15 * * * * ?")
-    public void timeoutKick(){
+    public void timeoutKick() {
 //        var timeoutUsers = onlineStateService.timeoutKick();
 //        for (Long userId : timeoutUsers) {
 //            webSocketServer.close(userId);

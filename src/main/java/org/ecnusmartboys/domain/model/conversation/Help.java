@@ -3,7 +3,6 @@ package org.ecnusmartboys.domain.model.conversation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ecnusmartboys.domain.model.BaseEntity;
 import org.ecnusmartboys.domain.model.user.User;
 
 @Data

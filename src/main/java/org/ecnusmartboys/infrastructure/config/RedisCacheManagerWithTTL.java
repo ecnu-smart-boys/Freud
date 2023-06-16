@@ -8,15 +8,14 @@ import java.time.Duration;
 
 public class RedisCacheManagerWithTTL extends RedisCacheManager {
 
-    public RedisCacheManagerWithTTL(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration) {
-        super(cacheWriter, defaultCacheConfiguration);
-    }
-
     private static final RedisSerializationContext.SerializationPair<Object> DEFAULT_PAIR =
             RedisSerializationContext.SerializationPair
                     .fromSerializer(new GenericJackson2JsonRedisSerializer());
+    private static final CacheKeyPrefix DEFAULT_CACHE_KEY_PREFIX = cacheName -> cacheName + ":";
 
-    private static final CacheKeyPrefix DEFAULT_CACHE_KEY_PREFIX = cacheName -> cacheName+":";
+    public RedisCacheManagerWithTTL(RedisCacheWriter cacheWriter, RedisCacheConfiguration defaultCacheConfiguration) {
+        super(cacheWriter, defaultCacheConfiguration);
+    }
 
     @Override
     protected RedisCache createRedisCache(String name, RedisCacheConfiguration cacheConfig) {
@@ -30,7 +29,7 @@ public class RedisCacheManagerWithTTL extends RedisCacheManager {
                     .serializeValuesWith(DEFAULT_PAIR);
             final String cacheName = name.substring(0, lastIndexOf);
             return super.createRedisCache(cacheName, cacheConfig);
-        }else{
+        } else {
             //修改缓存key和value值的序列化方式
             cacheConfig = cacheConfig.computePrefixWith(DEFAULT_CACHE_KEY_PREFIX)
                     .serializeValuesWith(DEFAULT_PAIR);

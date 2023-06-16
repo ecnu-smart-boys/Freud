@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ecnusmartboys.application.dto.UserInfo;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

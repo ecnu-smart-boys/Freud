@@ -15,13 +15,14 @@ import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
 import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
 import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.service.ConversationService;
+import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.Visitor;
-import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -39,14 +40,14 @@ public class ConversationController {
     @AuthRoles(Admin.ROLE)
     @ApiOperation("管理员获得咨询记录列表")
     @GetMapping("/admin/consultations")
-    public Responses<ConsultRecordsResponse> getAllConsultations(@Validated ConsultRecordListReq req){
+    public Responses<ConsultRecordsResponse> getAllConsultations(@Validated ConsultRecordListReq req) {
         return conversationService.getAllConsultations(req);
     }
 
     @AuthRoles(Consultant.ROLE)
     @ApiOperation("咨询师获得最近咨询记录")
     @GetMapping("/consultant/recentConsultations")
-    public Responses<ConsultRecordsResponse> getRecentConsultations(HttpServletRequest request){
+    public Responses<ConsultRecordsResponse> getRecentConsultations(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getRecentConsultations(common);
     }
@@ -54,7 +55,7 @@ public class ConversationController {
     @AuthRoles(Consultant.ROLE)
     @ApiOperation("咨询师获得咨询记录列表")
     @GetMapping("/consultant/consultations")
-    public Responses<ConsultRecordsResponse> getConsultantConsultations(@Validated ConsultRecordListReq req, HttpServletRequest request){
+    public Responses<ConsultRecordsResponse> getConsultantConsultations(@Validated ConsultRecordListReq req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getConsultConsultations(req, common);
     }
@@ -62,7 +63,7 @@ public class ConversationController {
     @AuthRoles(Supervisor.ROLE)
     @ApiOperation("督导获得求助记录列表")
     @GetMapping("/supervisor/helpRecords")
-    public Responses<HelpRecordsResponse> getSupervisorHelpRecords(@Validated ConsultRecordListReq req, HttpServletRequest request){
+    public Responses<HelpRecordsResponse> getSupervisorHelpRecords(@Validated ConsultRecordListReq req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getSupervisorHelpRecords(req, common);
     }
@@ -70,7 +71,7 @@ public class ConversationController {
     @AuthRoles(Supervisor.ROLE)
     @ApiOperation("督导获得最近咨询记录")
     @GetMapping("/supervisor/recentHelps")
-    public Responses<HelpRecordsResponse> getRecentHelps(HttpServletRequest request){
+    public Responses<HelpRecordsResponse> getRecentHelps(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getRecentHelps(common);
     }
@@ -78,7 +79,7 @@ public class ConversationController {
     @AuthRoles(Supervisor.ROLE)
     @ApiOperation("督导获得绑定咨询师的咨询记录")
     @GetMapping("/supervisor/boundConsultations")
-    public Responses<ConsultRecordsResponse> getBoundConsultations(@Validated ConsultRecordListReq req, HttpServletRequest request){
+    public Responses<ConsultRecordsResponse> getBoundConsultations(@Validated ConsultRecordListReq req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getBoundConsultations(req, common);
     }
@@ -197,7 +198,7 @@ public class ConversationController {
     @AuthRoles(Visitor.ROLE)
     @PostMapping("/consult")
     @ApiOperation("访客发起咨询会话")
-    public Responses<LeftConversation> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request){
+    public Responses<LeftConversation> startConversation(@RequestBody @Validated StartConsultRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.startConversation(req, common);
     }
@@ -205,7 +206,7 @@ public class ConversationController {
     @AuthRoles({Visitor.ROLE, Consultant.ROLE})
     @PostMapping("/endConsultation")
     @ApiOperation("结束咨询会话")
-    public Responses<EndConsultResponse> endConsultation(@RequestBody @Validated EndConsultRequest req, HttpServletRequest request){
+    public Responses<EndConsultResponse> endConsultation(@RequestBody @Validated EndConsultRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.endConsultation(req, common);
     }
@@ -245,7 +246,7 @@ public class ConversationController {
     @AuthRoles(Visitor.ROLE)
     @PostMapping("/visitorComment")
     @ApiOperation("访客会话结束后评价")
-    public Responses<EndConsultResponse> visitorComment(@RequestBody @Validated VisitorCommentRequest req, HttpServletRequest request){
+    public Responses<EndConsultResponse> visitorComment(@RequestBody @Validated VisitorCommentRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.visitorComment(req, common);
     }
@@ -253,7 +254,7 @@ public class ConversationController {
     @AuthRoles(Consultant.ROLE)
     @PostMapping("/consultantComment")
     @ApiOperation("咨询师会话结束后评价")
-    public Responses<EndConsultResponse> consultantComment(@RequestBody @Validated ConsultantCommentRequest req, HttpServletRequest request){
+    public Responses<EndConsultResponse> consultantComment(@RequestBody @Validated ConsultantCommentRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.consultantComment(req, common);
     }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ConsultantInfo extends UserInfo{
+public class ConsultantInfo extends UserInfo {
 
     private String idNumber;
 

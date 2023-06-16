@@ -4,11 +4,7 @@ import io.github.doocs.im.ImClient;
 import io.github.doocs.im.model.request.KickRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ecnusmartboys.application.convertor.ConsultantInfoConvertor;
-import org.ecnusmartboys.application.convertor.SupervisorInfoConvertor;
-import org.ecnusmartboys.application.convertor.UpdateVisitorReqConvertor;
-import org.ecnusmartboys.application.convertor.UserInfoConvertor;
-import org.ecnusmartboys.application.convertor.VisitorInfoConvertor;
+import org.ecnusmartboys.application.convertor.*;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -28,7 +24,7 @@ import java.io.IOException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserInfoConvertor userInfoConvertor;
@@ -42,16 +38,16 @@ public class UserServiceImpl implements UserService{
     @Override
     public Responses<UserInfo> getUserInfo(Common common) {
         var user = userRepository.retrieveById(common.getUserId());
-        if(user == null) {
+        if (user == null) {
             return Responses.ok(null);
         }
         UserInfo userInfo;
         if (user instanceof Visitor) {
-            userInfo = visitorInfoConvertor.fromEntity((Visitor)user);
+            userInfo = visitorInfoConvertor.fromEntity((Visitor) user);
         } else if (user instanceof Supervisor) {
-            userInfo = supervisorInfoConvertor.fromEntity((Supervisor)user);
+            userInfo = supervisorInfoConvertor.fromEntity((Supervisor) user);
         } else if (user instanceof Consultant) {
-            userInfo = consultantInfoConvertor.fromEntity((Consultant)user);
+            userInfo = consultantInfoConvertor.fromEntity((Consultant) user);
         } else {
             userInfo = userInfoConvertor.fromEntity(user);
         }

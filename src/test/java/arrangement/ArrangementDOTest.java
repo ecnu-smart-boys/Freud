@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
 @Slf4j
 @SpringBootTest(classes = FreudApp.class)
 @ActiveProfiles({"local", "test"})

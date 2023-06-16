@@ -23,13 +23,10 @@ import java.util.zip.Deflater;
 @ConfigurationProperties(prefix = "freud.im")
 public class IMConfig {
 
-    private Long appId;
-
-    private String secretKey;
-
-    private String token;
-
     public static final int EXPIRE = 60 * 60 * 24 * 30;
+    private Long appId;
+    private String secretKey;
+    private String token;
 
     public String getUserSig(String userId) throws JSONException {
         return genUserSig(userId, EXPIRE);

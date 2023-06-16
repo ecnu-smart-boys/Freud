@@ -44,7 +44,7 @@ public class FreudConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    CommonsRequestLoggingFilter loggingFilter(){
+    CommonsRequestLoggingFilter loggingFilter() {
         CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
         loggingFilter.setIncludeHeaders(true);
         loggingFilter.setIncludePayload(true);

@@ -20,7 +20,6 @@ import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -34,7 +33,7 @@ public class ArrangeServiceImpl implements ArrangeService {
     @Override
     public Responses<Object> remove(RemoveArrangeRequest req) {
         Date date = new Date(req.getTimestamp());
-        if(!(date.after(new Date()))) {
+        if (!(date.after(new Date()))) {
             throw new BadRequestException("只能移除未来的排班");
         }
         arrangementRepository.remove(req.getUserId(), date);
@@ -45,16 +44,16 @@ public class ArrangeServiceImpl implements ArrangeService {
     @Override
     public Responses<Object> addArrangement(AddArrangementRequest req) {
         var user = userRepository.retrieveById(req.getUserId());
-        if(user == null) {
+        if (user == null) {
             throw new BadRequestException("所要排班的用户不存在");
         }
 
-        if((!(user instanceof Consultant) && !(user instanceof Supervisor))) {
+        if ((!(user instanceof Consultant) && !(user instanceof Supervisor))) {
             throw new BadRequestException("只能给咨询师和督导进行排班");
         }
 
         Date date = new Date(req.getTimestamp());
-        if(!(date.after(new Date()))) {
+        if (!(date.after(new Date()))) {
             throw new BadRequestException("只能给以后的日期进行排班");
         }
 
@@ -74,7 +73,7 @@ public class ArrangeServiceImpl implements ArrangeService {
         arrangements.forEach(arrangement -> {
             var user = userRepository.retrieveById(arrangement.getUserId());
 
-            if(user instanceof Consultant) {
+            if (user instanceof Consultant) {
                 result.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
         });
@@ -90,7 +89,7 @@ public class ArrangeServiceImpl implements ArrangeService {
         arrangements.forEach(arrangement -> {
             var user = userRepository.retrieveById(arrangement.getUserId());
 
-            if(user instanceof Supervisor) {
+            if (user instanceof Supervisor) {
                 result.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
         });
@@ -107,13 +106,13 @@ public class ArrangeServiceImpl implements ArrangeService {
         calendar.set(Calendar.MONTH, req.getMonth() - 1);
 
         int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        for(int day = 1; day <= lastDayOfMonth; day++) {
+        for (int day = 1; day <= lastDayOfMonth; day++) {
             result.add(new DayArrangeInfo(day, 0, 0));
         }
 
         var arrangementInfoList = arrangementRepository.retrieveMonthArrangement(req.getYear(), req.getMonth());
         arrangementInfoList.forEach(v -> {
-            if(Objects.equals(v.getRole(), "supervisor")) {
+            if (Objects.equals(v.getRole(), "supervisor")) {
                 result.get(v.getDay() - 1).setSupervisors(v.getTotal());
             } else {
                 result.get(v.getDay() - 1).setConsultants(v.getTotal());
@@ -135,7 +134,7 @@ public class ArrangeServiceImpl implements ArrangeService {
 
         List<User> users = userRepository.retrieveByRole(role, req.getName());
         users.forEach(user -> {
-            if(!ids.contains(user.getId())) {
+            if (!ids.contains(user.getId())) {
                 result.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
         });
@@ -147,7 +146,7 @@ public class ArrangeServiceImpl implements ArrangeService {
         List<Integer> result = new ArrayList<>();
         LocalDate currentDate = LocalDate.now();
         int daysInMonth = currentDate.lengthOfMonth();
-        for(int i = 0; i < daysInMonth; i++) {
+        for (int i = 0; i < daysInMonth; i++) {
             result.add(0);
         }
 

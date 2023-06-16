@@ -3,12 +3,13 @@ package org.ecnusmartboys.infrastructure.ws;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
-import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.OnlineStateService;
 import org.ecnusmartboys.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Map;
@@ -20,14 +21,11 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class WebSocketServer extends TextWebSocketHandler {
 
+    private final Map<Long, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+    private final OnlineStateService onlineStateService;
+    private final UserService userService;
     @Value("${freud.online.timeout:15}")
     private int timeout;
-
-    private final Map<Long, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
-
-    private final OnlineStateService onlineStateService;
-
-    private final UserService userService;
 
     public boolean send(Long userId, String message) {
         WebSocketSession session = sessionMap.get(userId);

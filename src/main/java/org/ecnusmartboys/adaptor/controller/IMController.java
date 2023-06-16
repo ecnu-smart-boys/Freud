@@ -11,8 +11,8 @@ import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
 import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
-import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.MsgListResponse;
+import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.dto.response.SigResponse;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.user.Admin;
@@ -21,11 +21,8 @@ import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.Visitor;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -42,11 +39,11 @@ public class IMController {
     @PostMapping("/cb")
     @AnonymousAccess
     public Responses<?> callback(IMCallbackParam param,
-        @RequestBody String body, HttpServletRequest request) {
+                                 @RequestBody String body, HttpServletRequest request) {
         return messageService.callback(param, body, request);
     }
 
-    @AuthRoles({Supervisor.ROLE,Visitor.ROLE,Consultant.ROLE})
+    @AuthRoles({Supervisor.ROLE, Visitor.ROLE, Consultant.ROLE})
     @ApiOperation(value = "获取微信IM签名")
     @GetMapping("/generateUserSig")
     public Responses<SigResponse> generateUserSig(HttpServletRequest request) {

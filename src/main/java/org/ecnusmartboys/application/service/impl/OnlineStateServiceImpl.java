@@ -16,18 +16,17 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class OnlineStateServiceImpl implements OnlineStateService {
 
-    private final RedisUtil redisUtil;
-    private final OnlineUserRepository onlineUserRepository;
-
-    @Value("${freud.online.timeout:15}")
-    private int timeoutInMinutes;
     private static final String KEY_PREFIX = "onlineState:";
     private static final String TIMEOUT_KEY = "onlineStateTimeout";
+    private final RedisUtil redisUtil;
+    private final OnlineUserRepository onlineUserRepository;
+    @Value("${freud.online.timeout:15}")
+    private int timeoutInMinutes;
 
     @Override
     public OnlineState getUserState(Long userId) {
         String key = getKey(userId);
-        Integer ordinal = (Integer)redisUtil.get(key);
+        Integer ordinal = (Integer) redisUtil.get(key);
         return ordinal == null ? OnlineState.OFFLINE : OnlineState.values()[ordinal];
     }
 

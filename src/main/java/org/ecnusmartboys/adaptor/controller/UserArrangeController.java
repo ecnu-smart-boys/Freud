@@ -17,6 +17,7 @@ import org.ecnusmartboys.application.service.UserArrangeService;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;

@@ -8,5 +8,5 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = BaseConvertor.COMPONENT_MODEL,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface AddSupReqConvertor extends BaseConvertor<AddSupervisorRequest, Supervisor>{
+public interface AddSupReqConvertor extends BaseConvertor<AddSupervisorRequest, Supervisor> {
 }

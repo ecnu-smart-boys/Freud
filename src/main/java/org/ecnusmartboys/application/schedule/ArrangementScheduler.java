@@ -19,10 +19,10 @@ public class ArrangementScheduler {
     private final UserRepository userRepository;
 
     @Scheduled(cron = "0 0 0 ? * ?")
-    public void setTodaysArrangement(){
+    public void setTodaysArrangement() {
         var now = new Date();
         var dayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
-        if (dayOfWeek == -1){
+        if (dayOfWeek == -1) {
             dayOfWeek = 6;
         }
 

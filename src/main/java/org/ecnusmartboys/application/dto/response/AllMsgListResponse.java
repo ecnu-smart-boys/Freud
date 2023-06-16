@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @ApiModel("返回咨询消息记录+求助消息记录")
 @AllArgsConstructor
- @NoArgsConstructor
+@NoArgsConstructor
 public class AllMsgListResponse {
 
     @ApiModelProperty("咨询记录列表")

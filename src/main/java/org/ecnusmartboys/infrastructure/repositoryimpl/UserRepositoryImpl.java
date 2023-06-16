@@ -70,9 +70,9 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
 
     @Override
     public PageResult<User> retrieveByRoleAndPage(String role, Long current, Long size, String name) {
-        Page<UserDO> page = new Page<>(current , size);
+        Page<UserDO> page = new Page<>(current, size);
         LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, role);
-        if(!name.equals("")) {
+        if (!name.equals("")) {
             wrapper.like(UserDO::getName, name);
         }
         userMapper.selectPage(page, wrapper);
@@ -86,7 +86,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     }
 
 
-    private User convert(UserDO userDO){
+    private User convert(UserDO userDO) {
         String role = userDO.getRole();
         switch (role) {
             case Visitor.ROLE:
@@ -101,7 +101,6 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
         }
         return userConvertor.toUser(userDO);
     }
-
 
 
     @Override
@@ -119,7 +118,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.insert(staffInfoDO);
             user.setId(String.valueOf(staffInfoDO.getStaffId()));
-        } else if(user instanceof Supervisor) {
+        } else if (user instanceof Supervisor) {
             var staffInfoDO = userConvertor.toStaffInfoDO((Supervisor) user);
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.insert(staffInfoDO);
@@ -140,7 +139,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
             var staffInfoDO = userConvertor.toStaffInfoDO((Consultant) user);
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.updateById(staffInfoDO);
-        } else if(user instanceof Supervisor) {
+        } else if (user instanceof Supervisor) {
             var staffInfoDO = userConvertor.toStaffInfoDO((Supervisor) user);
             staffInfoDO.setStaffId(userDO.getId());
             staffInfoMapper.updateById(staffInfoDO);
@@ -150,9 +149,9 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     @Override
     public List<String> retrieveIdsByArrangement(int dayOfWeek) {
         var wrapper = new QueryWrapper<StaffInfoDO>().eq(
-            "arrangement & " + (1 << dayOfWeek), 1 << dayOfWeek);
+                "arrangement & " + (1 << dayOfWeek), 1 << dayOfWeek);
         var staffList = staffInfoMapper.selectList(wrapper);
-        List<String> results =  new ArrayList<>();
+        List<String> results = new ArrayList<>();
         staffList.forEach(v -> {
             results.add(v.getStaffId().toString());
         });
@@ -162,7 +161,7 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
     @Override
     public List<User> retrieveByRole(String role, String name) {
         LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<UserDO>().eq(UserDO::getRole, role);
-        if(!name.equals("")) {
+        if (!name.equals("")) {
             wrapper.like(UserDO::getName, name);
         }
         List<UserDO> userDOS = userMapper.selectList(wrapper);
@@ -172,7 +171,6 @@ public class UserRepositoryImpl implements UserRepository, InitializingBean {
         });
         return users;
     }
-
 
 
     @Override

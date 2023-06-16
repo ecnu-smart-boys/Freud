@@ -12,6 +12,7 @@ public interface UserService {
 
     /**
      * 把用户踢下线
+     *
      * @param userId
      */
     void offline(Long userId);

@@ -31,45 +31,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WxUtil {
 
-    private final RestTemplate restTemplate;
-
-    private final WeixinMpConfig config;
-
-    private final RedisUtil redisUtil;
-
     private static final String ACCESS_TOKEN_PREFIX = "";
-
-    /**
-     * 通过小程序前端获取的jscode向微信请求Session相关信息
-     */
-    public Code2SessionResponse code2Session(String code) {
-        Assert.notNull(code, "code不能为空");
-        String url = "https://api.weixin.qq.com/sns/jscode2session?"
-                + "appid=" + config.getAppId()
-                + "&secret=" + config.getSecret()
-                + "&js_code=" + code
-                + "&grant_type=authorization_code";
-        var resp = restTemplate.getForObject(url, Code2SessionResponse.class, new HashMap<>());
-        if (resp == null || !StringUtils.hasLength(resp.getOpenid())) {
-            if (resp != null) {
-                throw new BadRequestException(resp.getErrmsg());
-            }
-            throw new InternalException("code2Session return null");
-        }
-        return resp;
-    }
-
-    @Cacheable(cacheNames = "access_token#7000", key = "'wx_access_token'")
-    public String getAccessToken(){
-        String url = "https://api.weixin.qq.com/cgi-bin/token?"
-                + "grant_type=client_credential"
-                + "&appid=" + config.getAppId()
-                + "&secret=" + config.getSecret();
-        var token = restTemplate.getForObject(url, AccessTokenResponse.class, new HashMap<>());
-        Assert.notNull(token, "获取access_token失败");
-        return token.getAccess_token();
-    }
-
+    private final RestTemplate restTemplate;
+    private final WeixinMpConfig config;
+    private final RedisUtil redisUtil;
 
     /**
      * 处理小程序发送的encryptedData
@@ -97,6 +62,37 @@ public class WxUtil {
         } catch (Exception e) {
             log.error("error in decryptPhoneNumber: ", e);
         }
+    }
+
+    /**
+     * 通过小程序前端获取的jscode向微信请求Session相关信息
+     */
+    public Code2SessionResponse code2Session(String code) {
+        Assert.notNull(code, "code不能为空");
+        String url = "https://api.weixin.qq.com/sns/jscode2session?"
+                + "appid=" + config.getAppId()
+                + "&secret=" + config.getSecret()
+                + "&js_code=" + code
+                + "&grant_type=authorization_code";
+        var resp = restTemplate.getForObject(url, Code2SessionResponse.class, new HashMap<>());
+        if (resp == null || !StringUtils.hasLength(resp.getOpenid())) {
+            if (resp != null) {
+                throw new BadRequestException(resp.getErrmsg());
+            }
+            throw new InternalException("code2Session return null");
+        }
+        return resp;
+    }
+
+    @Cacheable(cacheNames = "access_token#7000", key = "'wx_access_token'")
+    public String getAccessToken() {
+        String url = "https://api.weixin.qq.com/cgi-bin/token?"
+                + "grant_type=client_credential"
+                + "&appid=" + config.getAppId()
+                + "&secret=" + config.getSecret();
+        var token = restTemplate.getForObject(url, AccessTokenResponse.class, new HashMap<>());
+        Assert.notNull(token, "获取access_token失败");
+        return token.getAccess_token();
     }
 
 }

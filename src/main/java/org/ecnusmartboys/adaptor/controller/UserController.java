@@ -8,8 +8,8 @@ import org.ecnusmartboys.adaptor.Extractor;
 import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
-import org.ecnusmartboys.application.service.UserService;
 import org.ecnusmartboys.application.dto.response.Responses;
+import org.ecnusmartboys.application.service.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

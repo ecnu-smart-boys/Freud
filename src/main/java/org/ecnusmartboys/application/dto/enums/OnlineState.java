@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum OnlineState implements BaseEnum{
+public enum OnlineState implements BaseEnum {
     OFFLINE(0, "离线"),
     IDLE(1, "空闲"),
     IN_CONVERSATION(2, "会话中");

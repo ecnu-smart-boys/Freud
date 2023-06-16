@@ -3,7 +3,7 @@ package org.ecnusmartboys.domain.model.user;
 import lombok.Data;
 
 @Data
-public class Supervisor extends User{
+public class Supervisor extends User {
     public static final String ROLE = "supervisor";
 
     private String idNumber;

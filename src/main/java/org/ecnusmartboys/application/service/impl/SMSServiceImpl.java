@@ -19,6 +19,7 @@ public class SMSServiceImpl implements SMSService {
     private final SmsUtil smsUtil;
 
     private final RedisUtil redisUtil;
+
     @Override
     public Responses<String> sendSMS(SendSMSRequest req, Common common) {
         String key = "limit:sms:" + common.getExtra().getIp();

@@ -8,7 +8,7 @@ public class BusinessException extends RuntimeException {
         this.status = status;
     }
 
-    public int getStatus(){
+    public int getStatus() {
         return this.status;
     }
 }

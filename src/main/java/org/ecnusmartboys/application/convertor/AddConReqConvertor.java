@@ -9,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = BaseConvertor.COMPONENT_MODEL,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface AddConReqConvertor extends BaseConvertor<AddConsultantRequest, Consultant>{
+public interface AddConReqConvertor extends BaseConvertor<AddConsultantRequest, Consultant> {
     @Override
     @Mapping(target = "role", constant = Consultant.ROLE)
     Consultant toEntity(AddConsultantRequest dto);

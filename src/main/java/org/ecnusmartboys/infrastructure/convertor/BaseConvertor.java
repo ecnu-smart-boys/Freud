@@ -10,6 +10,7 @@ import java.util.List;
  */
 public interface BaseConvertor<D, E> {
     String COMPONENT_MODEL = "spring";
+
     E toEntity(D dto);
 
     D fromEntity(E entity);

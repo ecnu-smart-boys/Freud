@@ -6,6 +6,7 @@ package org.ecnusmartboys.infrastructure.exception;
 public class ForbiddenException extends RuntimeException {
     public static final ForbiddenException DISABLED = new ForbiddenException("账号已被禁用");
     public static final ForbiddenException PERMISSION_DENY = new ForbiddenException("账号权限不足");
+
     public ForbiddenException() {
         super();
     }
