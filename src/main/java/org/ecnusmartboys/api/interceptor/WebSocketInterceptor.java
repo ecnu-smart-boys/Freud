@@ -1,6 +1,7 @@
 package org.ecnusmartboys.api.interceptor;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -19,9 +20,9 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
     private final RedisIndexedSessionRepository sessionRepository;
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest request,
-                                   ServerHttpResponse response,
-                                   WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+    public boolean beforeHandshake(@NotNull ServerHttpRequest request,
+                                   @NotNull ServerHttpResponse response,
+                                   @NotNull WebSocketHandler wsHandler, @NotNull Map<String, Object> attributes) throws Exception {
         var x = ((ServletServerHttpRequest) request).getServletRequest().getParameter("x-freud");
         if (x == null) {
             return false;
@@ -37,7 +38,7 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
     }
 
     @Override
-    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
+    public void afterHandshake(@NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
 
     }
 

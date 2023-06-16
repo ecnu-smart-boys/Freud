@@ -2,9 +2,7 @@ package org.ecnusmartboys.api.interceptor;
 
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.api.Extractor;
-import org.ecnusmartboys.api.annotation.AnonymousAccess;
 import org.ecnusmartboys.api.annotation.AuthRoles;
-import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.mapper.UserMapper;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -26,11 +24,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) throws Exception {
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod method = (HandlerMethod) handler;
-            if (method.hasMethodAnnotation(AnonymousAccess.class)) {
+                             @NotNull HttpServletResponse response,
+                             @NotNull Object handler) throws Exception {
+        if (handler instanceof HandlerMethod method) {
+            if (!method.hasMethodAnnotation(AuthRoles.class)) {
                 return true;
             }
             // 不加AnonymousAccess注解表示登录才可以访问
@@ -56,12 +53,5 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             }
         }
         return true;
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request,
-                                HttpServletResponse response,
-                                Object handler, Exception ex) throws Exception {
-
     }
 }

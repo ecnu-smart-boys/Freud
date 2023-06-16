@@ -1,8 +1,5 @@
 package org.ecnusmartboys.infrastructure.config;
 
-import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
 import lombok.RequiredArgsConstructor;
 import org.ecnusmartboys.api.interceptor.AuthenticationInterceptor;
 import org.springframework.context.annotation.Bean;
@@ -27,9 +24,7 @@ public class FreudConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html/**");
+        registry.addInterceptor(authenticationInterceptor);
     }
 
     @Bean

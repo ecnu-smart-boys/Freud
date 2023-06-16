@@ -1,5 +1,7 @@
 server:
   port: 5508
+  servlet:
+    context-path: /api
 
 logging:
   level:
