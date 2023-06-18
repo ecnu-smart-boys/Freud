@@ -13,21 +13,21 @@ import io.github.doocs.im.model.message.TIMMsgElement;
 import io.github.doocs.im.model.message.TIMSoundMsgElement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ecnusmartboys.application.dto.ConsultantInfo;
 import org.ecnusmartboys.application.dto.MessageInfo;
+import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
-import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
-import org.ecnusmartboys.application.dto.response.MsgListResponse;
-import org.ecnusmartboys.application.dto.response.Responses;
-import org.ecnusmartboys.application.dto.response.SigResponse;
+import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.dto.ws.MsgNotification;
 import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.message.Message;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
+import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
 import org.ecnusmartboys.domain.repository.ConversationRepository;
@@ -213,8 +213,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Responses<MsgListResponse> getVisitorConsultationMsg(SingleMsgRequest req, Common common) {
-        Conversation consultation = conversationRepository.retrieveById(req.getConversationId());
+    public Responses<AllDetailsResponse> getVisitorConsultationMsg(String conversationId, Common common) {
+        Conversation consultation = conversationRepository.retrieveById(conversationId);
         if (consultation == null || !Objects.equals(consultation.getFromUser().getId(), common.getUserId())) {
             throw new BadRequestException("你不存在这条会话记录");
 
@@ -222,8 +222,24 @@ public class MessageServiceImpl implements MessageService {
             throw new BadRequestException("该咨询尚未结束，无法查看消息记录");
         }
 
-        List<MessageInfo> infos = retrieveMsg(consultation.getId(), req.getIterator(), req.getSize());
-        return Responses.ok(new MsgListResponse(infos));
+        AllDetailsResponse response = new AllDetailsResponse();
+
+        List<MessageInfo> infos = retrieveMsg(consultation.getId(), -1, OFFSET);
+        response.setConsultation(infos);
+
+        var toUser = consultation.getToUser();
+        var fromUser = consultation.getFromUser();
+        response.setVisitorText(consultation.getFromUserComment().getText());
+        response.setVisitorScore(consultation.getFromUserComment().getScore());
+        response.setConsultantText(consultation.getToUserComment().getText());
+        response.setTag(consultation.getToUserComment().getTag());
+
+        ConsultationInfo consultationInfo =
+                new ConsultationInfo(consultation.getId(), toUser.getId(), fromUser.getId(), toUser.getName(), toUser.getAvatar(), fromUser.getPhone(),
+                        fromUser.getName(), fromUser.getAvatar(), consultation.getStartTime(), consultation.getEndTime(), true);
+        response.setConsultationInfo(consultationInfo);
+
+        return Responses.ok(response);
     }
 
     @Override

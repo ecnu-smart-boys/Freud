@@ -10,10 +10,7 @@ import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
-import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
-import org.ecnusmartboys.application.dto.response.MsgListResponse;
-import org.ecnusmartboys.application.dto.response.Responses;
-import org.ecnusmartboys.application.dto.response.SigResponse;
+import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.application.service.MessageService;
 import org.ecnusmartboys.domain.model.user.Admin;
 import org.ecnusmartboys.domain.model.user.Consultant;
@@ -84,11 +81,11 @@ public class IMController {
     }
 
     @AuthRoles(Visitor.ROLE)
-    @ApiOperation("访客查看咨询记录消息列表")
+    @ApiOperation("访客查看咨询记录全部信息")
     @GetMapping("details/visitorConsultationList")
-    public Responses<MsgListResponse> getVisitorConsultationMsg(@Validated SingleMsgRequest req, HttpServletRequest request) {
+    public Responses<AllDetailsResponse> getVisitorConsultationMsg(@RequestParam String conversationId, HttpServletRequest request) {
         var common = Extractor.extract(request);
-        return messageService.getVisitorConsultationMsg(req, common);
+        return messageService.getVisitorConsultationMsg(conversationId, common);
     }
 
     /************************* 获取在线会话的消息 *************************/

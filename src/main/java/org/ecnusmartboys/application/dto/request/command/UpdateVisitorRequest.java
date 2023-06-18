@@ -14,6 +14,7 @@ import javax.validation.constraints.Email;
 public class UpdateVisitorRequest {
 
     @Range(min = 0, message = "年龄不能为负数")
+    @Range(min = 10, max = 100, message = "年龄必须在10-100之间")
     @ApiModelProperty("年龄")
     private Integer age;
 
@@ -22,6 +23,7 @@ public class UpdateVisitorRequest {
     private String avatar;
 
     @ApiModelProperty("性别")
+    @Range(min = 1, max = 2, message = "性别只能取值为 1 或 2")
     private Integer gender;
 
     @Length(max = 32, message = "姓名过长")
@@ -40,5 +42,6 @@ public class UpdateVisitorRequest {
     private String emergencyContact;
 
     @ApiModelProperty("紧急联系人电话")
+    @Phone
     private String emergencyPhone;
 }

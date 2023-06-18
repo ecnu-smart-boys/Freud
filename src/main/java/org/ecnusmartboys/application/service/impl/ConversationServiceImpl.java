@@ -90,6 +90,7 @@ public class ConversationServiceImpl implements ConversationService {
         var consultations = conversationRepository.retrieveConsultationByVisitorId(common.getUserId());
         consultations.forEach(conversation -> {
             WxConsultRecordInfo info = new WxConsultRecordInfo();
+            info.setConversationId(conversation.getId());
             info.setAvatar(conversation.getToUser().getAvatar()); // 咨询师头像
             info.setStartTime(conversation.getStartTime()); // 开始时间
             info.setEndTime(conversation.getEndTime()); // 结束时间

@@ -4,10 +4,7 @@ import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.AllMessageRequest;
 import org.ecnusmartboys.application.dto.request.command.SynchronizeMsgRequest;
 import org.ecnusmartboys.application.dto.request.query.SingleMsgRequest;
-import org.ecnusmartboys.application.dto.response.AllMsgListResponse;
-import org.ecnusmartboys.application.dto.response.MsgListResponse;
-import org.ecnusmartboys.application.dto.response.Responses;
-import org.ecnusmartboys.application.dto.response.SigResponse;
+import org.ecnusmartboys.application.dto.response.*;
 import org.ecnusmartboys.infrastructure.data.im.IMCallbackParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +44,7 @@ public interface MessageService {
     /**
      * 访客查看咨询记录消息列表
      */
-    Responses<MsgListResponse> getVisitorConsultationMsg(SingleMsgRequest req, Common common);
+    Responses<AllDetailsResponse> getVisitorConsultationMsg(String conversationId, Common common);
 
     /**
      * 督导同步咨询师和访客的聊天记录
