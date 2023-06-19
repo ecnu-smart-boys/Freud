@@ -8,8 +8,10 @@ import org.ecnusmartboys.adaptor.Extractor;
 import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.AvailableConsultant;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
+import org.ecnusmartboys.application.dto.conversation.WxConsultationInfo;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
 import org.ecnusmartboys.application.dto.request.query.OnlineStaffListRequest;
@@ -333,5 +335,13 @@ public class ConversationController {
     public Responses<OnlineStateResponse>  getOnlineVisitorState(HttpServletRequest request) {
         var common = Extractor.extract(request);
         return conversationService.getOnlineVisitorState(common);
+    }
+
+    @AuthRoles(Visitor.ROLE)
+    @ApiOperation("访客查看在线会话")
+    @GetMapping("currentConsultation")
+    public Responses<WxConsultationInfo> getCurrentConsultation(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getCurrentConsultation(common);
     }
 }

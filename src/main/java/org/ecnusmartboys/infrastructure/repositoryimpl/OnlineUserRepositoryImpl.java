@@ -3,6 +3,7 @@ package org.ecnusmartboys.infrastructure.repositoryimpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.OnlineStaffInfo;
+import org.ecnusmartboys.application.dto.conversation.WxConsultationInfo;
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
 import org.ecnusmartboys.application.dto.response.OnlineStateResponse;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
@@ -412,7 +413,6 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             return;
         }
 
-
         // 在线会话中
         response.getConversation().setUserId(visitor.getConsultant().toString());
         long vId = Long.parseLong(visitorId);
@@ -423,6 +423,25 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
         }
 
         response.getConversation().setConversationId(tracker.get(identifier).getConversationId());
+    }
+
+    @Override
+    public void retrieveCurrentConsultationId(String visitorId, WxConsultationInfo info) {
+        var visitor = fetchVisitor(Long.parseLong(visitorId));
+        if(visitor.getConsultant() == OnlineVisitor.NULL_CONSULTANT) {
+            // 没有在线会话
+            return;
+        }
+
+        info.setUserId(visitor.getConsultant().toString());
+        long vId = Long.parseLong(visitorId);
+        long cId = Long.parseLong(info.getUserId());
+        long identifier = ((long) Math.max(cId, vId) << 32) + Math.min(cId, vId);
+        if (!tracker.containsKey(identifier)) {
+            return;
+        }
+
+        info.setConversationId(tracker.get(identifier).getConversationId());
     }
 
 

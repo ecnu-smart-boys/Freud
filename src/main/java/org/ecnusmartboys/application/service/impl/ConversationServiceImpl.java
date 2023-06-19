@@ -11,10 +11,7 @@ import io.github.doocs.im.model.response.SendMsgResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.*;
-import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
-import org.ecnusmartboys.application.dto.conversation.HelpInfo;
-import org.ecnusmartboys.application.dto.conversation.LeftConversation;
-import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
+import org.ecnusmartboys.application.dto.conversation.*;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
@@ -37,6 +34,7 @@ import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
+import org.ecnusmartboys.infrastructure.exception.BusinessException;
 import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -639,19 +637,37 @@ public class ConversationServiceImpl implements ConversationService {
         }
 
         response.setConversation(new LeftConversation());
+        response.getConversation().setEnd(false);
         onlineUserRepository.getCurrentConsultant(common.getUserId(), response);
 
         if(response.getConversation().getConversationId() != null) {
             // 有在线会话
             response.setState(1);
             var conversation = conversationRepository.retrieveById(response.getConversation().getConversationId());
-            response.getConversation().setConversationId(conversation.getId());
+            response.setStartTime(conversation.getStartTime());
             return Responses.ok(response);
         }
 
         // 排队会话
         response.setState(2);
         return Responses.ok(response);
+    }
+
+    @Override
+    public Responses<WxConsultationInfo> getCurrentConsultation(Common common) {
+        WxConsultationInfo info = new WxConsultationInfo();
+        onlineUserRepository.retrieveCurrentConsultationId(common.getUserId(), info);
+        if(info.getConversationId() == null) {
+            throw new BusinessException(402, "没有在线会话");
+        }
+
+        var consultation = conversationRepository.retrieveById(info.getConversationId());
+        var consultant = userRepository.retrieveById(info.getUserId());
+        info.setName(consultant.getName());
+        info.setAvatar(consultant.getAvatar());
+        info.setEnd(false);
+        info.setStartTime(consultation.getStartTime());
+        return Responses.ok(info);
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package org.ecnusmartboys.domain.repository;
 
+import org.ecnusmartboys.application.dto.conversation.WxConsultationInfo;
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
 import org.ecnusmartboys.application.dto.response.OnlineStateResponse;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
@@ -121,4 +122,9 @@ public interface OnlineUserRepository {
      * 在线访客获得当前咨询或排队的咨询师信息
      */
     void getCurrentConsultant(String userId, OnlineStateResponse response);
+
+    /**
+     * 访客获得在线会话
+     */
+    void retrieveCurrentConsultationId(String userId, WxConsultationInfo info);
 }

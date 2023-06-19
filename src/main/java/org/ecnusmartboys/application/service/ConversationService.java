@@ -2,8 +2,10 @@ package org.ecnusmartboys.application.service;
 
 import org.ecnusmartboys.application.dto.AvailableConsultant;
 import org.ecnusmartboys.application.dto.StaffBaseInfo;
+import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 import org.ecnusmartboys.application.dto.conversation.LeftConversation;
 import org.ecnusmartboys.application.dto.conversation.WxConsultRecordInfo;
+import org.ecnusmartboys.application.dto.conversation.WxConsultationInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.*;
 import org.ecnusmartboys.application.dto.request.query.ConsultRecordListReq;
@@ -89,4 +91,6 @@ public interface ConversationService {
 
 
     Responses<OnlineStateResponse> getOnlineVisitorState(Common common);
+
+    Responses<WxConsultationInfo> getCurrentConsultation(Common common);
 }
