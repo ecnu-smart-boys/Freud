@@ -337,17 +337,17 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     }
 
     @Override
-    public int getOnlineConversationNumber(String userId, String role) {
+    public int getOnlineConversationNumber(String userId, String role, int maxConcurrent) {
         if (Objects.equals(role, Consultant.ROLE)) {
             onlineConsultants.add(Long.valueOf(userId)); // 服务器重启后，redis不一致
             OnlineConsultant consultant = fetchConsultant(Long.parseLong(userId));
-            // TODO
+            consultant.setMaxConcurrent(maxConcurrent);
             return consultant.getVisitors().size();
         }
 
         onlineSupervisors.add(Long.valueOf(userId));
         OnlineSupervisor supervisor = fetchSupervisor(Long.parseLong(userId));
-        // TODO
+        supervisor.setMaxConcurrent(maxConcurrent);
         return supervisor.getConsultants().size();
     }
 

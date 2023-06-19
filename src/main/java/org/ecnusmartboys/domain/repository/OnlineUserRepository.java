@@ -98,7 +98,7 @@ public interface OnlineUserRepository {
     /**
      * 获得用户在线会话数
      */
-    int getOnlineConversationNumber(String userId, String role);
+    int getOnlineConversationNumber(String userId, String role, int maxConcurrent);
 
     /**
      * 访客取消排队

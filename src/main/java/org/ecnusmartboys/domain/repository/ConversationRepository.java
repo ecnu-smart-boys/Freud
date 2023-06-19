@@ -68,11 +68,6 @@ public interface ConversationRepository {
      */
     List<Conversation> retrieveConsultationByFromId(String fromId);
 
-//    /**
-//     * 根据访客id，获得所有在线的咨询会话
-//     */
-//    List<Conversation> retrieveOnlineConsultationByFromId(String fromId); TODO
-
     /**
      * 获得这个月的咨询会话排名
      */

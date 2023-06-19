@@ -472,8 +472,12 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<Integer> getOnlineConversationNumber(Common common) {
         User user = userRepository.retrieveById(common.getUserId());
-        var result = onlineUserRepository.getOnlineConversationNumber(common.getUserId(), user.getRole());
-        return Responses.ok(result);
+
+        if(Objects.equals(user.getRole(), Consultant.ROLE)) {
+            return Responses.ok(onlineUserRepository.getOnlineConversationNumber(common.getUserId(), user.getRole(), ((Consultant) user).getMaxConversations()));
+        }
+
+        return Responses.ok(onlineUserRepository.getOnlineConversationNumber(common.getUserId(), user.getRole(), ((Supervisor) user).getMaxConversations()));
     }
 
     @Override

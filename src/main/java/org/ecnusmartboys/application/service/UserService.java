@@ -4,6 +4,7 @@ import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.Common;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     Responses<UserInfo> getUserInfo(Common common);
@@ -17,4 +18,8 @@ public interface UserService {
      */
     void offline(Long userId);
 
+    /**
+     * 保存头像
+     */
+    Responses<String> saveAvatar(MultipartFile file, Common common);
 }

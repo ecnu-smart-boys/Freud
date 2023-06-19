@@ -335,6 +335,11 @@ public class MessageServiceImpl implements MessageService {
                     parseImageContent(msgKey, index, ((TIMImageMsgElement) elements.get(index)).getMsgContent());
                     continue;
                 }
+
+                if(Objects.equals(elements.get(index).getMsgType(), MsgType.TIM_CUSTOM_ELEM)) {
+                    // 自定义消息类型
+                    continue;
+                }
                 // 非法消息类型
                 throw new RuntimeException("非法消息类型");
             }

@@ -6,14 +6,18 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.adaptor.Extractor;
 import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
+import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.UserService;
+import org.ecnusmartboys.domain.model.user.Visitor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileOutputStream;
 
 @Slf4j
 @RestController
@@ -40,5 +44,13 @@ public class UserController {
     public Responses<Object> updateVisitorInfo(@RequestBody @Validated UpdateVisitorRequest req, HttpServletRequest request) {
         var common = Extractor.extract(request);
         return userService.updateVisitorInfo(req, common);
+    }
+
+    @ApiOperation("保存头像")
+    @AuthRoles(Visitor.ROLE)
+    @PostMapping("/saveAvatar")
+    public Responses<String> saveAvatar(MultipartFile file, HttpServletRequest request)  {
+        var common  = Extractor.extract(request);
+        return userService.saveAvatar(file, common);
     }
 }
