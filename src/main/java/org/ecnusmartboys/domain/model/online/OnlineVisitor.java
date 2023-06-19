@@ -3,6 +3,8 @@ package org.ecnusmartboys.domain.model.online;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @Data
 public class OnlineVisitor {
@@ -12,6 +14,8 @@ public class OnlineVisitor {
     private Long consultant;
 
     private Long wait;
+
+    private long startWaitTime;
 
     public OnlineVisitor() {
         consultant = NULL_CONSULTANT;
@@ -33,12 +37,14 @@ public class OnlineVisitor {
         }
 
         this.wait = consultant;
+        this.startWaitTime = new Date().getTime();
         return true;
     }
 
     public long endWaiting() {
         var temp = this.wait;
         this.wait = NULL_CONSULTANT;
+        this.startWaitTime = 0;
         return temp;
     }
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.dto.OnlineStaffInfo;
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
+import org.ecnusmartboys.application.dto.response.OnlineStateResponse;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
 import org.ecnusmartboys.domain.model.online.OnlineConsultant;
 import org.ecnusmartboys.domain.model.online.OnlineSupervisor;
@@ -339,7 +340,7 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
     @Override
     public int getOnlineConversationNumber(String userId, String role, int maxConcurrent) {
         if (Objects.equals(role, Consultant.ROLE)) {
-            onlineConsultants.add(Long.valueOf(userId)); // 服务器重启后，redis不一致
+            onlineConsultants.add(Long.valueOf(userId));
             OnlineConsultant consultant = fetchConsultant(Long.parseLong(userId));
             consultant.setMaxConcurrent(maxConcurrent);
             return consultant.getVisitors().size();
@@ -399,6 +400,29 @@ public class OnlineUserRepositoryImpl implements OnlineUserRepository {
             return null;
         }
         return tracker.get(identifier);
+    }
+
+    @Override
+    public void getCurrentConsultant(String visitorId, OnlineStateResponse response) {
+        var visitor = fetchVisitor(Long.parseLong(visitorId));
+        if(visitor.getConsultant() == OnlineVisitor.NULL_CONSULTANT) {
+            // 排队中
+            response.getConversation().setUserId(visitor.getWait().toString());
+            response.setStartTime(visitor.getStartWaitTime());
+            return;
+        }
+
+
+        // 在线会话中
+        response.getConversation().setUserId(visitor.getConsultant().toString());
+        long vId = Long.parseLong(visitorId);
+        long cId = Long.parseLong(response.getConversation().getUserId());
+        long identifier = ((long) Math.max(cId, vId) << 32) + Math.min(cId, vId);
+        if (!tracker.containsKey(identifier)) {
+            return;
+        }
+
+        response.getConversation().setConversationId(tracker.get(identifier).getConversationId());
     }
 
 

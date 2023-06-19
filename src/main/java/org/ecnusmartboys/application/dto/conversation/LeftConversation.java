@@ -26,4 +26,5 @@ public class LeftConversation {
 
     @ApiModelProperty("会话是否已经结束")
     private boolean isEnd;
+
 }

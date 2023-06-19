@@ -326,4 +326,12 @@ public class ConversationController {
         var common = Extractor.extract(request);
         return conversationService.removeConversation(req, common);
     }
+
+    @AuthRoles(Visitor.ROLE)
+    @ApiOperation("访客获得当前在线会话状态")
+    @GetMapping("onlineState")
+    public Responses<OnlineStateResponse>  getOnlineVisitorState(HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getOnlineVisitorState(common);
+    }
 }

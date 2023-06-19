@@ -1,7 +1,8 @@
 package org.ecnusmartboys.infrastructure.config;
 
-import com.tencentcloudapi.common.Credential;
-import com.tencentcloudapi.sms.v20210111.SmsClient;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.profile.DefaultProfile;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -9,23 +10,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "freud.sms")
+@ConfigurationProperties(prefix = "freud.alisms")
 public class SmsConfig {
 
-    private String secretId;
+    private String accessKeyId;
 
-    private String secretKey;
-
-    private String sdkAppId;
+    private String accessSecret;
 
     private String signName;
 
-    private String templateId;
+    private String templateCode;
 
     @Bean
-    public SmsClient createClient() {
-        Credential cred = new Credential(secretId, secretKey);
-        return new SmsClient(cred, "ap-nanjing");
+    public IAcsClient createClient() {
+        DefaultProfile profile = DefaultProfile.getProfile("default", accessKeyId, accessSecret);
+        return new DefaultAcsClient(profile);
     }
 
 }

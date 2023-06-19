@@ -88,4 +88,5 @@ public interface ConversationService {
     Responses<Object> removeConversation(RemoveConversationRequest req, Common common);
 
 
+    Responses<OnlineStateResponse> getOnlineVisitorState(Common common);
 }

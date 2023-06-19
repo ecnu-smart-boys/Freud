@@ -1,18 +1,25 @@
 package org.ecnusmartboys.infrastructure.utils;
 
-import com.tencentcloudapi.sms.v20210111.SmsClient;
-import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
-import com.tencentcloudapi.sms.v20210111.models.SendSmsResponse;
-import com.tencentcloudapi.sms.v20210111.models.SendStatus;
+import com.alibaba.fastjson.JSON;
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import netscape.javascript.JSObject;
 import org.apache.commons.lang3.StringUtils;
 import org.ecnusmartboys.application.dto.SMSCode;
 import org.ecnusmartboys.infrastructure.config.SmsConfig;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,11 +31,10 @@ public class SmsUtil {
 
 
     private static final String CODE_PREFIX = "smscode:";
-    private static final int CODE_EXPIRE_MINUTES = 10;
+    private static final int CODE_EXPIRE_MINUTES = 5;
     private static final int CODE_LENGTH = 6;
     private static final int CODE_RANGE = 1000000;
     private final RedisUtil redisUtil;
-    private final SmsClient smsClient;
     private final SmsConfig smsConfig;
 
     public SMSCode sendSMSCode(String phone) {
@@ -51,31 +57,35 @@ public class SmsUtil {
     }
 
     private void sendSms(String code, String phone) {
-        SendSmsRequest req = new SendSmsRequest();
-        req.setSmsSdkAppId(smsConfig.getSdkAppId());
-        req.setSignName(smsConfig.getSignName());
-        req.setTemplateId(smsConfig.getTemplateId());
-        /*
-         * {1}为您的登录验证码，请于{2}分钟内填写，如非本人操作，请忽略本短信。
-         */
-        String[] templateParamSet = {code, CODE_EXPIRE_MINUTES + ""};
-        req.setTemplateParamSet(templateParamSet);
-        String[] phoneNumberSet = {"+86" + phone};
-        req.setPhoneNumberSet(phoneNumberSet);
 
+        CommonRequest request = new CommonRequest();
+        request.setMethod(MethodType.POST);
+        // 阿里云服务器域名
+        request.setDomain("dysmsapi.aliyuncs.com");
+        request.setVersion("2017-05-25");
+        request.setAction("SendSms");
+
+        // 短信接收者手机号
+        request.putQueryParameter("PhoneNumbers", phone);
+        // 短信签名
+        request.putQueryParameter("SignName", smsConfig.getSignName());
+        // 模板ID
+        request.putQueryParameter("TemplateCode", smsConfig.getTemplateCode());
+
+        Map<String, String> jsonParam = new HashMap<>();
+        jsonParam.put("code", code);
+
+        request.putQueryParameter("TemplateParam", JSON.toJSONString(jsonParam));
+
+        CommonResponse response = null;
         try {
-            /* 通过 client 对象调用 SendSms 方法发起请求。注意请求方法名与请求对象是对应的
-             * 返回的 res 是一个 SendSmsResponse 类的实例，与请求对象对应 */
-            SendSmsResponse res = smsClient.SendSms(req);
-            for (SendStatus sendStatus : res.getSendStatusSet()) {
-                if (!"Ok".equals(sendStatus.getCode())) {
-                    throw new InternalException("服务器短信发送异常，请稍后重试");
-                }
+            response = smsConfig.createClient().getCommonResponse(request);
+            if(response.getHttpResponse().isSuccess()) {
+                log.info("短信发送成功，手机号：{}，返回结果：{}", phone, response.getData());
             }
-            log.info("短信发送成功，手机号：{}，返回结果：{}", phone, SendSmsResponse.toJsonString(res));
-        } catch (Exception e) {
+        } catch (ClientException e) {
             log.error(e.getMessage(), e);
-            throw new InternalException("服务器短信发送异常，请稍后重试");
+            throw new RuntimeException(e);
         }
     }
 

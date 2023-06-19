@@ -1,6 +1,7 @@
 package org.ecnusmartboys.domain.repository;
 
 import org.ecnusmartboys.application.dto.response.OnlineInfoResponse;
+import org.ecnusmartboys.application.dto.response.OnlineStateResponse;
 import org.ecnusmartboys.domain.model.online.ConversationMsgTracker;
 import org.ecnusmartboys.domain.model.user.User;
 
@@ -116,5 +117,8 @@ public interface OnlineUserRepository {
 
     ConversationMsgTracker fetchTracker(String fromAccount, String toAccount);
 
-
+    /**
+     * 在线访客获得当前咨询或排队的咨询师信息
+     */
+    void getCurrentConsultant(String userId, OnlineStateResponse response);
 }

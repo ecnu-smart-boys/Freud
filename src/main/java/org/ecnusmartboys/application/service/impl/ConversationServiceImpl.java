@@ -182,7 +182,9 @@ public class ConversationServiceImpl implements ConversationService {
 
         // 将该访客插入该咨询师当前咨询队列或等待队列
         if (onlineUserRepository.consultRequest(common.getUserId(), req.getToId())) {
-            return Responses.ok("请排队等待");
+            var consultant = userRepository.retrieveById(req.getToId());
+            return Responses.ok(new LeftConversation("-1", consultant.getId(),
+                    consultant.getName(), consultant.getAvatar(), false));
         }
         // 创建新咨询会话
         var conversation = conversationRepository.startConsultation(common.getUserId(), req.getToId());
@@ -624,6 +626,32 @@ public class ConversationServiceImpl implements ConversationService {
         conversation.setShown(true);
         conversationRepository.remove(conversation.getId());
         return Responses.ok("移除成功");
+    }
+
+    @Override
+    public Responses<OnlineStateResponse> getOnlineVisitorState(Common common) {
+        OnlineStateResponse response = new OnlineStateResponse();
+
+        if(!onlineUserRepository.isVisitorBusy(common.getUserId())) {
+            // 没有排队和在线会话
+            response.setState(0);
+            return Responses.ok(response);
+        }
+
+        response.setConversation(new LeftConversation());
+        onlineUserRepository.getCurrentConsultant(common.getUserId(), response);
+
+        if(response.getConversation().getConversationId() != null) {
+            // 有在线会话
+            response.setState(1);
+            var conversation = conversationRepository.retrieveById(response.getConversation().getConversationId());
+            response.getConversation().setConversationId(conversation.getId());
+            return Responses.ok(response);
+        }
+
+        // 排队会话
+        response.setState(2);
+        return Responses.ok(response);
     }
 
     @NotNull
