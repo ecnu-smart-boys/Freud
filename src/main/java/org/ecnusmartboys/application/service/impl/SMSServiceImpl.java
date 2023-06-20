@@ -32,6 +32,6 @@ public class SMSServiceImpl implements SMSService {
 
         redisUtil.set(key, 1, 1, TimeUnit.MINUTES);
 
-        return Responses.ok("ok", code.getCodeId());
+        return Responses.ok("ok");
     }
 }
