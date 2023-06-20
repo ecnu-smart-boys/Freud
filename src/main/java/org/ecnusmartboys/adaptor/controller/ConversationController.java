@@ -295,6 +295,14 @@ public class ConversationController {
         return conversationService.getAdminConsultationInfo(conversationId, common);
     }
 
+    @AuthRoles(Visitor.ROLE)
+    @ApiOperation("访客查看咨询记录信息")
+    @GetMapping("/details/visitorConsultationInfo")
+    public Responses<WxConversationInfoResponse> getVisitorConsultationInfo(@RequestParam String conversationId, HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return conversationService.getVisitorConsultationInfo(conversationId, common);
+    }
+
     /************************* 查看正在进行的会话详情 *************************/
 
     @AuthRoles({Consultant.ROLE, Supervisor.ROLE})

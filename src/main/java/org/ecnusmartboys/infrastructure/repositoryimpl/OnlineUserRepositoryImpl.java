@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 @Repository
 public class OnlineUserRepositoryImpl implements OnlineUserRepository {
 
-    private static final int SEND_NULL_MSG = 2; // TODO
-    private static final int END_CONVERSATION = 1; // TODO
+    private static final int SEND_NULL_MSG = 20; // TODO
+    private static final int END_CONVERSATION = 10; // TODO
     private final Set<Long> onlineSupervisors;
     private final Set<Long> onlineConsultants;
     private final Set<Long> onlineVisitors;

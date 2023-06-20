@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
+import org.ecnusmartboys.application.dto.conversation.WxConsultationInfo;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +14,7 @@ import org.ecnusmartboys.application.dto.conversation.ConsultationInfo;
 @ApiModel("一次已经结束的会话的基本信息，返回给微信小程序端，不需要有求助记录")
 public class WxConversationInfoResponse {
 
-    private ConsultationInfo consultationInfo;
+    private WxConsultationInfo consultationInfo;
 
     @ApiModelProperty("用户评价分数")
     private int visitorScore;

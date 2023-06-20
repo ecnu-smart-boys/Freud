@@ -53,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw UnauthorizedException.AUTHENTICATION_FAIL;
         }
+        onlineUserRepository.join(user);
         return Responses.ok(userInfoConvertor.fromEntity(user));
     }
 

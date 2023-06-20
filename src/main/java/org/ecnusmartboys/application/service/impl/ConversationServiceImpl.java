@@ -85,7 +85,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<List<WxConsultRecordInfo>> getVisitorConsultations(Common common) {
         List<WxConsultRecordInfo> result = new ArrayList<>();
+        long startTime = new Date().getTime();
         var consultations = conversationRepository.retrieveConsultationByVisitorId(common.getUserId());
+        long endTime = new Date().getTime();
+        log.info("cost time: {} ", endTime - startTime);
         consultations.forEach(conversation -> {
             WxConsultRecordInfo info = new WxConsultRecordInfo();
             info.setConversationId(conversation.getId());
@@ -93,7 +96,8 @@ public class ConversationServiceImpl implements ConversationService {
             info.setStartTime(conversation.getStartTime()); // 开始时间
             info.setEndTime(conversation.getEndTime()); // 结束时间
             info.setConsultantName(conversation.getToUser().getName()); // 咨询师姓名
-            info.setScore(onlineUserRepository.getConsultantState(conversation.getToUser().getId())); // 咨询师状态
+            info.setScore(conversation.getFromUserComment().getScore());
+            info.setState(onlineUserRepository.getConsultantState(conversation.getToUser().getId())); // 咨询师状态
             result.add(info);
         });
         return Responses.ok(result);
@@ -506,6 +510,7 @@ public class ConversationServiceImpl implements ConversationService {
                         availableConsultant.setHasConsulted(true);
                     }
                 }
+                availableConsultant.setAvgComment(score / consultations.size());
             }
 
             availableConsultants.add(availableConsultant);
@@ -577,6 +582,33 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
+    public Responses<WxConversationInfoResponse> getVisitorConsultationInfo(String conversationId, Common common) {
+        var consultation = conversationRepository.retrieveById(conversationId);
+        if(!Objects.equals(consultation.getFromUser().getId(), common.getUserId())) {
+            throw new BadRequestException("你不存在该会话");
+        }
+
+        WxConversationInfoResponse response = new WxConversationInfoResponse();
+
+        WxConsultationInfo info = new WxConsultationInfo();
+        info.setEnd(false);
+        info.setUserId(consultation.getId());
+        info.setName(consultation.getToUser().getName()); // 咨询师名字
+        info.setAvatar(consultation.getToUser().getAvatar()); // 咨询师头像
+        info.setStartTime(consultation.getStartTime());
+
+        if(consultation.getEndTime() != null) {
+            info.setEndTime(consultation.getEndTime());
+            info.setEnd(true);
+            response.setVisitorScore(consultation.getFromUserComment().getScore());
+            response.setVisitorText(consultation.getFromUserComment().getText());
+            response.setConsultantText(consultation.getToUserComment().getText());
+            response.setTag(consultation.getToUserComment().getTag());
+        }
+        return Responses.ok(response);
+    }
+
+    @Override
     public Responses<List<LeftConversation>> getConversationsList(Common common) {
         List<LeftConversation> result = new ArrayList<>();
         var conversations = conversationRepository.retrieveConversationListByToId(common.getUserId());
@@ -638,6 +670,7 @@ public class ConversationServiceImpl implements ConversationService {
 
         response.setConversation(new LeftConversation());
         response.getConversation().setEnd(false);
+        response.setState(2);
         onlineUserRepository.getCurrentConsultant(common.getUserId(), response);
 
         if(response.getConversation().getConversationId() != null) {
@@ -645,11 +678,12 @@ public class ConversationServiceImpl implements ConversationService {
             response.setState(1);
             var conversation = conversationRepository.retrieveById(response.getConversation().getConversationId());
             response.setStartTime(conversation.getStartTime());
-            return Responses.ok(response);
         }
 
-        // 排队会话
-        response.setState(2);
+        var user= userRepository.retrieveById(response.getConversation().getUserId());
+        response.getConversation().setName(user.getName());
+        response.getConversation().setAvatar(user.getAvatar());
+
         return Responses.ok(response);
     }
 

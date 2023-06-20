@@ -81,6 +81,8 @@ public interface ConversationService {
 
     Responses<WebConversationInfoResponse> getAdminConsultationInfo(String conversationId, Common common);
 
+    Responses<WxConversationInfoResponse> getVisitorConsultationInfo(String conversationId, Common common);
+
     Responses<List<LeftConversation>> getConversationsList(Common common);
 
     Responses<WebConversationInfoResponse> getConsultationInfo(String conversationId, Common common);
@@ -93,4 +95,6 @@ public interface ConversationService {
     Responses<OnlineStateResponse> getOnlineVisitorState(Common common);
 
     Responses<WxConsultationInfo> getCurrentConsultation(Common common);
+
+
 }

@@ -40,29 +40,25 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public PageResult<Conversation> retrieveAllConsultations(Long current, Long size, String name, Long timestamp) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectAllConsultation(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)));
-        var conversations = convert2List(conversationDOS, current, size);
-        return new PageResult<>(conversations, conversationDOS.size());
+        List<Conversation> conversations = conversationMapper.selectAllConsultation(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)));
+        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
     }
 
     @Override
     public PageResult<Conversation> retrieveConsultationsByToUser(Long current, Long size, String name, Long timestamp, String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), toId);
-        var conversations = convert2List(conversationDOS, current, size);
-        return new PageResult<>(conversations, conversationDOS.size());
+        List<Conversation> conversations = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), toId);
+        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
     }
 
     @Override
     public PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), supervisorId);
-        var conversations = convert2List(conversationDOS, current, size);
-        return new PageResult<>(conversations, conversationDOS.size());
+        List<Conversation> conversations = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), supervisorId);
+        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
     }
 
     @Override
     public List<Conversation> retrieveConsultationByVisitorId(String visitorId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByVisitorId(visitorId);
-        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+        return conversationMapper.selectConsultationByVisitorId(visitorId, 0L, 1L << 31);
     }
 
     @Override
@@ -89,8 +85,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public List<Conversation> retrieveRecent(String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectRecentByToId(toId);
-        return convert2List(conversationDOS, 0L, 4L);
+        return conversationMapper.selectRecentByToId(toId);
     }
 
     @Override
@@ -170,26 +165,22 @@ public class ConversationRepositoryImpl implements ConversationRepository {
 
     @Override
     public List<Conversation> retrieveConsultationByToId(String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByToId(toId);
-        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+        return conversationMapper.selectConsultationByToId(toId, 0L, 1L << 32);
     }
 
     @Override
     public List<Conversation> retrieveConversationListByToId(String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConversationListByToId(toId);
-        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+        return conversationMapper.selectConversationListByToId(toId);
     }
 
     @Override
     public List<Conversation> retrieveHelpByToId(String toId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectHelpByToId(toId);
-        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+        return conversationMapper.selectHelpByToId(toId);
     }
 
     @Override
     public List<Conversation> retrieveConsultationByFromId(String fromId) {
-        List<ConversationDO> conversationDOS = conversationMapper.selectConsultationByFromId(fromId);
-        return convert2List(conversationDOS, 0L, (long) conversationDOS.size());
+        return  conversationMapper.selectConsultationByFromId(fromId);
     }
 
 

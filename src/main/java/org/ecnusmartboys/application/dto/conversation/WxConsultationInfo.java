@@ -27,4 +27,7 @@ public class WxConsultationInfo {
 
     @ApiModelProperty("开始时间")
     private long startTime;
+
+    @ApiModelProperty("结束时间")
+    private long endTime;
 }
