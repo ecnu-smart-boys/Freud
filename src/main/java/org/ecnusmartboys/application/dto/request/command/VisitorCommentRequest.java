@@ -21,6 +21,6 @@ public class VisitorCommentRequest {
 
     @NotNull(message = "评分不能为空")
     @ApiModelProperty("评分")
-    @Range(min = 0, max = 5, message = ("评分必须是0 - 5之间的一个整数"))
+    @Range(min = 1, max = 5, message = ("评分必须是1 - 5之间的一个整数"))
     private int score;
 }

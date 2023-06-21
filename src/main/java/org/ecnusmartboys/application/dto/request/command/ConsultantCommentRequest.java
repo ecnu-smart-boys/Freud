@@ -22,7 +22,7 @@ public class ConsultantCommentRequest {
 
     @NotNull(message = "评论标识不能为空")
     @ApiModelProperty("评论标识")
-    @Size(max = 255, message = "评论标识不能超过255个字符")
+    @Size(min = 1, max = 255, message = "评论标识必须在1-255个字符之间")
     private String tag;
 
 }

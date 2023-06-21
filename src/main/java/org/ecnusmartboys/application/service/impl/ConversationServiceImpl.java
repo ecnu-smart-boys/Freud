@@ -500,17 +500,23 @@ public class ConversationServiceImpl implements ConversationService {
             availableConsultant.setHasConsulted(false);
 
             var consultations = conversationRepository.retrieveConsultationByToId(user.getId());
-            if (consultations.size() == 0) {
-                availableConsultant.setAvgComment(0);
-            } else {
-                int score = 0;
-                for (var consultation : consultations) {
+            int score = 0;
+            int count = 0;
+            for (var consultation : consultations) {
+                if(consultation.getFromUserComment().getScore() != 0) {
+                    count++;
                     score += consultation.getFromUserComment().getScore();
-                    if (Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
-                        availableConsultant.setHasConsulted(true);
-                    }
                 }
-                availableConsultant.setAvgComment(score / consultations.size());
+                score += consultation.getFromUserComment().getScore();
+                if (Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
+                    availableConsultant.setHasConsulted(true);
+                }
+            }
+
+            if(count != 0) {
+                availableConsultant.setAvgComment(score / count);
+            } else {
+                availableConsultant.setAvgComment(0);
             }
 
             availableConsultants.add(availableConsultant);
@@ -987,4 +993,5 @@ public class ConversationServiceImpl implements ConversationService {
             throw new RuntimeException(e);
         }
     }
+
 }

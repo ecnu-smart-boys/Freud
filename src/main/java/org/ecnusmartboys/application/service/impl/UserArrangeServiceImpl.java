@@ -70,18 +70,22 @@ public class UserArrangeServiceImpl implements UserArrangeService {
             List<Conversation> conversations = conversationRepository.retrieveConsultationByToId(v.getId());
             int totalTime = 0;
             int totalScore = 0;
+            int count = 0;
             for (Conversation conversation : conversations) {
                 totalTime = (int) (totalTime + (conversation.getEndTime() - conversation.getStartTime()));
-                totalScore += conversation.getFromUserComment().getScore();
+                if(conversation.getFromUserComment().getScore() != 0) {
+                    count++;
+                    totalScore += conversation.getFromUserComment().getScore();
+                }
             }
             consultantInfo.setTotalTime(totalTime);
             consultantInfo.setConsultTimes(conversations.size());
 
             // 平均评价
-            if (conversations.size() == 0) {
+            if (count == 0) {
                 consultantInfo.setAvgComment(0);
             } else {
-                consultantInfo.setAvgComment(totalScore / conversations.size());
+                consultantInfo.setAvgComment(totalScore / count);
             }
 
             // 获得绑定的督导

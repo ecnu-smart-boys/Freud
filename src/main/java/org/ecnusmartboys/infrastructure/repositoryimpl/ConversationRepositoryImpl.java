@@ -125,6 +125,7 @@ public class ConversationRepositoryImpl implements ConversationRepository {
             CommentDO commentDO1 = new CommentDO();
             commentDO1.setConversationId(conversationDO.getConversationId());
             commentDO1.setUserId(conversationDO.getFromId());
+            commentDO1.setScore(0); // 默认评价分数
 
             CommentDO commentDO2 = new CommentDO();
             commentDO2.setConversationId(conversationDO.getConversationId());
