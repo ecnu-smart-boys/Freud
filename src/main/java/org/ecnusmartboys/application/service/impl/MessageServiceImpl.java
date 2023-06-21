@@ -48,6 +48,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,7 +99,7 @@ public class MessageServiceImpl implements MessageService {
                     message.setToId(cb.getToAccount());
                     message.setMsgBody(msgBody); // 消息体
                     message.setRevoked(false);
-                    message.setTime(cb.getMsgTime());
+                    message.setTime(new Date().getTime());
                     messageRepository.save(message);
 
                     // 重置超时计时
