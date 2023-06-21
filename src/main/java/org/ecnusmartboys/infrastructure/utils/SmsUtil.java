@@ -3,18 +3,13 @@ package org.ecnusmartboys.infrastructure.utils;
 import com.alibaba.fastjson.JSON;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import netscape.javascript.JSObject;
 import org.apache.commons.lang3.StringUtils;
 import org.ecnusmartboys.application.dto.SMSCode;
 import org.ecnusmartboys.infrastructure.config.SmsConfig;
-import org.ecnusmartboys.infrastructure.exception.InternalException;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

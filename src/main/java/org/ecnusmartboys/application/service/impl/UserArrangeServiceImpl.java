@@ -277,6 +277,7 @@ public class UserArrangeServiceImpl implements UserArrangeService {
         for (String supervisorId : req.getSupervisorIds()) {
             consulvisorRepository.save(new Consulvisor(consultant.getId(), supervisorId));
         }
+        importImUser(consultant);
         return Responses.ok("成功添加咨询师");
     }
 

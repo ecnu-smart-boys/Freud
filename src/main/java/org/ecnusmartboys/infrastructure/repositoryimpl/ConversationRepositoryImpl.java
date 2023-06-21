@@ -1,6 +1,7 @@
 package org.ecnusmartboys.infrastructure.repositoryimpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jayway.jsonpath.internal.function.numeric.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.domain.model.PageResult;
@@ -41,19 +42,33 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     @Override
     public PageResult<Conversation> retrieveAllConsultations(Long current, Long size, String name, Long timestamp) {
         List<Conversation> conversations = conversationMapper.selectAllConsultation(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)));
-        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
+        return new PageResult<>(getSubList(conversations, current, size), conversations.size());
     }
 
     @Override
     public PageResult<Conversation> retrieveConsultationsByToUser(Long current, Long size, String name, Long timestamp, String toId) {
         List<Conversation> conversations = conversationMapper.selectConsultationsByToId(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), toId);
-        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
+        return new PageResult<>(getSubList(conversations, current, size), conversations.size());
     }
 
     @Override
     public PageResult<Conversation> retrieveBoundConsultations(Long current, Long size, String name, Long timestamp, String supervisorId) {
         List<Conversation> conversations = conversationMapper.selectBoundConsultations(name, new SimpleDateFormat("yyyy-MM-dd").format(new Date(timestamp)), supervisorId);
-        return new PageResult<>(conversations.subList((int) (current * size), (int) ((current + 1) * size)), conversations.size());
+        return new PageResult<>(getSubList(conversations, current, size), conversations.size());
+    }
+
+    private List<Conversation> getSubList(List<Conversation> raw, long current, long size) {
+        if(raw.size() == 0) {
+            return raw;
+        }
+
+        int fromIndex = (int) (current * size);
+        if(fromIndex >= raw.size()) {
+            return new ArrayList<>();
+        }
+
+        int toIndex = Math.min(raw.size(), (int) ((current + 1) * size));
+        return raw.subList(fromIndex, toIndex);
     }
 
     @Override
