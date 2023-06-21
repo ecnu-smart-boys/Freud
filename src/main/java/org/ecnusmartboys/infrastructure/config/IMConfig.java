@@ -64,7 +64,7 @@ public class IMConfig {
     }
 
     public void deleteChatRecords(String fromUserId, String toUserId) {
-        String baseURL = "https://xxxxxx/v4/recentcontact/delete";
+        String baseURL = "https://console.tim.qq.com/v4/recentcontact/delete";
         String identifier = "administrator";
         String random = "99999999";
 

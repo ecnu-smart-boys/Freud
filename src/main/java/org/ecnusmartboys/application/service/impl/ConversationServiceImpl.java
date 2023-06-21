@@ -194,6 +194,8 @@ public class ConversationServiceImpl implements ConversationService {
         onlineUserRepository.resetConversation(conversation.getId());
         // 开始跟踪该会话的消息记录
         onlineUserRepository.addConsultation(conversation.getId(), common.getUserId(), req.getToId());
+        // 删除之前的聊天记录
+        imConfig.deleteChatRecords(common.getUserId(), req.getToId());
 
         // ws通知咨询师
         LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -295,6 +297,8 @@ public class ConversationServiceImpl implements ConversationService {
         onlineUserRepository.resetConversation(help.getId());
         // 开始跟踪该会话的消息记录
         onlineUserRepository.addHelp(help.getId(), common.getUserId(), req.getToId(), conversation.getFromUser().getId());
+        // 删除之前的聊天记录
+        imConfig.deleteChatRecords(common.getUserId(), req.getToId());
 
         // ws发消息给督导
         LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
@@ -822,6 +826,8 @@ public class ConversationServiceImpl implements ConversationService {
             onlineUserRepository.resetConversation(conversation.getId());
             // 开始跟踪该会话的消息记录
             onlineUserRepository.addConsultation(conversation.getId(), visitorId, consultantId);
+            // 删除之前的聊天记录
+            imConfig.deleteChatRecords(visitorId, consultantId);
 
             // ws通知双方会话开始
             LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
