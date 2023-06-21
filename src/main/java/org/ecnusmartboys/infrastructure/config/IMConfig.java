@@ -69,7 +69,6 @@ public class IMConfig {
         String random = "99999999";
 
         try {
-
             // 创建请求头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -99,23 +98,7 @@ public class IMConfig {
             outputStream.write(requestBody.toString().getBytes());
             outputStream.flush();
             outputStream.close();
-
-            // 获取响应
-            int responseCode = connection.getResponseCode();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder responseBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                responseBuilder.append(line);
-            }
-            reader.close();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (ProtocolException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
     }
