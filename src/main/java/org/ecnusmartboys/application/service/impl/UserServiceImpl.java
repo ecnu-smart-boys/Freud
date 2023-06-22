@@ -11,6 +11,7 @@ import org.ecnusmartboys.application.convertor.*;
 import org.ecnusmartboys.application.dto.UserInfo;
 import org.ecnusmartboys.application.dto.enums.OnlineState;
 import org.ecnusmartboys.application.dto.request.Common;
+import org.ecnusmartboys.application.dto.request.command.UpdatePsdAndAvatarRequest;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.OnlineStateService;
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
             // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(inputStream.available());
-            String newPath = "avatar/" + common.getUserId() + '_' + file.getOriginalFilename();
+            String newPath = "avatar/" + System.currentTimeMillis() + "/" + file.getOriginalFilename();
             PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(),
                     newPath, inputStream, metadata);
             // 执行文件上传
@@ -114,5 +115,15 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             throw new BusinessException(402, "文件转为字节流失败");
         }
+    }
+
+    @Override
+    public Responses<String> updatePsdAndAvatar(UpdatePsdAndAvatarRequest req, Common common) {
+        var user = userRepository.retrieveById(common.getUserId());
+        user.setAvatar(req.getAvatar());
+        user.setPassword(req.getPassword());
+
+        userRepository.save(user);
+        return Responses.ok("修改成功");
     }
 }

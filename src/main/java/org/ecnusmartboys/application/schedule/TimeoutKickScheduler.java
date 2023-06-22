@@ -24,6 +24,7 @@ public class TimeoutKickScheduler {
         var timeoutUsers = onlineStateService.timeoutKick();
         for (Long userId : timeoutUsers) {
             webSocketServer.close(userId);
+            log.info("websocket关闭 userId: {}", userId);
             var kickRequest = io.github.doocs.im.model.request.KickRequest.builder().userId(userId.toString()).build();
             try {
                 adminClient.account.kick(kickRequest);

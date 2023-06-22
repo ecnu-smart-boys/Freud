@@ -6,18 +6,11 @@ import lombok.Data;
 import okhttp3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -44,11 +37,6 @@ public class IMConfig {
         return genUserSig(userId, EXPIRE);
     }
 
-//    @Bean
-//    public OkHttpClient httpClient() {
-//        return new OkHttpClient();
-//    }
-
     @Bean("adminClient")
     public ImClient adminClient() {
         return ImClient.getInstance(appId, "administrator", secretKey);
@@ -57,13 +45,6 @@ public class IMConfig {
     public String genUserSig(String userid, long expire) throws JSONException {
         return genUserSig(userid, expire, null);
     }
-
-    private String getAuthorization() {
-        long currentTime = System.currentTimeMillis() / 1000;
-        String sign = hmacsha256("administrator", currentTime, EXPIRE, null);
-        return "TLS sig=" + sign + "&identifier=administrator&sdkappid=" + appId + "&random=" + currentTime;
-    }
-
 
     private String hmacsha256(String identifier, long currTime, long expire, String base64Userbuf) {
         String contentToBeSigned = "TLS.identifier:" + identifier + "\n"

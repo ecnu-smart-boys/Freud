@@ -4,13 +4,18 @@ package org.ecnusmartboys.adaptor.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.Super;
 import org.ecnusmartboys.adaptor.Extractor;
 import org.ecnusmartboys.adaptor.annotation.AnonymousAccess;
 import org.ecnusmartboys.adaptor.annotation.AuthRoles;
 import org.ecnusmartboys.application.dto.UserInfo;
+import org.ecnusmartboys.application.dto.request.command.UpdatePsdAndAvatarRequest;
 import org.ecnusmartboys.application.dto.request.command.UpdateVisitorRequest;
 import org.ecnusmartboys.application.dto.response.Responses;
 import org.ecnusmartboys.application.service.UserService;
+import org.ecnusmartboys.domain.model.user.Admin;
+import org.ecnusmartboys.domain.model.user.Consultant;
+import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.Visitor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +52,18 @@ public class UserController {
     }
 
     @ApiOperation("保存头像")
-    @AuthRoles(Visitor.ROLE)
+    @AuthRoles({Visitor.ROLE, Consultant.ROLE, Supervisor.ROLE, Admin.ROLE})
     @PostMapping("/saveAvatar")
     public Responses<String> saveAvatar(MultipartFile file, HttpServletRequest request)  {
         var common  = Extractor.extract(request);
         return userService.saveAvatar(file, common);
+    }
+
+    @ApiOperation("修改密码和头像")
+    @AuthRoles({Consultant.ROLE, Supervisor.ROLE})
+    @PostMapping("updatePsdAndAvatar")
+    public Responses<String> updatePsdAndAvatar(@RequestBody @Validated UpdatePsdAndAvatarRequest req, HttpServletRequest request) {
+        var common = Extractor.extract(request);
+        return userService.updatePsdAndAvatar(req, common);
     }
 }
