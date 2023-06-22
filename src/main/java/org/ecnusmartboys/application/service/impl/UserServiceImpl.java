@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -120,8 +121,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Responses<String> updatePsdAndAvatar(UpdatePsdAndAvatarRequest req, Common common) {
         var user = userRepository.retrieveById(common.getUserId());
+
+        if(!Objects.equals(user.getPassword(), req.getOldPsd())) {
+            throw new BadRequestException("旧密码不正确");
+        }
+
         user.setAvatar(req.getAvatar());
-        user.setPassword(req.getPassword());
+        user.setPassword(req.getNewPsd());
 
         userRepository.save(user);
         return Responses.ok("修改成功");
