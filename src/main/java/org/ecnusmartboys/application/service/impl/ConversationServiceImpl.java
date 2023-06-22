@@ -10,6 +10,7 @@ import io.github.doocs.im.model.request.SendMsgRequest;
 import io.github.doocs.im.model.response.SendMsgResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.ecnusmartboys.application.dto.*;
 import org.ecnusmartboys.application.dto.conversation.*;
 import org.ecnusmartboys.application.dto.request.Common;
@@ -37,12 +38,21 @@ import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.BusinessException;
 import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 @Slf4j
@@ -60,6 +70,8 @@ public class ConversationServiceImpl implements ConversationService {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     @Resource
     IMConfig imConfig;
+
+    private final OkHttpClient httpClient;
 
     @Override
     public Responses<ConsultRecordsResponse> getAllConsultations(ConsultRecordListReq req) {
@@ -195,7 +207,7 @@ public class ConversationServiceImpl implements ConversationService {
         // 开始跟踪该会话的消息记录
         onlineUserRepository.addConsultation(conversation.getId(), common.getUserId(), req.getToId());
         // 删除之前的聊天记录
-        imConfig.deleteChatRecords(common.getUserId(), req.getToId());
+        deleteChatRecords(common.getUserId(), req.getToId());
 
         // ws通知咨询师
         LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -298,7 +310,7 @@ public class ConversationServiceImpl implements ConversationService {
         // 开始跟踪该会话的消息记录
         onlineUserRepository.addHelp(help.getId(), common.getUserId(), req.getToId(), conversation.getFromUser().getId());
         // 删除之前的聊天记录
-        imConfig.deleteChatRecords(common.getUserId(), req.getToId());
+        deleteChatRecords(common.getUserId(), req.getToId());
 
         // ws发消息给督导
         LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
@@ -827,7 +839,7 @@ public class ConversationServiceImpl implements ConversationService {
             // 开始跟踪该会话的消息记录
             onlineUserRepository.addConsultation(conversation.getId(), visitorId, consultantId);
             // 删除之前的聊天记录
-            imConfig.deleteChatRecords(visitorId, consultantId);
+            deleteChatRecords(visitorId, consultantId);
 
             // ws通知双方会话开始
             LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -996,6 +1008,46 @@ public class ConversationServiceImpl implements ConversationService {
                         mapper.writeValueAsString(notify));
             }
         } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteChatRecords(String fromUserId, String toUserId) {
+        String baseURL = "https://console.tim.qq.com/v4/recentcontact/delete";
+        String identifier = "administrator";
+        String random = "99999999";
+
+        try {
+            // 创建请求头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // 构建请求体
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("From_Account", fromUserId);
+            requestBody.put("Type", 1);
+            requestBody.put("To_Account", toUserId);
+            requestBody.put("ClearRamble", 1);
+
+            // 构建请求 URL
+            String requestUrl = baseURL + "?sdkappid=" + imConfig.getAppId() + "&identifier=" + identifier +
+                    "&usersig=" + imConfig.getUserSig(identifier) + "&random=" + random + "&contenttype=json";
+
+            // 创建 URL 对象
+            URL url = new URL(requestUrl);
+
+            // 创建 HttpURLConnection 对象
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // 发送请求体
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(requestBody.toString().getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
     }

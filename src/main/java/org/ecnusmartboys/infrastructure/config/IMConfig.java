@@ -10,20 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.http.MediaType;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -42,17 +35,19 @@ public class IMConfig {
     private String secretKey;
     private String token;
 
-    @Autowired
-    private OkHttpClient httpClient;
+    @Bean
+    public OkHttpClient httpClient() {
+        return new OkHttpClient();
+    }
 
     public String getUserSig(String userId) throws JSONException {
         return genUserSig(userId, EXPIRE);
     }
 
-    @Bean
-    public OkHttpClient httpClient() {
-        return new OkHttpClient();
-    }
+//    @Bean
+//    public OkHttpClient httpClient() {
+//        return new OkHttpClient();
+//    }
 
     @Bean("adminClient")
     public ImClient adminClient() {
@@ -61,46 +56,6 @@ public class IMConfig {
 
     public String genUserSig(String userid, long expire) throws JSONException {
         return genUserSig(userid, expire, null);
-    }
-
-    public void deleteChatRecords(String fromUserId, String toUserId) {
-        String baseURL = "https://console.tim.qq.com/v4/recentcontact/delete";
-        String identifier = "administrator";
-        String random = "99999999";
-
-        try {
-            // 创建请求头
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // 构建请求体
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("From_Account", fromUserId);
-            requestBody.put("Type", 1);
-            requestBody.put("To_Account", toUserId);
-            requestBody.put("ClearRamble", 1);
-
-            // 构建请求 URL
-            String requestUrl = baseURL + "?sdkappid=" + appId + "&identifier=" + identifier +
-                    "&usersig=" + getUserSig(identifier) + "&random=" + random + "&contenttype=json";
-
-            // 创建 URL 对象
-            URL url = new URL(requestUrl);
-
-            // 创建 HttpURLConnection 对象
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-
-            // 发送请求体
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(requestBody.toString().getBytes());
-            outputStream.flush();
-            outputStream.close();
-        } catch (JSONException | IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private String getAuthorization() {
