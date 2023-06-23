@@ -125,14 +125,18 @@ public class ConversationServiceImpl implements ConversationService {
     public Responses<Integer> getAvgComment(Common common) {
         var conversations = conversationRepository.retrieveHelpByToId(common.getUserId());
         int totalScore = 0;
+        int count = 0;
         for (Conversation conversation : conversations) {
-            totalScore += conversation.getFromUserComment().getScore();
+            if(conversation.getFromUserComment().getScore() != 0) {
+                totalScore += conversation.getFromUserComment().getScore();
+                count++;
+            }
         }
 
-        if (totalScore == 0) {
+        if (count == 0) {
             return Responses.ok(0);
         }
-        return Responses.ok(totalScore / conversations.size());
+        return Responses.ok(totalScore / count);
     }
 
     @Override
