@@ -36,7 +36,7 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "(SELECT * FROM conversation " +
             "WHERE end_time IS NOT NULL and (#{date} = '1970-01-01' or DATE(start_time) = #{date}) and is_consultation = 1) AS a, " +
             "(SELECT * FROM sys_user WHERE (#{name} = '' or name LIKE CONCAT('%', #{name}, '%'))) AS b " +
-            "WHERE from_id = id ) "
+            "WHERE from_id = id order by start_time desc ) "
             + commonSQL)
     List<Conversation> selectAllConsultation(String name, String date);
 
@@ -46,7 +46,7 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "(SELECT * FROM conversation " +
             "WHERE end_time IS NOT NULL and to_id = #{toId} and (#{date} = '1970-01-01' or DATE(start_time) = #{date})) AS a, " +
             "(SELECT * FROM sys_user WHERE (#{name} = '' or name LIKE CONCAT('%', #{name}, '%'))) AS b " +
-            "WHERE from_id = id ) " +
+            "WHERE from_id = id order by start_time desc ) " +
             commonSQL)
     List<Conversation> selectConsultationsByToId(String name, String date, String toId);
 
@@ -58,7 +58,7 @@ public interface ConversationMapper extends BaseMapper<ConversationDO> {
             "ON a.consultant_id = b.to_id " +
             "JOIN " +
             "(SELECT * FROM sys_user WHERE (#{name} = '' or name LIKE CONCAT('%', #{name}, '%'))) AS c " +
-            "ON b.from_id = c.id ) " +
+            "ON b.from_id = c.id order by start_time desc ) " +
             commonSQL)
     List<Conversation> selectBoundConsultations(String name, String date, String supervisorId);
 
