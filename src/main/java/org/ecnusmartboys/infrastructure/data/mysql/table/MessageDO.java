@@ -38,8 +38,6 @@ public class MessageDO extends BaseDO {
      */
     private Date time;
 
-    public static final String REVOKED = "is_revoked";
-    @TableField(REVOKED)
     private Boolean revoked;
 
 
