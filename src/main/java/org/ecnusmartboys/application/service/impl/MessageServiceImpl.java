@@ -42,6 +42,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -366,14 +368,13 @@ public class MessageServiceImpl implements MessageService {
             // 下载语音文件到本地
             URL url = new URL(msgContent.getUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
             // 获取输入流
             InputStream inputStream = connection.getInputStream();
-
             // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(inputStream.available());
+            metadata.setContentLength(connection.getContentLength());
             PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), "sound/" + fileName + '.' + extension, inputStream, metadata);
-
             // 执行文件上传
             PutObjectResult putObjectResult = cosConfig.cosClient().putObject(putObjectRequest);
             // 关闭 InputStream
@@ -421,17 +422,18 @@ public class MessageServiceImpl implements MessageService {
                 // 下载图片文件到本地
                 URL url = new URL(imageInfo.getUrl());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
                 // 获取输入流
                 InputStream inputStream = connection.getInputStream();
+
 
                 // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
                 String path = "image/" + fileName + "_" + i + '.' + extension;
                 ObjectMetadata metadata = new ObjectMetadata();
-                metadata.setContentLength(inputStream.available());
-                PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), path, inputStream, metadata);
-
-                // 执行文件上传
+                metadata.setContentLength(connection.getContentLength());
+                PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), "sound/" + fileName + '.' + extension, inputStream, metadata); // 执行文件上传
                 PutObjectResult putObjectResult = cosConfig.cosClient().putObject(putObjectRequest);
+
                 // 关闭 InputStream
                 inputStream.close();
 
