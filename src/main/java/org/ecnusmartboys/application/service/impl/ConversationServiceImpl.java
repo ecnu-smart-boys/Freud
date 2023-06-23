@@ -530,7 +530,7 @@ public class ConversationServiceImpl implements ConversationService {
                     score += consultation.getFromUserComment().getScore();
                 }
                 score += consultation.getFromUserComment().getScore();
-                if (Objects.equals(common.getUserId(), consultation.getFromUserComment().getUserId())) {
+                if (Objects.equals(common.getUserId(), consultation.getToUser().getId())) {
                     availableConsultant.setHasConsulted(true);
                 }
             }

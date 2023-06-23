@@ -315,6 +315,8 @@ public class MessageServiceImpl implements MessageService {
 
         if (!message.getRevoked()) {
             messageInfo.setMsgBody(message.getMsgBody());
+        } else {
+            messageInfo.setMsgBody("");
         }
         return messageInfo;
     }

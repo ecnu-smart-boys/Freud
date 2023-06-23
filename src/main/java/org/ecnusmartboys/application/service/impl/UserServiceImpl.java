@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
         user.setAvatar(req.getAvatar());
         user.setPassword(req.getNewPsd());
 
-        userRepository.save(user);
+        userRepository.update(user);
         return Responses.ok("修改成功");
     }
 }
