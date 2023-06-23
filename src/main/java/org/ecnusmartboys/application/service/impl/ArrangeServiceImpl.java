@@ -53,8 +53,8 @@ public class ArrangeServiceImpl implements ArrangeService {
         }
 
         Date date = new Date(req.getTimestamp());
-        if (!(date.after(new Date()))) {
-            throw new BadRequestException("只能给以后的日期进行排班");
+        if (!date.after(new Date()) && !date.equals(new Date())) {
+            throw new BadRequestException("只能给今天及以后的日期进行排班");
         }
 
         try {
