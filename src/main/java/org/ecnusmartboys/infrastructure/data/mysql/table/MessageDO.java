@@ -16,11 +16,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "message", autoResultMap = true)
+@TableName(value = MessageDO.TABLE_NAME, autoResultMap = true)
 public class MessageDO extends BaseDO {
-
-
-
+    public static final String TABLE_NAME = "message";
     private Long id;
 
     private String msgKey;

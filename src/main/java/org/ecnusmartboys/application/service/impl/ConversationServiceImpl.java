@@ -552,10 +552,6 @@ public class ConversationServiceImpl implements ConversationService {
         if (consultation == null || !Objects.equals(consultation.getHelper().getSupervisor().getId(), common.getUserId())) {
             throw new BadRequestException("该督导不存在这条会话记录");
         }
-        if (consultation.getEndTime() == null) {
-            throw new BadRequestException("该会话尚未结束");
-        }
-
 
         return Responses.ok(convertToWebConversationInfo(consultation));
     }
