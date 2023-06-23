@@ -308,12 +308,12 @@ public class MessageServiceImpl implements MessageService {
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setToId(message.getToId());
         messageInfo.setFromId(message.getFromId());
-        messageInfo.setRevoked(message.isRevoked());
+        messageInfo.setRevoked(message.getRevoked());
         messageInfo.setMsgKey(message.getMsgKey());
         messageInfo.setTime(message.getTime());
         messageInfo.setIterator(message.getIterator() % OFFSET);
 
-        if (!message.isRevoked()) {
+        if (!message.getRevoked()) {
             messageInfo.setMsgBody(message.getMsgBody());
         }
         return messageInfo;
@@ -374,6 +374,7 @@ public class MessageServiceImpl implements MessageService {
             // 创建 PutObjectRequest 对象，并指定输入流和 COS 存储路径
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(connection.getContentLength());
+//            metadata.setContentLength(inputStream.available());
             PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.cosBucket(), "sound/" + fileName + '.' + extension, inputStream, metadata);
 
             // 执行文件上传

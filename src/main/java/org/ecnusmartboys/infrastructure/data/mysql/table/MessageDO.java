@@ -19,6 +19,8 @@ import java.util.Date;
 @TableName(value = "message", autoResultMap = true)
 public class MessageDO extends BaseDO {
 
+
+
     private Long id;
 
     private String msgKey;
@@ -31,9 +33,6 @@ public class MessageDO extends BaseDO {
 
     private Long toId;
 
-    /**
-     * JSON格式
-     */
     private String msgBody;
 
     /**
@@ -41,8 +40,9 @@ public class MessageDO extends BaseDO {
      */
     private Date time;
 
-    @TableField("is_revoked")
-    private boolean revoked;
+    public static final String REVOKED = "is_revoked";
+    @TableField(REVOKED)
+    private Boolean revoked;
 
 
 }

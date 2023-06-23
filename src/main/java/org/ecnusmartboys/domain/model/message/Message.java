@@ -25,7 +25,7 @@ public class Message {
 
     private long time;
 
-    private boolean revoked;
+    private Boolean revoked;
 
 
 }
