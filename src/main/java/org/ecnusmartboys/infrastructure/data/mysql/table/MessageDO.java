@@ -39,6 +39,4 @@ public class MessageDO extends BaseDO {
     private Date time;
 
     private Boolean revoked;
-
-
 }
