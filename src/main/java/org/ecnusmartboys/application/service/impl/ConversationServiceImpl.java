@@ -208,6 +208,7 @@ public class ConversationServiceImpl implements ConversationService {
         onlineUserRepository.addConsultation(conversation.getId(), common.getUserId(), req.getToId());
         // 删除之前的聊天记录
         deleteChatRecords(common.getUserId(), req.getToId());
+        deleteChatRecords(req.getToId(), common.getUserId());
 
         // ws通知咨询师
         LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -311,6 +312,7 @@ public class ConversationServiceImpl implements ConversationService {
         onlineUserRepository.addHelp(help.getId(), common.getUserId(), req.getToId(), conversation.getFromUser().getId());
         // 删除之前的聊天记录
         deleteChatRecords(common.getUserId(), req.getToId());
+        deleteChatRecords(req.getToId(), common.getUserId());
 
         // ws发消息给督导
         LeftConversation notifySupervisor = new LeftConversation(help.getId(), help.getFromUser().getId(),
@@ -840,6 +842,7 @@ public class ConversationServiceImpl implements ConversationService {
             onlineUserRepository.addConsultation(conversation.getId(), visitorId, consultantId);
             // 删除之前的聊天记录
             deleteChatRecords(visitorId, consultantId);
+            deleteChatRecords(consultantId, visitorId);
 
             // ws通知双方会话开始
             LeftConversation notifyConsultant = new LeftConversation(conversation.getId(), conversation.getFromUser().getId(),
@@ -1012,7 +1015,7 @@ public class ConversationServiceImpl implements ConversationService {
         }
     }
 
-    private void deleteChatRecords(String fromUserId, String toUserId) {
+    public void deleteChatRecords(String fromUserId, String toUserId) {
         String baseURL = "https://console.tim.qq.com/v4/recentcontact/delete";
         String identifier = "administrator";
         String random = "99999999";
@@ -1032,7 +1035,7 @@ public class ConversationServiceImpl implements ConversationService {
             // 构建请求 URL
             String requestUrl = baseURL + "?sdkappid=" + imConfig.getAppId() + "&identifier=" + identifier +
                     "&usersig=" + imConfig.getUserSig(identifier) + "&random=" + random + "&contenttype=json";
-
+            System.out.println(requestUrl);
             // 创建 URL 对象
             URL url = new URL(requestUrl);
 
