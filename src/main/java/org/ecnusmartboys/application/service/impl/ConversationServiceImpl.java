@@ -22,6 +22,7 @@ import org.ecnusmartboys.application.dto.ws.EndConsultationNotification;
 import org.ecnusmartboys.application.dto.ws.EndHelpNotification;
 import org.ecnusmartboys.application.dto.ws.Notify;
 import org.ecnusmartboys.application.service.ConversationService;
+import org.ecnusmartboys.domain.model.arrangement.Arrangement;
 import org.ecnusmartboys.domain.model.conversation.Conversation;
 import org.ecnusmartboys.domain.model.conversation.ConversationInfo;
 import org.ecnusmartboys.domain.model.conversation.Help;
@@ -29,10 +30,7 @@ import org.ecnusmartboys.domain.model.user.Consultant;
 import org.ecnusmartboys.domain.model.user.Consulvisor;
 import org.ecnusmartboys.domain.model.user.Supervisor;
 import org.ecnusmartboys.domain.model.user.User;
-import org.ecnusmartboys.domain.repository.ConsulvisorRepository;
-import org.ecnusmartboys.domain.repository.ConversationRepository;
-import org.ecnusmartboys.domain.repository.OnlineUserRepository;
-import org.ecnusmartboys.domain.repository.UserRepository;
+import org.ecnusmartboys.domain.repository.*;
 import org.ecnusmartboys.infrastructure.config.IMConfig;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.BusinessException;
@@ -54,6 +52,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -62,6 +61,7 @@ public class ConversationServiceImpl implements ConversationService {
 
     private final static long ONE_DAY = 24 * 60 * 60 * 1000L;
     private final ConversationRepository conversationRepository;
+    private final ArrangementRepository arrangementRepository;
     private final UserRepository userRepository;
     private final ConsulvisorRepository consulvisorRepository;
     private final OnlineUserRepository onlineUserRepository;
@@ -255,11 +255,16 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Responses<List<StaffBaseInfo>> getAvailableSupervisors(Common common) {
         var consulvisors = consulvisorRepository.retrieveByConId(common.getUserId());
+        // 获得今日排班列表
+        Set<String> todayUserId = arrangementRepository.retrieveByDate(new Date())
+                .stream()
+                .map(Arrangement::getUserId)
+                .collect(Collectors.toSet());
         List<StaffBaseInfo> infos = new ArrayList<>();
 
         Set<String> ids = onlineUserRepository.retrieveAvailableSupervisors(common.getUserId());
         consulvisors.forEach(consulvisor -> {
-            if (ids.contains(consulvisor.getSupervisorId())) {
+            if (ids.contains(consulvisor.getSupervisorId()) && todayUserId.contains(consulvisor.getSupervisorId())) {
                 User user = userRepository.retrieveById(consulvisor.getSupervisorId());
                 infos.add(new StaffBaseInfo(user.getId(), user.getName(), user.getAvatar()));
             }
@@ -508,40 +513,47 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Responses<List<AvailableConsultant>> getAvailableConsultants(Common common) {
+        Set<String> todayUserId = arrangementRepository.retrieveByDate(new Date())
+                .stream()
+                .map(Arrangement::getUserId)
+                .collect(Collectors.toSet());
+
         List<AvailableConsultant> availableConsultants = new ArrayList<>();
         var response = onlineUserRepository.getOnlineConsultantsInfo(0, 100);
         var consultants = response.getStaffs();
         consultants.forEach(consultant -> {
-            AvailableConsultant availableConsultant = new AvailableConsultant();
-            availableConsultant.setState(consultant.getState());
-            availableConsultant.setConsultantId(consultant.getUserId());
+            if(todayUserId.contains(consultant.getUserId())) {
+                AvailableConsultant availableConsultant = new AvailableConsultant();
+                availableConsultant.setState(consultant.getState());
+                availableConsultant.setConsultantId(consultant.getUserId());
 
-            var user = userRepository.retrieveById(consultant.getUserId());
-            availableConsultant.setName(user.getName());
-            availableConsultant.setAvatar(user.getAvatar());
-            availableConsultant.setHasConsulted(false);
+                var user = userRepository.retrieveById(consultant.getUserId());
+                availableConsultant.setName(user.getName());
+                availableConsultant.setAvatar(user.getAvatar());
+                availableConsultant.setHasConsulted(false);
 
-            var consultations = conversationRepository.retrieveConsultationByToId(user.getId());
-            int score = 0;
-            int count = 0;
-            for (var consultation : consultations) {
-                if(consultation.getFromUserComment().getScore() != 0) {
-                    count++;
-                    score += consultation.getFromUserComment().getScore();
+                var consultations = conversationRepository.retrieveConsultationByToId(user.getId());
+                int score = 0;
+                int count = 0;
+                for (var consultation : consultations) {
+                    if(consultation.getFromUserComment().getScore() != 0) {
+                        count++;
+                        score += consultation.getFromUserComment().getScore();
+                    }
+
+                    if (Objects.equals(common.getUserId(), consultation.getToUser().getId())) {
+                        availableConsultant.setHasConsulted(true);
+                    }
                 }
 
-                if (Objects.equals(common.getUserId(), consultation.getToUser().getId())) {
-                    availableConsultant.setHasConsulted(true);
+                if(count != 0) {
+                    availableConsultant.setAvgComment(score / count);
+                } else {
+                    availableConsultant.setAvgComment(0);
                 }
-            }
 
-            if(count != 0) {
-                availableConsultant.setAvgComment(score / count);
-            } else {
-                availableConsultant.setAvgComment(0);
+                availableConsultants.add(availableConsultant);
             }
-
-            availableConsultants.add(availableConsultant);
         });
         return Responses.ok(availableConsultants);
     }
