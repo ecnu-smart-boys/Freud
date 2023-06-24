@@ -1,6 +1,6 @@
 package org.ecnusmartboys.adaptor.annotation;
 
-import org.ecnusmartboys.adaptor.validator.IdNumberValidator;
+import org.ecnusmartboys.application.validator.IdNumberValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

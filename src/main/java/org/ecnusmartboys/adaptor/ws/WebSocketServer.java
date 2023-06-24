@@ -1,4 +1,4 @@
-package org.ecnusmartboys.infrastructure.ws;
+package org.ecnusmartboys.adaptor.ws;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

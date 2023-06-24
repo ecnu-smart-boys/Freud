@@ -29,7 +29,7 @@ import org.ecnusmartboys.domain.repository.OnlineUserRepository;
 import org.ecnusmartboys.domain.repository.UserRepository;
 import org.ecnusmartboys.infrastructure.exception.BadRequestException;
 import org.ecnusmartboys.infrastructure.exception.InternalException;
-import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
+import org.ecnusmartboys.adaptor.ws.WebSocketServer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

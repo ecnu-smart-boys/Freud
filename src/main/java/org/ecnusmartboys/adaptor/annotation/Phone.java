@@ -1,6 +1,6 @@
 package org.ecnusmartboys.adaptor.annotation;
 
-import org.ecnusmartboys.adaptor.validator.PhoneValidator;
+import org.ecnusmartboys.application.validator.PhoneValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

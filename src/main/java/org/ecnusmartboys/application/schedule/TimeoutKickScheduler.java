@@ -4,7 +4,7 @@ import io.github.doocs.im.ImClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ecnusmartboys.application.service.OnlineStateService;
-import org.ecnusmartboys.infrastructure.ws.WebSocketServer;
+import org.ecnusmartboys.adaptor.ws.WebSocketServer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

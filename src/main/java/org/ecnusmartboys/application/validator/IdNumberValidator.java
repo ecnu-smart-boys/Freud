@@ -1,4 +1,4 @@
-package org.ecnusmartboys.adaptor.validator;
+package org.ecnusmartboys.application.validator;
 
 import org.ecnusmartboys.adaptor.annotation.IdNumber;
 import org.ecnusmartboys.infrastructure.utils.Validator;
