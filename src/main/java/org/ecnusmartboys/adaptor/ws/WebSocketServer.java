@@ -83,7 +83,7 @@ public class WebSocketServer extends TextWebSocketHandler {
         Long userId = (Long) session.getAttributes().get("userId");
         log.debug("WebSocket connection closed for userId {}", userId);
 
-        sessionMap.remove(userId);
+//        sessionMap.remove(userId);
 
         userService.offline(userId);
     }
