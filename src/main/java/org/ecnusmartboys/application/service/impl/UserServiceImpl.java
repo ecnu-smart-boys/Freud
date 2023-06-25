@@ -84,8 +84,8 @@ public class UserServiceImpl implements UserService {
         onlineStateService.setUserState(userId, OnlineState.OFFLINE);
         var kickRequest = KickRequest.builder().userId(userId.toString()).build();
         try {
-            adminClient.account.kick(kickRequest);
-        } catch (IOException e) {
+//            adminClient.account.kick(kickRequest);
+        } catch (Exception e) {
             log.error("IM踢下线失败, userId {}, {}", userId, e.getMessage());
         }
     }
