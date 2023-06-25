@@ -70,9 +70,15 @@ freud:
     app-id:
     secret-key:
     token:
-  sms:
+  cos:
     secretId:
     secretKey:
-    sdkAppId:
+    region:
+    bucket:
+  alisms:
+    accessKeyId:
+    accessSecret:
+    enable:
+    templateCode:
     signName:
-    templateId:
+

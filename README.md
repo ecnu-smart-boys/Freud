@@ -14,16 +14,21 @@ IDEA启动配置Active Profiles填写local, dev
 # example application-local.yaml
 freud:
   weixin:
-    app-id: 
-    secret: 
+    app-id:
+    secret:
   im:
-    app-id: 
-    secret-key: 
-    token: 
-  sms:
+    app-id:
+    secret-key:
+    token:
+  cos:
     secretId:
     secretKey:
-    sdkAppId:
-    signName:
-    templateId:
+    region:
+    bucket:
+  alisms:
+    accessKeyId:
+    accessSecret:
+    enable:
+    templateCode:
+    signName: 
 ```

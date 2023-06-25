@@ -19,7 +19,7 @@ public class SwaggerConfig {
                 .host("ecnu.xhpolaris.com")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("org.ecnusmartboys.api.controller"))
+                .apis(RequestHandlerSelectors.basePackage("org.ecnusmartboys.adaptor.controller"))
                 // .paths(PathSelectors.any()) // 选择所有的API,如果你想只为部分API生成文档，可以配置这里
                 .build();
     }
